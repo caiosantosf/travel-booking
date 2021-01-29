@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link, useHistory } from "react-router-dom"
 import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
-import { PencilSquare, ChevronDoubleLeft, ChevronDoubleRight, ChevronRight, ChevronLeft } from 'react-bootstrap-icons'
+import { PencilSquare, ChevronDoubleLeft, ChevronDoubleRight, ChevronRight, ChevronLeft, Whatsapp } from 'react-bootstrap-icons'
 import { api } from '../../config/api'
 
 function Users() {
@@ -61,25 +61,36 @@ function Users() {
 
             <h5>Visualização de Usuários</h5>
           
-            <table className="table table-sm table-striped table-hover">
-              <thead>
-                <tr key="0">
-                  <th scope="col">Descrição</th>
-                  <th scope="col">Assentos</th>
-                  <th scope="col">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map(user => {
-                  return (
-                    <tr key={user.id}>
-                      <td>{user.name}</td>
-                      <td><Link className="me-2" to={`/usuarios/${user.id}`}><PencilSquare /></Link></td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+            <div className="table-responsive-sm">
+              <table className="table table-responsive-sm table-sm table-striped table-hover">
+                <thead>
+                  <tr key="0">
+                    <th scope="col">Nome</th>
+                    <th scope="col">CPF</th>
+                    <th scope="col">Telefone</th>
+                    <th scope="col">Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map(user => {
+                    const phoneLen = user.phone.length
+                    return (
+                      <tr key={user.id}>
+                        <td>{user.name}</td>
+                        <td>{user.cpf}</td>
+                        <td>
+                          {`(${user.phone.substr(0, 2)}) ${user.phone.substr(2, phoneLen === 10 ? 4: 5)}-${user.phone.substr(phoneLen === 10 ? 6: 7, 4)}`}
+                          <a className='ms-2' href={`https://api.whatsapp.com/send?phone=55${user.phone}`} target="_blank" rel="noreferrer">
+                            <Whatsapp style={{color:'green'}} />
+                          </a>
+                        </td>
+                        <td><Link to={`/usuarios/${user.id}`}><PencilSquare /> </Link></td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
 
             <nav aria-label="Page navigation example">
               <ul className="pagination">

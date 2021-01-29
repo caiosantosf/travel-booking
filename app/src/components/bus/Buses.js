@@ -60,78 +60,76 @@ function Buses() {
 
   return (
     <React.Fragment>
-      <div className="container-fluid">
-        <div className="row">
-          <NavHeader />
-          
-          <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <Sidebar pageType="admin"/>
+      <NavHeader />
+      
+      <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <Sidebar pageType="admin"/>
 
-            <h5>Cadastro de ônibus</h5>
-          
-            <table className="table table-sm table-striped table-hover">
-              <thead>
-                <tr key="0">
-                  <th scope="col">Descrição</th>
-                  <th scope="col">Assentos</th>
-                  <th scope="col">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {buses.map(bus => {
-                  return (
-                    <tr key={bus.id}>
-                      <td>{bus.description}</td>
-                      <td>{countSeats(bus.layout.seats)}</td>
-                      <td><Link className="me-2" to={`/onibus/${bus.id}`}><PencilSquare /></Link></td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+        <h5>Cadastro de ônibus</h5>
+      
+        <div className="table-responsive-sm">
+          <table className="table table-sm table-striped table-hover">
+            <thead>
+              <tr key="0">
+                <th scope="col">Descrição</th>
+                <th scope="col">Assentos</th>
+                <th scope="col">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {buses.map(bus => {
+                return (
+                  <tr key={bus.id}>
+                    <td>{bus.description}</td>
+                    <td>{countSeats(bus.layout.seats)}</td>
+                    <td><Link className="me-2" to={`/onibus/${bus.id}`}><PencilSquare /></Link></td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
 
-            <nav aria-label="Page navigation example">
-              <ul className="pagination">
-                <li className="page-item">
-                  <button type="button" className="btn btn-outline-primary m-1" 
-                    disabled={currentPage === 1 ? true : false}
-                    onClick={handleFirst}><ChevronDoubleLeft />
-                  </button>
-                </li>
-
-                <li className="page-item">
-                  <button type="button" className="btn btn-outline-primary m-1" 
-                    disabled={currentPage === 1 ? true : false}
-                    onClick={handlePrevious}><ChevronLeft />
-                  </button>
-                </li>
-
-                <li className="page-item">
-                  <button type="button" className="btn btn-outline-primary m-1" 
-                    disabled={currentPage === lastPage ? true : false}
-                    onClick={handleNext}><ChevronRight />
-                  </button>
-                </li>
-
-                <li className="page-item">
-                  <button type="button" className="btn btn-outline-primary m-1" 
-                    disabled={currentPage === lastPage ? true : false}
-                    onClick={handleLast}><ChevronDoubleRight />
-                  </button>
-                </li>
-
-              </ul>
-            </nav>
-
-            <div className="text-center d-grid gap-2">
-              <button type="button" 
-                      className="btn btn-primary"
-                      onClick={handleNew}>
-                Novo
+        <nav aria-label="Page navigation example">
+          <ul className="pagination">
+            <li className="page-item">
+              <button type="button" className="btn btn-outline-primary m-1" 
+                disabled={currentPage === 1 ? true : false}
+                onClick={handleFirst}><ChevronDoubleLeft />
               </button>
+            </li>
 
-            </div>
-          </div>
+            <li className="page-item">
+              <button type="button" className="btn btn-outline-primary m-1" 
+                disabled={currentPage === 1 ? true : false}
+                onClick={handlePrevious}><ChevronLeft />
+              </button>
+            </li>
+
+            <li className="page-item">
+              <button type="button" className="btn btn-outline-primary m-1" 
+                disabled={currentPage === lastPage ? true : false}
+                onClick={handleNext}><ChevronRight />
+              </button>
+            </li>
+
+            <li className="page-item">
+              <button type="button" className="btn btn-outline-primary m-1" 
+                disabled={currentPage === lastPage ? true : false}
+                onClick={handleLast}><ChevronDoubleRight />
+              </button>
+            </li>
+
+          </ul>
+        </nav>
+
+        <div className="text-center d-grid gap-2">
+          <button type="button" 
+                  className="btn btn-primary"
+                  onClick={handleNew}>
+            Novo
+          </button>
+
         </div>
       </div>
     </React.Fragment>

@@ -5,6 +5,12 @@ function Sidebar(props) {
 
   let links = []
 
+  if (props.pageType === 'register') {
+    links = [
+              { key: 1, name: 'Login', to: '/' },
+            ]
+  }
+
   if (props.pageType === 'admin') {
     links = [
               { key: 1, name: 'Página Inicial', to: '/admin-inicial' },

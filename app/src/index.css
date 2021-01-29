@@ -12,6 +12,10 @@ code {
     monospace;
 }
 
+td {
+  white-space:nowrap;
+}
+
 .btn-primary {
   background-color: #434596 !important; 
   border-color: #434596 !important;
@@ -33,6 +37,11 @@ code {
 }
 
 /* Nav & SideBar */
+
+.navbar .navbar-toggler {
+  top: .25rem;
+  right: 1rem;
+}
 
 .feather {
   width: 16px;
