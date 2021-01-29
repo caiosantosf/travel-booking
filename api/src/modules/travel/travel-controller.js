@@ -4,33 +4,33 @@ module.exports = {
 
   async getMany (req, res) {
     const { currentpage: currentPage } = req.headers
-    const buses = await db('buses')
-                          .orderBy('description')
+    const travels = await db('travels')
+                          .orderBy('departure', 'desc')
                           .paginate({ perPage: 10, currentPage, isLengthAware: true })
 
-    if (buses.hasOwnProperty('data')) {
-      if (buses.data.length) {
-        return res.status(200).json(buses)
+    if (travels.hasOwnProperty('data')) {
+      if (travels.data.length) {
+        return res.status(200).json(travels)
       }
     }
-    return res.status(204).json({ message: 'Não existem ônibus cadastrados' })
+    return res.status(204).json({ message: 'Não existem viagens cadastradas' })
   },
 
   async getOne (req, res) {
     const { id } = req.params
-    const bus = await db('buses').where({ id })
+    const travel = await db('travels').where({ id })
 
-    if (bus.length) {
-      return res.status(200).json(bus[0])
+    if (travel.length) {
+      return res.status(200).json(travel[0])
     }
-    return res.status(404).json({ message: 'Ônibus não encontrato'})
+    return res.status(404).json({ message: 'Viagem não encontrada'})
   },
 
   async post (req, res) {
     const data = req.body
 
     try {
-      const id = await db('buses').insert(data).returning('id')
+      const id = await db('travels').insert(data).returning('id')
       return res.status(201).json({ id: id[0] })
     } catch (error) {
       return res.status(400).json({ message: 'Ocorreu um erro não identificado', error })
@@ -41,11 +41,11 @@ module.exports = {
     const { id } = req.params
     const data = req.body
     try {
-      const result = await db('buses').where({ id }).update({ id, ...data })
+      const result = await db('travels').where({ id }).update({ id, ...data })
       if (result) {
-        return res.status(200).json({ message : 'Ônibus salvo com sucesso'})
+        return res.status(200).json({ message : 'Viagem salva com sucesso'})
       }
-      return res.status(404).json({ message: 'Ônibus não encontrato'})
+      return res.status(404).json({ message: 'Viagem não encontrada'})
     } catch (error) {
       return res.status(500).json({ message: 'Ocorreu um erro não identificado', error })     
     }
@@ -53,11 +53,11 @@ module.exports = {
 
   async destroy (req, res) {
     const { id } = req.params
-    const result = await db('buses').where({ id }).del()
+    const result = await db('travels').where({ id }).del()
 
     if (result) {
-      return res.status(200).json({ message: 'Ônibus excluído com sucesso'})
+      return res.status(200).json({ message: 'Viagem excluída com sucesso'})
     }
-    return res.status(404).json({ message: 'Ônibus não encontrato'})
+    return res.status(404).json({ message: 'Viagem não encontrada'})
   }
 }

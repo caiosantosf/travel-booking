@@ -79,7 +79,7 @@ module.exports = {
     if (user.length) {
       return res.status(200).json(user[0])
     }
-    return res.status(404).json({ message: 'Usuário não encontrato'})
+    return res.status(404).json({ message: 'Usuário não encontrado'})
   },
 
   async post (req, res) {
@@ -104,7 +104,7 @@ module.exports = {
       if (result) {
         return res.status(200).json({ message : 'Usuário alterado'})
       }
-      return res.status(404).json({ message: 'Usuário não encontrato'})
+      return res.status(404).json({ message: 'Usuário não encontrado'})
     } catch (error) {
       const message = dbErrors(error)
       return res.status(500).json(message)     
@@ -124,7 +124,7 @@ module.exports = {
       }
       return res.status(400).json({ email: 'Houve um problema ao enviar o email de recuperação de senha. Contate a empresa.'})
     }
-    return res.status(404).json({ email: 'Não foi encontrato nenhum Usuário com esse email'})
+    return res.status(404).json({ email: 'Não foi encontrado nenhum Usuário com esse email'})
     
   },
 
@@ -135,6 +135,6 @@ module.exports = {
     if (result) {
       return res.status(200).json({ message: 'Usuário excluído'})
     }
-    return res.status(404).json({ message: 'Usuário não encontrato'})
+    return res.status(404).json({ message: 'Usuário não encontrado'})
   }
 }

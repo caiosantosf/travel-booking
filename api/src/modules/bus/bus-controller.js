@@ -23,7 +23,7 @@ module.exports = {
     if (bus.length) {
       return res.status(200).json(bus[0])
     }
-    return res.status(404).json({ message: 'Ônibus não encontrato'})
+    return res.status(404).json({ message: 'Ônibus não encontrado'})
   },
 
   async post (req, res) {
@@ -45,7 +45,7 @@ module.exports = {
       if (result) {
         return res.status(200).json({ message : 'Ônibus salvo com sucesso'})
       }
-      return res.status(404).json({ message: 'Ônibus não encontrato'})
+      return res.status(404).json({ message: 'Ônibus não encontrado'})
     } catch (error) {
       return res.status(500).json({ message: 'Ocorreu um erro não identificado', error })     
     }
@@ -58,6 +58,6 @@ module.exports = {
     if (result) {
       return res.status(200).json({ message: 'Ônibus excluído com sucesso'})
     }
-    return res.status(404).json({ message: 'Ônibus não encontrato'})
+    return res.status(404).json({ message: 'Ônibus não encontrado'})
   }
 }
