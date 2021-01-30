@@ -1,5 +1,16 @@
 const db = require('../../database/connection')
 
+const dbErrors = error => {
+  let message = { message : 'Ocorreu um erro não identificado', error}
+  if (error.hasOwnProperty('constraint')) {
+    if (error.constraint === 'travels_bus_id_foreign') {
+      message = { bus_id : 'O ônibus não existe!' }
+    }
+  }
+  return message
+}
+
+
 module.exports = {
 
   async getMany (req, res) {
@@ -28,18 +39,20 @@ module.exports = {
 
   async post (req, res) {
     const data = req.body
-
+    data.departure = new Date(data.departure)
     try {
       const id = await db('travels').insert(data).returning('id')
       return res.status(201).json({ id: id[0] })
     } catch (error) {
-      return res.status(400).json({ message: 'Ocorreu um erro não identificado', error })
+      const message = dbErrors(error)
+      return res.status(400).json(message)
     }
   },
 
   async put (req, res) {
     const { id } = req.params
     const data = req.body
+    data.departure = new Date(data.departure)
     try {
       const result = await db('travels').where({ id }).update({ id, ...data })
       if (result) {
@@ -47,7 +60,8 @@ module.exports = {
       }
       return res.status(404).json({ message: 'Viagem não encontrada'})
     } catch (error) {
-      return res.status(500).json({ message: 'Ocorreu um erro não identificado', error })     
+      const message = dbErrors(error)
+      return res.status(400).json(message)
     }
   },
 

@@ -24,7 +24,7 @@ const validation = (fields) => {
     }
 
     if (fields.includes('destination')) {
-      if ( (typeof t !== 'undefined') && (destination.trim() !== '') ) {
+      if ( (typeof destination !== 'undefined') && (destination.trim() !== '') ) {
         if (destination.length > 255) {
           messages.destination = 'O Destino não pode ter mais do que 255 caracteres'
         }
@@ -66,10 +66,10 @@ const validation = (fields) => {
     if (fields.includes('days')) {
       if ( (typeof days !== 'undefined') && (days.trim() !== '') ) {
         if (isNaN(days) || (!days)) {
-          messages.days = 'O Valor não é valido'
+          messages.days = 'Os dias não são validos'
         }
       } else {
-        messages.days = 'O Valor é obrigatório'
+        messages.days = 'Os dias são obrigatório'
       }
     }
     
