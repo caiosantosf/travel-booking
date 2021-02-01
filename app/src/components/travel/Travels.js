@@ -4,6 +4,7 @@ import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
 import { PencilSquare, ChevronDoubleLeft, ChevronDoubleRight, ChevronRight, ChevronLeft } from 'react-bootstrap-icons'
 import { api } from '../../config/api'
+import { dateTimeBrazil } from '../../config/transformations'
 
 function Travels() {
   const [travels, setTravels] = useState([])
@@ -51,14 +52,14 @@ function Travels() {
   }
 
   const handleNew = async () => {
-    history.push('/onibus/novo')
+    history.push('/viagens/novo')
   }
 
   return (
     <React.Fragment>
       <NavHeader />
-      
-      <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <div className="container-fluid">
+        <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <Sidebar pageType="admin"/>
 
         <h5>Cadastro de viagens</h5>
@@ -75,12 +76,15 @@ function Travels() {
             </thead>
             <tbody>
               {travels.map(travel => {
+                const { id, description, destination, departure } = travel
+                const departureFormatted = dateTimeBrazil(departure)
+                
                 return (
-                  <tr key={travel.id}>
-                    <td>{travel.description}</td>
-                    <td>{travel.destination}</td>
-                    <td>{travel.departure}</td>
-                    <td><Link className="me-2" to={`/viagem/${travel.id}`}><PencilSquare /></Link></td>
+                  <tr key={id}>
+                    <td>{description}</td>
+                    <td>{destination}</td>
+                    <td>{departureFormatted}</td>
+                    <td><Link className="me-2" to={`/viagens/${id}`}><PencilSquare /></Link></td>
                   </tr>
                 )
               })}
@@ -129,6 +133,7 @@ function Travels() {
           </button>
 
         </div>
+      </div>
       </div>
     </React.Fragment>
   )

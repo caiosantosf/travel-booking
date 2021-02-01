@@ -11,6 +11,7 @@ import Admin              from './components/admin/AdminHome'
 import Buses              from './components/bus/Buses'
 import Bus                from './components/bus/Bus'
 import Travels            from './components/travel/Travels'
+import Travel             from './components/travel/Travel'
 
 export default function Routes() {
   return (
@@ -21,6 +22,7 @@ export default function Routes() {
         <Route path="/email-redefine-senha" exact component={EmailResetPassword} />
         <Route path="/redefine-senha/:id"         component={ResetPassword} />
         <Route path="/viagens/"             exact component={Travels} />
+        <Route path="/viagens/:id"                component={Travel} />
         <Route path="/inicial/"             exact component={UserHome} />
         <Route path="/admin-inicial/"       exact component={Admin} />
         <Route path="/registro/"            exact component={User} />

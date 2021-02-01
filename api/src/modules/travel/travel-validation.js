@@ -54,7 +54,7 @@ const validation = (fields) => {
     }
 
     if (fields.includes('bus_id')) {
-      if ( (typeof bus_id !== 'undefined') && (bus_id.trim() !== '') ) {
+      if (typeof bus_id !== 'undefined') {
         if (isNaN(bus_id) || (!bus_id)) {
           messages.bus_id = 'O Ônibus não é valido'
         }
@@ -64,7 +64,7 @@ const validation = (fields) => {
     }
 
     if (fields.includes('days')) {
-      if ( (typeof days !== 'undefined') && (days.trim() !== '') ) {
+      if (typeof days !== 'undefined') {
         if (isNaN(days) || (!days)) {
           messages.days = 'Os dias não são validos'
         }

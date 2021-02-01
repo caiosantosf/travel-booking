@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom"
 import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
 import { api } from '../../config/api'
+import { dateTimeDefault } from '../../config/transformations'
 
 function Travel(props) {
   const [loadingSave, setLoadingSave] = useState(false)
@@ -10,11 +11,14 @@ function Travel(props) {
   const [travel, setTravel] = useState({description: '', layout: {seats: []}})
   const [error, setError] = useState({})
   const [message, setMessage] = useState('')
-  const [seats, setSeats] = useState(4)
 
   let history = useHistory()
 
   const { id } = props.match.params
+
+  const config = { headers :{
+    'x-access-token' : localStorage.getItem('token')
+  }}
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,8 +27,11 @@ function Travel(props) {
           { headers :{
             'x-access-token' : localStorage.getItem('token')
           }})
+        let { data } = res
+        data.departure = dateTimeDefault(data.departure)
         setTravel(res.data)
       } catch (error) {
+        console.log(error)
         setMessage(error.response.data.message)
       }
     }
@@ -32,10 +39,6 @@ function Travel(props) {
       fetchData()
     }
   }, [id])
-
-  const config = { headers :{
-    'x-access-token' : localStorage.getItem('token')
-  }}
 
   const handleSave = async () => {
     setLoadingSave(true)
@@ -46,34 +49,39 @@ function Travel(props) {
         ? await api.put(`/travels/${id}`, travel, config) 
         : await api.post('/travels', travel, config)
 
-      history.push('/viagem')
+      history.push('/viagens')
     } catch (error) {
       setError(error.response.data)
     }
+
+    setLoadingSave(false)
   }
 
   const handleDestroy = async () => {
     setLoadingDestroy(true)
+
     try {
       await api.delete(`/travels/${id}`, config)
-      history.push('/viagem')
+      history.push('/viagens')
     } catch (error) {
       setError(error.response.data)
     }
+
+    setLoadingSave(false)
   }
 
   return (
     <React.Fragment>
       <NavHeader />
-      
-      <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <div className="container-fluid">
+        <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <Sidebar pageType="admin"/>
 
         <h5>Cadastro de viagens</h5>
 
         <form className="row g-3 mt-1 mb-4">
           <div className='alert text-center alert-primary' role="alert"
-                style={message ? { display: 'block'} : { display : 'none' }}>
+               style={message ? { display: 'block'} : { display : 'none' }}>
             {message}
           </div>
 
@@ -113,7 +121,7 @@ function Travel(props) {
 
           <div className="col-md-6">
             <label htmlFor="departure" className="form-label">Data de Saída</label>
-            <input type="datetime" className={`form-control ${error.departure ? 'is-invalid' : ''}`} id="departure" 
+            <input type="datetime-local" className={`form-control ${error.departure ? 'is-invalid' : ''}`} id="departure" 
               value={travel.departure || ''}
               onChange={e => {
                 setTravel({ ...travel,
@@ -162,6 +170,29 @@ function Travel(props) {
             </div>
           </div>
 
+          <div className="col-md-6">
+            <label htmlFor="departurePlace" className="form-label">Local de Saída</label>
+            <input type="text" className={`form-control ${error.value ? 'is-invalid' : ''}`} id="departurePlace" maxLength="2" 
+              value={travel.departurePlace || ''}
+              onChange={e => {
+                setTravel({ ...travel,
+                  departurePlace: e.target.value
+                })
+              }}/>
+
+            <div id="validationDeparturePlace" 
+              className="invalid-feedback" 
+              style={error.departurePlace ? { display: 'inline' } : { display: 'none' }}>
+              {error.departurePlace}
+            </div>
+          </div>
+
+          <div className="col-md-6">
+            <label htmlFor="file" className="form-label">Imagem</label>
+            <input name="file" type="file"
+                   className="form-control file-upload" data-cloudinary-field="image_id"
+                   data-form-data="{ 'transformation': {'crop':'limit','tags':'samples','width':3000,'height':2000}}"/>
+          </div>
         </form>
 
         <div className="text-center d-grid gap-2">
@@ -193,11 +224,12 @@ function Travel(props) {
           <button type="button" 
                   className="btn btn-warning text-white mb-4"
                   onClick={() => {
-                    history.push('/viagem')
+                    history.push('/viagens')
                   }}>
             Voltar
           </button>
         </div>
+      </div>
       </div>
     </React.Fragment>
   )
