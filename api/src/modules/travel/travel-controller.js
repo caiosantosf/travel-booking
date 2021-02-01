@@ -1,4 +1,6 @@
 const db = require('../../database/connection')
+const path = require("path")
+const { createWriteStream } = require("fs")
 
 const dbErrors = error => {
   let message = { message : 'Ocorreu um erro não identificado', error}
@@ -9,7 +11,6 @@ const dbErrors = error => {
   }
   return message
 }
-
 
 module.exports = {
 
@@ -39,7 +40,10 @@ module.exports = {
 
   async post (req, res) {
     const data = req.body
+    
     data.departure = new Date(data.departure)
+    data.imageName = ''
+
     try {
       const id = await db('travels').insert(data).returning('id')
       return res.status(201).json({ id: id[0] })
@@ -52,13 +56,32 @@ module.exports = {
   async put (req, res) {
     const { id } = req.params
     const data = req.body
+
     data.departure = new Date(data.departure)
+    data.imageName = ''
+
     try {
       const result = await db('travels').where({ id }).update({ id, ...data })
       if (result) {
         return res.status(200).json({ message : 'Viagem salva com sucesso'})
       }
       return res.status(404).json({ message: 'Viagem não encontrada'})
+    } catch (error) {
+      const message = dbErrors(error)
+      return res.status(400).json(message)
+    }
+  },
+
+  async patchImage (req, res) {
+    const { id } = req.params
+    const { filename : imageName} = req.file
+
+    try {
+      const result = await db('travels').where({ id }).update({ id, imageName })
+      if (result) {
+        return res.status(200).json({ message : 'Imagem salva com sucesso'})
+      }
+      return res.status(404).json({ message: 'Imagem não encontrada'})
     } catch (error) {
       const message = dbErrors(error)
       return res.status(400).json(message)

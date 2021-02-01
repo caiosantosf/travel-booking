@@ -1,7 +1,19 @@
 const express = require('express')
-const { getMany, post, destroy, getOne, put } = require('./travel-controller')
+const { getMany, post, destroy, getOne, put, patchImage } = require('./travel-controller')
 const { routeSecurity : security } = require('../../config/security')
 const validation = require('./travel-validation')
+const multer = require("multer")
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'public/uploads')
+  },
+  filename: function (req, file, cb) {
+    cb(null, Math.floor(Math.random() * 100000000) + file.originalname)
+  }
+})
+
+const upload = multer({ storage })
 
 const routes = express.Router()
 
@@ -27,6 +39,12 @@ routes.put('/travels/:id',
   validation(['description', 'destination', 'departure', 
               'value', 'bus_id', 'days', 'departurePlace']),
   put
+)
+
+routes.patch('/travels/image/:id', 
+  security([ 'admin' ]),
+  upload.single('file'),
+  patchImage
 )
 
 routes.delete('/travels/:id', 
