@@ -1,6 +1,6 @@
 const validation = (fields) => {
   return (req, res, next) => {
-    const { id, description, destination, departure, value, bus_id, days } = req.body
+    const { id, description, destination, departure, value, bus_id, days, departurePlace } = req.body
     const messages = {}
     
     if (fields.includes('id')) {
@@ -30,6 +30,16 @@ const validation = (fields) => {
         }
       } else {
         messages.destination = 'O Destino é obrigatório'
+      }
+    }
+
+    if (fields.includes('departurePlace')) {
+      if ( (typeof departurePlace !== 'undefined') && (departurePlace.trim() !== '') ) {
+        if (departurePlace.length > 255) {
+          messages.departurePlace = 'O Destino não pode ter mais do que 255 caracteres'
+        }
+      } else {
+        messages.departurePlace = 'O Destino é obrigatório'
       }
     }
 
