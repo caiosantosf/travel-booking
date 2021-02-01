@@ -11,6 +11,7 @@ function Travel(props) {
   const [travel, setTravel] = useState({description: '', layout: {seats: []}})
   const [error, setError] = useState({})
   const [message, setMessage] = useState('')
+  const [file, setFile] = useState()
 
   let history = useHistory()
 
@@ -31,7 +32,6 @@ function Travel(props) {
         data.departure = dateTimeDefault(data.departure)
         setTravel(res.data)
       } catch (error) {
-        console.log(error)
         setMessage(error.response.data.message)
       }
     }
@@ -49,12 +49,18 @@ function Travel(props) {
         ? await api.put(`/travels/${id}`, travel, config) 
         : await api.post('/travels', travel, config)
 
+      const data = new FormData()
+      data.append("name", travel.description)
+      data.append("file", file)
+  
+      await api.patch(`/travels/image/${id}`, data, config)
+
       history.push('/viagens')
     } catch (error) {
-      setError(error.response.data)
+      setLoadingSave(false)
+      console.log(error)
+      //setError(error.response.data)
     }
-
-    setLoadingSave(false)
   }
 
   const handleDestroy = async () => {
@@ -172,7 +178,7 @@ function Travel(props) {
 
           <div className="col-md-6">
             <label htmlFor="departurePlace" className="form-label">Local de Saída</label>
-            <input type="text" className={`form-control ${error.value ? 'is-invalid' : ''}`} id="departurePlace" maxLength="2" 
+            <input type="text" className={`form-control ${error.value ? 'is-invalid' : ''}`} id="departurePlace" maxLength="255" 
               value={travel.departurePlace || ''}
               onChange={e => {
                 setTravel({ ...travel,
@@ -190,8 +196,11 @@ function Travel(props) {
           <div className="col-md-6">
             <label htmlFor="file" className="form-label">Imagem</label>
             <input name="file" type="file"
-                   className="form-control file-upload" data-cloudinary-field="image_id"
-                   data-form-data="{ 'transformation': {'crop':'limit','tags':'samples','width':3000,'height':2000}}"/>
+                   className="form-control file-upload"
+                   onChange={e => {
+                    const file = e.target.files[0];
+                    setFile(file);
+                  }} />
           </div>
         </form>
 

@@ -23,3 +23,9 @@ yarn-debug.log*
 yarn-error.log*
 
 .env
+
+# exclude everything
+uploads
+
+# exception to the rule
+!uploads/.gitkeep 
