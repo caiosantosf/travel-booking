@@ -10,7 +10,7 @@ const app = express()
 
 app.use(cors())
 app.use(express.json())
-console.log(`${process.cwd()}\\public`)
+
 app.use(express.static(`${process.cwd()}\\public`))
 
 app.use(userRoutes)

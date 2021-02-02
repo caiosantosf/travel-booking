@@ -18,14 +18,13 @@ const upload = multer({ storage })
 const routes = express.Router()
 
 routes.get('/travels', 
-  security([ 'admin', 'regular' ]), 
+  security([ 'admin', 'regular' ]),
   getMany
 )
 
 routes.post('/travels', 
   security([ 'admin' ]),
-  validation(['description', 'destination', 'departure', 
-              'value', 'bus_id', 'days', 'departurePlace']), 
+  validation(['description', 'destination', 'bus_id', 'installments', 'controlsSeats']),
   post
 )
 
@@ -36,8 +35,7 @@ routes.get('/travels/:id',
 
 routes.put('/travels/:id', 
   security([ 'admin' ]), 
-  validation(['description', 'destination', 'departure', 
-              'value', 'bus_id', 'days', 'departurePlace']),
+  validation(['description', 'destination', 'bus_id', 'installments', 'controlsSeats']),
   put
 )
 

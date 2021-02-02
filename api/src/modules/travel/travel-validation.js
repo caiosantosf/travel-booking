@@ -1,6 +1,6 @@
 const validation = (fields) => {
   return (req, res, next) => {
-    const { id, description, destination, departure, value, bus_id, days, departurePlace } = req.body
+    const { id, description, destination, bus_id, installments, controlsSeats } = req.body
     const messages = {}
     
     if (fields.includes('id')) {
@@ -33,36 +33,6 @@ const validation = (fields) => {
       }
     }
 
-    if (fields.includes('departurePlace')) {
-      if ( (typeof departurePlace !== 'undefined') && (departurePlace.trim() !== '') ) {
-        if (departurePlace.length > 255) {
-          messages.departurePlace = 'O Destino não pode ter mais do que 255 caracteres'
-        }
-      } else {
-        messages.departurePlace = 'O Destino é obrigatório'
-      }
-    }
-
-    if (fields.includes('departure')) {
-      if ( (typeof departure !== 'undefined') && (departure.trim() !== '') ) {
-        if (new Date(departure) === 'Invalid Date') {
-          messages.departure = 'A Data de saída não é valida'
-        }
-      } else {
-        messages.departure = 'A Data de de saída é obrigatória'
-      }
-    }
-
-    if (fields.includes('value')) {
-      if ( (typeof value !== 'undefined') && (value.trim() !== '') ) {
-        if (isNaN(value) || (!value)) {
-          messages.value = 'O Valor não é valido'
-        }
-      } else {
-        messages.value = 'O Valor é obrigatório'
-      }
-    }
-
     if (fields.includes('bus_id')) {
       if (typeof bus_id !== 'undefined') {
         if (isNaN(bus_id) || (!bus_id)) {
@@ -73,13 +43,19 @@ const validation = (fields) => {
       }
     }
 
-    if (fields.includes('days')) {
-      if (typeof days !== 'undefined') {
-        if (isNaN(days) || (!days)) {
-          messages.days = 'Os dias não são validos'
+    if (fields.includes('installments')) {
+      if (typeof installments !== 'undefined') {
+        if (isNaN(installments) || (!installments)) {
+          messages.installments = 'Os dias não são validos'
         }
       } else {
-        messages.days = 'Os dias são obrigatório'
+        messages.installments = 'Os dias são obrigatório'
+      }
+    }
+
+    if (fields.includes('controlsSeats')) {
+      if ( (typeof controlsSeats == 'undefined') && (controlsSeats == '') ) {
+        messages.description = 'É obrigatório informar se irá controlar poltronas'
       }
     }
     
