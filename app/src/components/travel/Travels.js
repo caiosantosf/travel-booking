@@ -76,8 +76,11 @@ function Travels() {
             </thead>
             <tbody>
               {travels.map(travel => {
-                const { id, description, destination, departure } = travel
-                const departureFormatted = dateTimeBrazil(departure)
+                const { id, description, destination, departurePlaces } = travel
+
+                const departureFormatted = departurePlaces.length
+                  ? dateTimeBrazil(departurePlaces[0].departureDate)
+                  : ''
                 
                 return (
                   <tr key={id}>

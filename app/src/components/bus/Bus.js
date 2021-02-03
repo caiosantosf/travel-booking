@@ -130,12 +130,12 @@ function Bus(props) {
                       <input type="number" className='form-control' maxLength='2'
                               value={bus.layout.seats[j] || ''}
                               onChange={e => {
-                              let seatsAux = bus.layout.seats
-                              seatsAux[j] = parseInt(e.target.value)
-                              setBus({ ...bus,
-                                layout: {seats: seatsAux}
-                              })
-                            }}/>
+                                let seatsAux = bus.layout.seats
+                                seatsAux[j] = parseInt(e.target.value)
+                                setBus({ ...bus,
+                                  layout: {seats: seatsAux}
+                                })
+                              }}/>
                     </div>
                   )
                 })}

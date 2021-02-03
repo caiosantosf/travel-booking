@@ -55,7 +55,7 @@ function Buses() {
   }
 
   const countSeats = seats => {
-    return seats.length
+    return seats.filter(seat => seat).length
   }
 
   return (
