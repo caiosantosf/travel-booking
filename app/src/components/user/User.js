@@ -55,17 +55,15 @@ function User(props) {
 
   const handleCepApi = async () => {
     try {
-      if (!error.cep) {
-        const res = await apiCep(user.cep)
-        const { data } = res
-        setUser({ ...user,
-                  homeAddress: data.logradouro, 
-                  complement: data.complement,
-                  neighborhood: data.bairro,
-                  city: data.localidade,
-                  state: data.uf
-                })
-      }
+      const res = await apiCep(user.cep)
+      const { data } = res
+      setUser({ ...user,
+                homeAddress: data.logradouro, 
+                complement: data.complement,
+                neighborhood: data.bairro,
+                city: data.localidade,
+                state: data.uf
+              })
     } catch (error) {
       setError({cep: "CEP Inválido!"})
     }

@@ -10,7 +10,7 @@ function DeparturePlace(props) {
   const [loadingDestroy, setLoadingDestroy] = useState(false)
   const [error, setError] = useState({})
   const [message, setMessage] = useState('')
-  const [departurePlace, setDeparturePlace] = useState([])
+  const [departurePlace, setDeparturePlace] = useState({state: 'AC'})
 
   let history = useHistory()
 
@@ -77,17 +77,15 @@ function DeparturePlace(props) {
 
   const handleCepApi = async () => {
     try {
-      if (!error.cep) {
-        const res = await apiCep(departurePlace.cep)
-        const { data } = res
-        setDeparturePlace({ ...departurePlace,
-                            homeAddress: data.logradouro, 
-                            complement: data.complement,
-                            neighborhood: data.bairro,
-                            city: data.localidade,
-                            state: data.uf
-                          })
-      }
+      const res = await apiCep(departurePlace.cep)
+      const { data } = res
+      setDeparturePlace({ ...departurePlace,
+                          homeAddress: data.logradouro, 
+                          complement: data.complement,
+                          neighborhood: data.bairro,
+                          city: data.localidade,
+                          state: data.uf
+                        })
     } catch (error) {
       setError({cep: "CEP Inválido!"})
     }
@@ -264,7 +262,7 @@ function DeparturePlace(props) {
 
           <div className="col-lg-6">
             <label htmlFor="departureDate" className="form-label">Data de Saída</label>
-            <input type="datetime-local" className={`form-control ${error.city ? 'is-invalid' : ''}`} id="departureDate"
+            <input type="datetime-local" className={`form-control ${error.departureDate ? 'is-invalid' : ''}`} id="departureDate"
               value={departurePlace.departureDate || ''}
               onChange={e => {
                 setDeparturePlace({ ...departurePlace,
@@ -272,7 +270,7 @@ function DeparturePlace(props) {
                 })
               }}/>
 
-            <div id="validationCity" 
+            <div id="validationDepartureDate" 
                className="invalid-feedback" 
                style={error.departureDate ? { display: 'inline' } : { display: 'none' }}>
                {error.departureDate}
@@ -289,7 +287,7 @@ function DeparturePlace(props) {
                 })
               }}/>
 
-            <div id="validationCity" 
+            <div id="validationReturnDate" 
                className="invalid-feedback" 
                style={error.returnDate ? { display: 'inline' } : { display: 'none' }}>
                {error.returnDate}

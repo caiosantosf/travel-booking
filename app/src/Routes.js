@@ -27,16 +27,16 @@ export default function Routes() {
         <Route path="/email-redefine-senha" exact component={EmailResetPassword} />
         <Route path="/redefine-senha/:id" exact component={ResetPassword} />
         <Route path="/registro/" exact component={User} />
-        <Route path="/usuarios/" exact render={() => (getUserType() === 'admin' ? <Users /> : <Forbidden />)}/>
+        <Route path="/usuarios/" exact render={props => (getUserType() === 'admin' ? <Users { ...props }/> : <Forbidden />)}/>
         <Route path="/usuarios/:id" exact component={User} />
         <Route path="/inicial/" exact component={UserHome} />
-        <Route path="/admin-inicial/" exact render={() => (getUserType() === 'admin' ? <Admin /> : <Forbidden />)}/>
-        <Route path="/viagens/" exact render={() => (getUserType() === 'admin' ? <Travels /> : <Forbidden />)}/>
-        <Route path="/viagens/:id" exact render={() => (getUserType() === 'admin' ? <Travel /> : <Forbidden />)}/>
-        <Route path="/viagens/:travel_id/valores/:id" exact render={() => (getUserType() === 'admin' ? <Value /> : <Forbidden />)}/>
-        <Route path="/viagens/:travel_id/saidas/:id" exact render={() => (getUserType() === 'admin' ? <DeparturePlace /> : <Forbidden />)}/>
-        <Route path="/onibus/" exact render={() => (getUserType() === 'admin' ? <Buses /> : <Forbidden />)}/>
-        <Route path="/onibus/:id" exact render={() => (getUserType() === 'admin' ? <Bus /> : <Forbidden />)}/>
+        <Route path="/admin-inicial/" exact render={props => (getUserType() === 'admin' ? <Admin { ...props }/> : <Forbidden />)}/>
+        <Route path="/viagens/" exact render={props => (getUserType() === 'admin' ? <Travels { ...props }/> : <Forbidden />)}/>
+        <Route path="/viagens/:id" exact render={props => (getUserType() === 'admin' ? <Travel { ...props }/> : <Forbidden />)}/>
+        <Route path="/viagens/:travel_id/valores/:id" exact render={props => (getUserType() === 'admin' ? <Value { ...props }/> : <Forbidden />)}/>
+        <Route path="/viagens/:travel_id/saidas/:id" exact render={props => (getUserType() === 'admin' ? <DeparturePlace { ...props }/> : <Forbidden />)}/>
+        <Route path="/onibus/" exact render={props => (getUserType() === 'admin' ? <Buses { ...props }/> : <Forbidden />)}/>
+        <Route path="/onibus/:id" exact render={props => (getUserType() === 'admin' ? <Bus { ...props }/> : <Forbidden />)}/>
       </Switch>
     </BrowserRouter>
   )

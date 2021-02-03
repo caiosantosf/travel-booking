@@ -87,8 +87,8 @@ function Value(props) {
           </div>
 
           <div className="col-md-3">
-            <label htmlFor="initialAge" className={`form-control ${error.initialAge ? 'is-invalid' : ''}`}>Idade Inicial</label>
-            <input  id="initialAge" type="number" className='form-control' 
+            <label htmlFor="initialAge" className='form-label'>Idade Inicial</label>
+            <input  id="initialAge" type="number" className={`form-control ${error.initialAge ? 'is-invalid' : ''}`}
                     value={value.initialAge || ''}
                     onChange={e => {
                       setValue({ ...value,
@@ -104,8 +104,8 @@ function Value(props) {
           </div>
 
           <div className="col-md-3">
-            <label htmlFor="finalAge" className={`form-control ${error.finalAge ? 'is-invalid' : ''}`}>Idade Final</label>
-            <input  id="finalAge" type="number" className='form-control' 
+            <label htmlFor="finalAge" className='form-label'>Idade Final</label>
+            <input  id="finalAge" type="number" className={`form-control ${error.finalAge ? 'is-invalid' : ''}`}
                     value={value.finalAge || ''}
                     onChange={e => {
                       setValue({ ...value,
@@ -121,8 +121,8 @@ function Value(props) {
           </div>
 
           <div className="col-md-6">
-            <label htmlFor="value" className={`form-control ${error.value ? 'is-invalid' : ''}`}>Valor</label>
-            <input  id="value" type="number" className='form-control' 
+            <label htmlFor="value" className='form-label'>Valor</label>
+            <input  id="value" type="number" className={`form-control ${error.finalAge ? 'is-invalid' : ''}`}
                     value={value.value || ''}
                     onChange={e => {
                       setValue({ ...value,
@@ -138,8 +138,8 @@ function Value(props) {
           </div>
 
           <div className="col-md-6">
-            <label htmlFor="onlyDepartureValue" className={`form-control ${error.onlyDepartureValue ? 'is-invalid' : ''}`}>Valor Ida</label>
-            <input  id="onlyDepartureValue" type="number" className='form-control' 
+            <label htmlFor="onlyDepartureValue" className='form-label'>Valor Ida</label>
+            <input  id="onlyDepartureValue" type="number" className={`form-control ${error.finalAge ? 'is-invalid' : ''}`}
                     value={value.onlyDepartureValue || ''}
                     onChange={e => {
                       setValue({ ...value,
@@ -155,8 +155,8 @@ function Value(props) {
           </div>
 
           <div className="col-md-6">
-            <label htmlFor="onlyReturnValue" className={`form-control ${error.onlyReturnValue ? 'is-invalid' : ''}`}>Valor Retorno</label>
-            <input  id="onlyReturnValue" type="number" className='form-control' 
+            <label htmlFor="onlyReturnValue" className='form-label'>Valor Retorno</label>
+            <input  id="onlyReturnValue" type="number" className={`form-control ${error.finalAge ? 'is-invalid' : ''}`}
                     value={value.onlyReturnValue || ''}
                     onChange={e => {
                       setValue({ ...value,
