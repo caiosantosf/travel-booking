@@ -12,13 +12,13 @@ const dbErrors = error => {
 
 const getValues = async id => {
   return await db('travelValues')
-                .where('id', id)
+                .where('travel_id', id)
                 .orderBy('id', 'desc')
 }
 
 const getDeparturePlaces = async id => {
   return await db('travelDeparturePlaces')
-                .where('id', id)
+                .where('travel_id', id)
                 .orderBy('id', 'desc')
 }
 
@@ -62,6 +62,7 @@ module.exports = {
     const data = req.body
     
     data.imageName = ''
+    data.installments = 1
 
     try {
       const id = await db('travels').insert(data).returning('id')

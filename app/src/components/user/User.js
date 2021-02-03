@@ -69,7 +69,6 @@ function User(props) {
     } catch (error) {
       setError({cep: "CEP Inválido!"})
     }
-    
   }
 
   const finishLogin = (id, type, token) => {
@@ -230,7 +229,7 @@ function User(props) {
 
           <div className="col-lg-2">
             <label htmlFor="cep" className="form-label">CEP</label>
-            <input type="text" className={`form-control ${error.cep ? 'is-invalid' : ''}`} id="cep" 
+            <input type="text" className={`form-control ${error.cep ? 'is-invalid' : ''}`} id="cep" maxLength="8"
               disabled={id}
               value={user.cep || ''}
               onChange={e => {
@@ -249,6 +248,7 @@ function User(props) {
                {error.cep}
             </div>
           </div>
+
           <div className="col-lg-6" >
             <label htmlFor="homeAddress" className="form-label">Endereço</label>
             <input type="text" className={`form-control ${error.homeAddress ? 'is-invalid' : ''}`} id="homeAddress" maxLength="255"
@@ -266,6 +266,7 @@ function User(props) {
                {error.homeAddress}
             </div>
           </div>
+
           <div className="col-lg-1">
             <label htmlFor="addressNumber" className="form-label">Número</label>
             <input type="text" className={`form-control ${error.addressNumber ? 'is-invalid' : ''}`} id="addressNumber" maxLength="5"
@@ -286,6 +287,7 @@ function User(props) {
                {error.addressNumber}
             </div>
           </div>
+
           <div className="col-lg-3">
             <label htmlFor="complement" className="form-label">Complemento</label>
             <input type="text" className={`form-control ${error.complement ? 'is-invalid' : ''}`} id="complement" maxLength="255"
@@ -303,6 +305,7 @@ function User(props) {
                {error.complement}
             </div>
           </div>
+
           <div className="col-lg-6" >
             <label htmlFor="neighborhood" className="form-label">Bairro</label>
             <input type="text" className={`form-control ${error.neighborhood ? 'is-invalid' : ''}`} id="neighborhood" maxLength="255"
@@ -320,6 +323,7 @@ function User(props) {
                {error.neighborhood}
             </div>
           </div>
+
           <div className="col-lg-3">
             <label htmlFor="state" className="form-label">Estado</label>
             <select className={`form-select ${error.state ? 'is-invalid' : ''}`} id="state"
@@ -365,6 +369,7 @@ function User(props) {
                {error.state}
             </div>
           </div>
+
           <div className="col-lg-3">
             <label htmlFor="city" className="form-label">Cidade</label>
             <input type="text" className={`form-control ${error.city ? 'is-invalid' : ''}`} id="city" maxLength="255"

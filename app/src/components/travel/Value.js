@@ -1,25 +1,19 @@
 import React, { useState, useEffect } from 'react'
-import { Link, useHistory } from "react-router-dom"
+import { useHistory } from "react-router-dom"
 import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
 import { api } from '../../config/api'
-import { dateTimeDefault } from '../../config/transformations'
-import { PencilSquare } from 'react-bootstrap-icons'
 
-function Travel(props) {
+function Value(props) {
   const [loadingSave, setLoadingSave] = useState(false)
   const [loadingDestroy, setLoadingDestroy] = useState(false)
-  const [travel, setTravel] = useState({})
   const [error, setError] = useState({})
   const [message, setMessage] = useState('')
-  const [file, setFile] = useState()
-  const [buses, setBuses] = useState([])
-  const [values, setValues] = useState([])
-  const [departurePlaces, setDeparturePlaces] = useState([])
+  const [value, setValue] = useState([])
 
   let history = useHistory()
 
-  let { id: travel_id } = props.match.params
+  let { travel_id, id } = props.match.params
 
   const config = { headers :{
     'x-access-token' : localStorage.getItem('token')
@@ -28,71 +22,36 @@ function Travel(props) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await api.get(`/travels/${travel_id}`, 
+        const res = await api.get(`/travels/${travel_id}/values/${id}`, 
           { headers :{
             'x-access-token' : localStorage.getItem('token')
           }})
 
         const { data } = res
 
-        setValues(data.values)
-        setDeparturePlaces(data.departurePlaces)
-
-        setTravel(data)
+        setValue(data)
       } catch (error) {
         setMessage(error.response.data.message)
       }
     }
 
-    const fetchBuses = async () => {
-      try {
-        const res = await api.get(`/buses`, 
-          { headers :{
-            'x-access-token' : localStorage.getItem('token')
-          }})
-
-        const { data } = res.data
-        setBuses(data)
-
-        if (travel_id === 'novo') {
-          setTravel({bus_id: data[0].id})
-        }
-      } catch (error) {
-        setMessage(error.response.data.message)
-      }
-    }
-
-    if (travel_id !== 'novo') {
+    if (id !== 'novo') {
       fetchData()
     }
-    fetchBuses()
-  }, [travel_id])
+  }, [travel_id, id])
 
   const handleSave = async () => {
     setLoadingSave(true)
     setError({})
 
     try {
-      if (travel_id !== 'novo') {
-        await api.put(`/travels/${travel_id}`, travel, config)
+      if (id !== 'novo') {
+        await api.put(`/travels/${travel_id}/values/${id}`, value, config)
       } else {
-        const res = await api.post('/travels', travel, config)
-        travel_id = res.data.id
+        await api.post(`/travels/${travel_id}/values`, value, config)
       }
 
-      if (file) {
-        const data = new FormData()
-        data.append("name", travel.description)
-        data.append("file", file)
-    
-        await api.patch(`/travels/image/${travel_id}`, data, config)
-      }
-
-      if (travel_id !== 'novo') {
-        history.push(`/viagens`)
-      } else {
-        history.push(`/viagens/${travel_id}`)
-      }
+      history.push(`/viagens/${travel_id}`)
     } catch (error) {
       setLoadingSave(false)
       setError(error.response.data)
@@ -103,21 +62,13 @@ function Travel(props) {
     setLoadingDestroy(true)
 
     try {
-      await api.delete(`/travels/${travel_id}`, config)
-      history.push('/viagens')
+      await api.delete(`/travels/${travel_id}/values/${id}`, config)
+      history.push(`/viagens/${travel_id}`)
     } catch (error) {
       setError(error.response.data)
     }
 
     setLoadingSave(false)
-  }
-
-  const handleAddValues = async () => {
-    history.push(`/viagens/${travel_id}/valores/novo`)
-  }
-
-  const handleAddDeparturePlaces = async () => {
-    history.push(`/viagens/${travel_id}/saidas/novo`)
   }
 
   return (
@@ -127,7 +78,7 @@ function Travel(props) {
         <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <Sidebar pageType="admin"/>
 
-        <h5>Cadastro de viagens</h5>
+        <h5>Cadastro de valores da viagem</h5>
 
         <form className="row g-3 mt-1 mb-4">
           <div className='alert text-center alert-primary' role="alert"
@@ -135,186 +86,88 @@ function Travel(props) {
             {message}
           </div>
 
-          <div className="col-md-12">
-            <label htmlFor="description" className="form-label">Descrição</label>
-            <input type="text" className={`form-control ${error.description ? 'is-invalid' : ''}`} id="description" maxLength="255" 
-              value={travel.description || ''}
-              onChange={e => {
-                setTravel({ ...travel,
-                  description: e.target.value
-                })
-              }}/>
+          <div className="col-md-3">
+            <label htmlFor="initialAge" className={`form-control ${error.initialAge ? 'is-invalid' : ''}`}>Idade Inicial</label>
+            <input  id="initialAge" type="number" className='form-control' 
+                    value={value.initialAge || ''}
+                    onChange={e => {
+                      setValue({ ...value,
+                        initialAge: e.target.value
+                      })
+                    }}/>
 
-            <div id="validationDescription" 
-              className="invalid-feedback" 
-              style={error.description ? { display: 'inline' } : { display: 'none' }}>
-              {error.description}
+            <div id="validationInitialAge" 
+                className="invalid-feedback" 
+                style={error.initialAge ? { display: 'inline' } : { display: 'none' }}>
+                {error.initialAge}
+            </div>
+          </div>
+
+          <div className="col-md-3">
+            <label htmlFor="finalAge" className={`form-control ${error.finalAge ? 'is-invalid' : ''}`}>Idade Final</label>
+            <input  id="finalAge" type="number" className='form-control' 
+                    value={value.finalAge || ''}
+                    onChange={e => {
+                      setValue({ ...value,
+                        finalAge: e.target.value
+                      })
+                    }}/>
+
+            <div id="validationFinalAge" 
+                className="invalid-feedback" 
+                style={error.finalAge ? { display: 'inline' } : { display: 'none' }}>
+                {error.finalAge}
             </div>
           </div>
 
           <div className="col-md-6">
-            <label htmlFor="destination" className="form-label">Destino</label>
-            <input type="text" className={`form-control ${error.destination ? 'is-invalid' : ''}`} id="description" maxLength="255" 
-              value={travel.destination || ''}
-              onChange={e => {
-                setTravel({ ...travel,
-                  destination: e.target.value
-                })
-              }}/>
+            <label htmlFor="value" className={`form-control ${error.value ? 'is-invalid' : ''}`}>Valor</label>
+            <input  id="value" type="number" className='form-control' 
+                    value={value.value || ''}
+                    onChange={e => {
+                      setValue({ ...value,
+                        value: e.target.value
+                      })
+                    }}/>
 
-            <div id="validationDestination" 
-              className="invalid-feedback" 
-              style={error.destination ? { display: 'inline' } : { display: 'none' }}>
-              {error.destination}
+            <div id="validationValue" 
+                className="invalid-feedback" 
+                style={error.value ? { display: 'inline' } : { display: 'none' }}>
+                {error.value}
             </div>
           </div>
 
           <div className="col-md-6">
-            <label htmlFor="bus" className="form-label">Ônibus</label>
-            <select className={`form-select ${error.bus_id ? 'is-invalid' : ''}`} id="bus"
-              value={travel.bus_id || ''}
-              onChange={e => {
-                setTravel({ ...travel,
-                  bus_id: e.target.value
-                })
-            }}>
-              {buses.map(bus => {
-                return (
-                  <option key={bus.id} value={bus.id}>{bus.description}</option>
-                )
-              })}
-            </select>
+            <label htmlFor="onlyDepartureValue" className={`form-control ${error.onlyDepartureValue ? 'is-invalid' : ''}`}>Valor Ida</label>
+            <input  id="onlyDepartureValue" type="number" className='form-control' 
+                    value={value.onlyDepartureValue || ''}
+                    onChange={e => {
+                      setValue({ ...value,
+                        onlyDepartureValue: e.target.value
+                      })
+                    }}/>
 
-            <div id="validationBusId" 
-              className="invalid-feedback" 
-              style={error.bus_id ? { display: 'inline' } : { display: 'none' }}>
-              {error.bus_id}
+            <div id="validationOnlyDepartureValue" 
+                className="invalid-feedback" 
+                style={error.onlyDepartureValue ? { display: 'inline' } : { display: 'none' }}>
+                {error.onlyDepartureValue}
             </div>
           </div>
 
-          <div className="col-md-4">
-            <label className="form-label" htmlFor="controlsSeat">Controla Poltronas?</label>
-            <select className={`form-select ${error.state ? 'is-invalid' : ''}`} id="state"
-              value={travel.controlsSeats || ''}
-              onChange={e => {
-                setTravel({ ...travel,
-                  controlsSeats: e.target.value
-                })
-              }}>
-              <option value={true}>Sim</option>
-              <option value={false}>Não</option>
-            </select>
-          </div>
+          <div className="col-md-6">
+            <label htmlFor="onlyReturnValue" className={`form-control ${error.onlyReturnValue ? 'is-invalid' : ''}`}>Valor Retorno</label>
+            <input  id="onlyReturnValue" type="number" className='form-control' 
+                    value={value.onlyReturnValue || ''}
+                    onChange={e => {
+                      setValue({ ...value,
+                        onlyReturnValue: e.target.value
+                      })
+                    }}/>
 
-          <div className="col-md-8">
-            <label htmlFor="file" className="form-label">Imagem</label>
-            <input name="file" type="file"
-                   className="form-control file-upload"
-                   onChange={e => {
-                    const file = e.target.files[0];
-                    setFile(file);
-                  }} />
-          </div>
-
-          <div className="col-md-12">
-            <label htmlFor="notes" className="form-label">Observações</label>
-            <textarea type="text" className={`form-control ${error.notes ? 'is-invalid' : ''}`} id="description" maxLength="1000" 
-              value={travel.notes || ''}
-              onChange={e => {
-                setTravel({ ...travel,
-                  notes: e.target.value
-                })
-              }}>
-            </textarea>
-
-            <div id="validationNotes" 
-              className="invalid-feedback" 
-              style={error.notes ? { display: 'inline' } : { display: 'none' }}>
-              {error.notes}
-            </div>
-          </div>
-
-          <div style={travel_id !== 'novo' ? { display: 'block'} : { display : 'none' }}>
-            <div className="col-md-12">
-              <label htmlFor="" className="form-label">Valores</label>
-              <br />
-              <button type="button" 
-                      className="btn btn-primary"
-                      onClick={handleAddValues}>
-                Adicionar Valor
-              </button>
-            </div>
-
-            <div className="table-responsive-sm mt-1">
-              <table className="table table-sm table-striped table-hover">
-                <thead>
-                  <tr key="0">
-                    <th scope="col">Idade Ini.</th>
-                    <th scope="col">idade Fin.</th>
-                    <th scope="col">Valor</th>
-                    <th scope="col">Valor Ida</th>
-                    <th scope="col">Valor Volta</th>
-                    <th scope="col">Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {values.map(v => {
-                    const { id, value, onlyReturnValue, onlyDepartureValue, initialAge, finalAge } = v
-                    
-                    return (
-                      <tr key={id}>
-                        <td>{initialAge}</td>
-                        <td>{finalAge}</td>
-                        <td>{value}</td>
-                        <td>{onlyDepartureValue}</td>
-                        <td>{onlyReturnValue}</td>
-                        <td><Link className="me-2" to={`/viagens/${travel_id}/valores/${id}`}><PencilSquare /></Link></td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="col-md-12">
-              <label htmlFor="" className="form-label">Pontos de Saída</label>
-              <br />
-              <button type="button" 
-                      className="btn btn-primary"
-                      onClick={handleAddDeparturePlaces}>
-                Adicionar Ponto de Saída
-              </button>
-            </div>
-          
-            <div className="table-responsive-sm mt-1">
-              <table className="table table-sm table-striped table-hover">
-                <thead>
-                  <tr key="0">
-                    <th scope="col">Endereço</th>
-                    <th scope="col">Número</th>
-                    <th scope="col">Cidade</th>
-                    <th scope="col">Data e Hora de Saída</th>
-                    <th scope="col">Data e Hora de Retorno</th>
-                    <th scope="col">Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {values.map(dp => {
-                    const { id, homeAddress, addressNumber, city, departureDate, returnDate } = dp
-                    
-                    return (
-                      <tr key={id}>
-                        <td>{homeAddress}</td>
-                        <td>{addressNumber}</td>
-                        <td>{city}</td>
-                        <td>{departureDate}</td>
-                        <td>{returnDate}</td>
-                        <td><Link className="me-2" to={`/viagens/${travel_id}/saidas/${id}`}><PencilSquare /></Link></td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
+            <div id="validationOnlyReturnValue" 
+                className="invalid-feedback" 
+                style={error.onlyReturnValue ? { display: 'inline' } : { display: 'none' }}>
+                {error.onlyReturnValue}
             </div>
           </div>
         </form>
@@ -334,7 +187,7 @@ function Travel(props) {
 
           <button type="button" 
                   className="btn btn-primary"
-                  style={travel_id !== 'novo' ? { display: 'inline-block'} : { display : 'none' }}
+                  style={id !== 'novo' ? { display: 'inline-block'} : { display : 'none' }}
                   onClick={handleDestroy}
                   disabled={loadingDestroy}>
             <span className="spinner-border spinner-border-sm mx-1" 
@@ -348,7 +201,7 @@ function Travel(props) {
           <button type="button" 
                   className="btn btn-warning text-white mb-4"
                   onClick={() => {
-                    history.push('/viagens')
+                    history.push(`/viagens/${travel_id}`)
                   }}>
             Voltar
           </button>
@@ -359,4 +212,4 @@ function Travel(props) {
   )
 }
 
-export default Travel
+export default Value

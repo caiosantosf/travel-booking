@@ -84,7 +84,7 @@ module.exports = {
 
   async destroy (req, res) {
     const { id } = req.params
-    const result = await db('travels').where({ id }).del()
+    const result = await db('travelDeparturePlaces').where({ id }).del()
 
     if (result) {
       return res.status(200).json({ message: 'Ponto de saída excluído com sucesso'})

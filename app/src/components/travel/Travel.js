@@ -3,8 +3,8 @@ import { Link, useHistory } from "react-router-dom"
 import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
 import { api } from '../../config/api'
-import { dateTimeDefault } from '../../config/transformations'
 import { PencilSquare } from 'react-bootstrap-icons'
+import { dateTimeBrazil } from '../../config/transformations'
 
 function Travel(props) {
   const [loadingSave, setLoadingSave] = useState(false)
@@ -55,7 +55,7 @@ function Travel(props) {
         setBuses(data)
 
         if (travel_id === 'novo') {
-          setTravel({bus_id: data[0].id})
+          setTravel({controlsSeats: true, bus_id: data[0].id})
         }
       } catch (error) {
         setMessage(error.response.data.message)
@@ -65,6 +65,7 @@ function Travel(props) {
     if (travel_id !== 'novo') {
       fetchData()
     }
+
     fetchBuses()
   }, [travel_id])
 
@@ -73,11 +74,13 @@ function Travel(props) {
     setError({})
 
     try {
+      let travel_id_created = 0
+
       if (travel_id !== 'novo') {
         await api.put(`/travels/${travel_id}`, travel, config)
       } else {
         const res = await api.post('/travels', travel, config)
-        travel_id = res.data.id
+        travel_id_created = res.data.id
       }
 
       if (file) {
@@ -85,13 +88,15 @@ function Travel(props) {
         data.append("name", travel.description)
         data.append("file", file)
     
-        await api.patch(`/travels/image/${travel_id}`, data, config)
+        await api.patch(`/travels/image/${travel_id_created}`, data, config)
       }
+
+      setLoadingSave(false)
 
       if (travel_id !== 'novo') {
         history.push(`/viagens`)
       } else {
-        history.push(`/viagens/${travel_id}`)
+        history.push(`/viagens/${travel_id_created}`)
       }
     } catch (error) {
       setLoadingSave(false)
@@ -299,7 +304,7 @@ function Travel(props) {
                   </tr>
                 </thead>
                 <tbody>
-                  {values.map(dp => {
+                  {departurePlaces.map(dp => {
                     const { id, homeAddress, addressNumber, city, departureDate, returnDate } = dp
                     
                     return (
@@ -307,8 +312,8 @@ function Travel(props) {
                         <td>{homeAddress}</td>
                         <td>{addressNumber}</td>
                         <td>{city}</td>
-                        <td>{departureDate}</td>
-                        <td>{returnDate}</td>
+                        <td>{dateTimeBrazil(departureDate)}</td>
+                        <td>{dateTimeBrazil(returnDate)}</td>
                         <td><Link className="me-2" to={`/viagens/${travel_id}/saidas/${id}`}><PencilSquare /></Link></td>
                       </tr>
                     )

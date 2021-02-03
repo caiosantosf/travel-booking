@@ -24,7 +24,7 @@ routes.get('/travels',
 
 routes.post('/travels', 
   security([ 'admin' ]),
-  validation(['description', 'destination', 'bus_id', 'installments', 'controlsSeats']),
+  validation(['description', 'destination', 'bus_id', 'controlsSeats']), //installments
   post
 )
 
@@ -35,7 +35,7 @@ routes.get('/travels/:id',
 
 routes.put('/travels/:id', 
   security([ 'admin' ]), 
-  validation(['description', 'destination', 'bus_id', 'installments', 'controlsSeats']),
+  validation(['description', 'destination', 'bus_id', 'controlsSeats']), //installments
   put
 )
 

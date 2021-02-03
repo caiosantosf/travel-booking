@@ -46,10 +46,10 @@ const validation = (fields) => {
     if (fields.includes('installments')) {
       if (typeof installments !== 'undefined') {
         if (isNaN(installments) || (!installments)) {
-          messages.installments = 'Os dias não são validos'
+          messages.installments = 'As parcelas não são validas'
         }
       } else {
-        messages.installments = 'Os dias são obrigatório'
+        messages.installments = 'As parcelas são obrigatórias'
       }
     }
 
