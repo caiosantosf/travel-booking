@@ -17,7 +17,7 @@ function Sidebar(props) {
               { key: 2, name: 'Visualização de Usuários', to: '/usuarios' },
               { key: 3, name: 'Cadastro de Viagens', to: '/viagens' },
               { key: 4, name: 'Cadastro de Ônibus', to: '/onibus' },
-              { key: 5, name: 'Sair', to: '/' }
+              { key: 5, name: 'Sair', to: '/sair' }
             ]
   }
 
@@ -26,7 +26,7 @@ function Sidebar(props) {
               { key: 1, name: 'Página Inicial', to: '/inicial' },
               { key: 2, name: 'Meus Dados', to: '/usuario' },
               { key: 3, name: 'Minhas Viagens', to: '/minhas-viagens' },
-              { key: 4, name: 'Sair', to: '/' }
+              { key: 4, name: 'Sair', to: '/sair' }
             ]
   }
 

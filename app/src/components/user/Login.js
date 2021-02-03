@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useHistory } from "react-router-dom"
 import { api } from '../../config/api'
 import logo from '../../assets/logo.png'
@@ -8,9 +8,41 @@ function Login(props) {
   const [error, setError] = useState({})
   const [loading, setLoading] = useState(false)
 
-  const admin = props.match.params.admin ? true : false
-
+  const admin = props.match.url === '/admin' ? true : false
+  const exit = props.match.url === '/sair' ? true : false
+  const token = localStorage.getItem('token')
+  
   let history = useHistory()
+
+  useEffect(() => {
+    if (exit) {
+      localStorage.removeItem('token')  
+    }
+  }, [exit])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (token) {
+          const res = await api.get(`/users/type`, 
+            { headers :{
+              'x-access-token' : localStorage.getItem('token')
+            }})
+
+          const { type } = res.data
+
+          if (type === 'admin') {
+            history.push('/admin-inicial')
+          } else {
+            if (type === 'regular') {
+              history.push('/inicial')
+            }
+          } 
+        }
+      } catch (error) {}
+    }
+    fetchData()
+  }, [token, history])
 
   const handleLogin = async () => {
     try {
@@ -30,10 +62,8 @@ function Login(props) {
   }
 
   const finishLogin = (id, type, token) => {
-    localStorage.setItem('id', id)
-    localStorage.setItem('type', type)
     localStorage.setItem('token', token)
-
+    
     setLoading(false)
     if (type === 'admin') {
       history.push('/admin-inicial')
@@ -94,13 +124,6 @@ function Login(props) {
                style={error.password ? { display: 'inline' } : { display: 'none' }}>
             {error.password}
           </div>
-        </div>
-        <div className="mb-1 form-check">
-          <input type="checkbox" 
-                 className="form-check-input" 
-                 id="keepConected" />
-                 
-          <label className="form-check-label" htmlFor="keepConected">Manter conectado</label>
         </div>
 
         <div className="mb-3">

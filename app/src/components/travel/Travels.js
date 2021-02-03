@@ -27,7 +27,7 @@ function Travels() {
         } else {
           setLastPage(1)
         }
-      } catch (error) {
+      } catch (error) {  
         history.push('/')
       }
     }
