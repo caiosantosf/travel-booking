@@ -4,12 +4,18 @@ module.exports = {
 
   async getMany (req, res) {
     const { currentpage: currentPage } = req.headers
-    const buses = await db('buses')
-                          .orderBy('description')
-                          .paginate({ perPage: 10, currentPage, isLengthAware: true })
-
+    const buses = currentPage ? await db('buses')
+                                  .orderBy('description')
+                                  .paginate({ perPage: 10, currentPage, isLengthAware: true })
+                              : await db('buses')
+                                  .orderBy('description')
+                          
     if (buses.hasOwnProperty('data')) {
       if (buses.data.length) {
+        return res.status(200).json(buses)
+      }
+    } else {
+      if (buses.length) {
         return res.status(200).json(buses)
       }
     }

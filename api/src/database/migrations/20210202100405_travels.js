@@ -6,7 +6,7 @@ exports.up = function(knex) {
 }
 
 exports.down = function(knex) {
-  return knex.schema.alterTable('users', (table) => {
+  return knex.schema.alterTable('travels', (table) => {
     table.dropColumn('notes')
   })
 }

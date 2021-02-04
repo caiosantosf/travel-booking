@@ -24,7 +24,7 @@ const validation = (fields) => {
           messages.cep = 'O CEP deve ser numérico'
         }
       } else {
-        messages.cep = 'O CEP é obrigatória'
+        messages.cep = 'O CEP é obrigatório'
       }
     }
 
@@ -110,6 +110,10 @@ const validation = (fields) => {
       } else {
         messages.returnDate = 'A Data de retorno é obrigatória'
       }
+    }
+
+    if (Object.keys(messages).length > 0) {
+      return res.status(400).json(messages)
     }
 
     next()

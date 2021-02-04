@@ -1,5 +1,5 @@
 const db = require('../../database/connection')
-const { encrypt, compareCrypt, token } = require('../../config/security')
+const { encrypt, compareCrypt, token, getUserType } = require('../../config/security')
 const sendMail = require('../../config/email')
 
 const dbErrors = error => {
@@ -19,6 +19,7 @@ const dbErrors = error => {
 }
 
 module.exports = {
+
   async auth (req, res) {
     const { cpf , password : reqPassword } = req.body
     const user = await db('users').where({ cpf })

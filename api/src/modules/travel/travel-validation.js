@@ -54,8 +54,8 @@ const validation = (fields) => {
     }
 
     if (fields.includes('controlsSeats')) {
-      if ( (typeof controlsSeats == 'undefined') && (controlsSeats == '') ) {
-        messages.description = 'É obrigatório informar se irá controlar poltronas'
+      if ( (typeof controlsSeats === 'undefined') || (controlsSeats === '') ) {
+        messages.controlsSeats = 'É obrigatório informar se irá controlar poltronas'
       }
     }
     

@@ -12,7 +12,7 @@ routes.get('/travels/:travel_id/values',
 
 routes.post('/travels/:travel_id/values', 
   security([ 'admin' ]),
-  validation(['value', 'onlyReturnValue', 'onlyDepartureValue', 'initialAge', 'finalAge']),
+  validation(['value', 'onlyReturnValue', 'onlyDepartureValue', 'initialAge', 'finalAge', 'lapChild']),
   post
 )
 
@@ -23,7 +23,7 @@ routes.get('/travels/:travel_id/values/:id',
 
 routes.put('/travels/:travel_id/values/:id', 
   security([ 'admin' ]), 
-  validation(['value', 'onlyReturnValue', 'onlyDepartureValue', 'initialAge', 'finalAge']),
+  validation(['value', 'onlyReturnValue', 'onlyDepartureValue', 'initialAge', 'finalAge', 'lapChild']),
   put
 )
 

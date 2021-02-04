@@ -1,6 +1,6 @@
 const express = require('express')
 const { auth, getMany, post, destroy, getOne, put, emailResetPassword } = require('./user-controller')
-const { routeSecurity : security } = require('../../config/security')
+const { routeSecurity : security, getUserType: getType } = require('../../config/security')
 const validation = require('./user-validation')
 
 const routes = express.Router()
@@ -8,6 +8,10 @@ const routes = express.Router()
 routes.post('/users/login', 
   validation(['cpf', 'password']), 
   auth
+)
+
+routes.get('/users/type', 
+  getType
 )
 
 routes.post('/users/login/admin', 

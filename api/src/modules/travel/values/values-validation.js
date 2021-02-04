@@ -1,6 +1,6 @@
 const validation = (fields) => {
   return (req, res, next) => {
-    const { travel_id, value, onlyReturnValue, onlyDepartureValue, initialAge, finalAge } = req.body
+    const { travel_id, value, onlyReturnValue, onlyDepartureValue, initialAge, finalAge, lapChild } = req.body
     const messages = {}
     
     if (fields.includes('travel_id')) {
@@ -15,7 +15,7 @@ const validation = (fields) => {
 
     if (fields.includes('value')) {
       if (typeof value !== 'undefined') {
-        if (isNaN(value) || (!value)) {
+        if (isNaN(value)) {
           messages.value = 'O valor não é valido'
         }
       } else {
@@ -25,7 +25,7 @@ const validation = (fields) => {
 
     if (fields.includes('onlyReturnValue')) {
       if (typeof onlyReturnValue !== 'undefined') {
-        if (isNaN(onlyReturnValue) || (!onlyReturnValue)) {
+        if (isNaN(onlyReturnValue)) {
           messages.onlyReturnValue = 'O valor de retorno não é valido'
         }
       } else {
@@ -35,7 +35,7 @@ const validation = (fields) => {
 
     if (fields.includes('onlyDepartureValue')) {
       if (typeof onlyDepartureValue !== 'undefined') {
-        if (isNaN(onlyDepartureValue) || (!onlyDepartureValue)) {
+        if (isNaN(onlyDepartureValue)) {
           messages.onlyDepartureValue = 'O valor de ida não é valido'
         }
       } else {
@@ -45,7 +45,7 @@ const validation = (fields) => {
 
     if (fields.includes('initialAge')) {
       if (typeof initialAge !== 'undefined') {
-        if (isNaN(initialAge) || (!initialAge)) {
+        if (isNaN(initialAge)) {
           messages.initialAge = 'A idade inicial não é valida'
         }
       } else {
@@ -55,11 +55,17 @@ const validation = (fields) => {
 
     if (fields.includes('finalAge')) {
       if (typeof finalAge !== 'undefined') {
-        if (isNaN(finalAge) || (!finalAge)) {
-          messages.finalAge = 'O valor de ida não é valido'
+        if (isNaN(finalAge)) {
+          messages.finalAge = 'A idade final não é valida'
         }
       } else {
-        messages.finalAge = 'O valor de ida é obrigatório'
+        messages.finalAge = 'A idade final é obrigatória'
+      }
+    }
+
+    if (fields.includes('lapChild')) {
+      if ( (typeof lapChild === 'undefined') || (lapChild === '') ) {
+        messages.lapChild = 'É obrigatório informar se é valor para criança de colo'
       }
     }
     
