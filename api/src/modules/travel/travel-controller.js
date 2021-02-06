@@ -13,30 +13,49 @@ const dbErrors = error => {
 const getValues = async id => {
   return await db('travelValues')
                 .where('travel_id', id)
-                .orderBy('id', 'desc')
+                .orderBy('initialAge', 'asc')
 }
 
 const getDeparturePlaces = async id => {
   return await db('travelDeparturePlaces')
                 .where('travel_id', id)
-                .orderBy('id', 'desc')
+                .orderBy('departureDate', 'asc')
 }
 
 module.exports = {
 
   async getMany (req, res) {
-    const { currentpage: currentPage } = req.headers
+    const { currentpage: currentPage, opentravels: openTravels } = req.headers
     
-    let travels = await db('travels')
-                          .orderBy('id', 'desc')
-                          .paginate({ perPage: 10, currentPage, isLengthAware: true })
+    let travels = currentPage ? await db('travels')
+                                .orderBy('id', 'desc')
+                                .paginate({ perPage: 10, currentPage, isLengthAware: true })
+                              : await db('travels')
+                                .orderBy('id', 'desc')
 
     if (travels.hasOwnProperty('data')) {
       if (travels.data.length) {
 
-        for (i = 0; i < travels.data.length; i++) {
-          travels.data[i].values = await getValues(travels.data[i].id)
-          travels.data[i].departurePlaces = await getDeparturePlaces(travels.data[i].id)
+        for (const [i, travel] of travels.data.entries()) {
+          travels.data[i].values = await getValues(travel.id)
+          travels.data[i].departurePlaces = await getDeparturePlaces(travel.id)
+        }
+        
+        if (openTravels) {
+          travels.data = travels.data.filter((travel) => (travel.departurePlaces[0] >= new Date()))
+        }
+
+        return res.status(200).json(travels)
+      }
+    } else {
+      if (travels.length) {
+        for (const [i, travel] of travels.entries()) {
+          travels[i].values = await getValues(travel.id)
+          travels[i].departurePlaces = await getDeparturePlaces(travel.id)
+        }
+
+        if (openTravels) {
+          travels = travels.filter((travel) => (travel.departurePlaces[0].departureDate >= new Date()))
         }
 
         return res.status(200).json(travels)

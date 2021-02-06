@@ -51,14 +51,16 @@ function Travel(props) {
             'x-access-token' : localStorage.getItem('token')
           }})
 
-        const { data } = res.data
-        setBuses(data)
-
-        if (travel_id === 'novo') {
-          setTravel({controlsSeats: true, bus_id: data[0].id})
+        if (res.status === 200) {
+          const { data } = res
+          setBuses(data)
+        
+          if (travel_id === 'novo') {
+            setTravel({controlsSeats: true, bus_id: data[0].id})
+          }
         }
       } catch (error) {
-        setMessage(error.response.data.message)
+        //setMessage(error.response.data.message)
       }
     }
 
@@ -199,7 +201,7 @@ function Travel(props) {
 
           <div className="col-md-4">
             <label className="form-label" htmlFor="controlsSeat">Controla Poltronas?</label>
-            <select className={`form-select ${error.state ? 'is-invalid' : ''}`} id="state"
+            <select className={`form-select ${error.controlsSeats ? 'is-invalid' : ''}`} id="controlsSeat"
               value={travel.controlsSeats || ''}
               onChange={e => {
                 setTravel({ ...travel,
@@ -209,6 +211,12 @@ function Travel(props) {
               <option value={true}>Sim</option>
               <option value={false}>Não</option>
             </select>
+
+            <div id="validationControlsSeats" 
+                className="invalid-feedback" 
+                style={error.controlsSeats ? { display: 'inline' } : { display: 'none' }}>
+                {error.controlsSeats}
+            </div>
           </div>
 
           <div className="col-md-8">

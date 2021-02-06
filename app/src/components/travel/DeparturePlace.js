@@ -79,13 +79,15 @@ function DeparturePlace(props) {
     try {
       const res = await apiCep(departurePlace.cep)
       const { data } = res
-      setDeparturePlace({ ...departurePlace,
-                          homeAddress: data.logradouro, 
-                          complement: data.complement,
-                          neighborhood: data.bairro,
-                          city: data.localidade,
-                          state: data.uf
-                        })
+      if (!data.erro) {
+        setDeparturePlace({ ...departurePlace,
+                            homeAddress: data.logradouro, 
+                            complement: data.complement,
+                            neighborhood: data.bairro,
+                            city: data.localidade,
+                            state: data.uf
+                          })
+      }
     } catch (error) {
       setError({cep: "CEP Inválido!"})
     }

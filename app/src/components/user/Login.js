@@ -17,8 +17,9 @@ function Login(props) {
   useEffect(() => {
     if (exit) {
       localStorage.removeItem('token')  
+      history.push('/')
     }
-  }, [exit])
+  }, [exit, history])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,7 +36,7 @@ function Login(props) {
             history.push('/admin-inicial')
           } else {
             if (type === 'regular') {
-              history.push('/inicial')
+              history.push('/')
             }
           } 
         }
@@ -68,7 +69,7 @@ function Login(props) {
     if (type === 'admin') {
       history.push('/admin-inicial')
     } else {
-      history.push('/inicial')
+      history.push('/')
     }
   }
 

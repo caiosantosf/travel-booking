@@ -5,8 +5,9 @@ const getUserType = () => {
     const token = localStorage.getItem('token')
     if (token) {
       const decoded = jwt_decode(token)
-      return decoded.type
+      return decoded.type || false
     }
+    return false
   } catch (error) {
     return false
   }

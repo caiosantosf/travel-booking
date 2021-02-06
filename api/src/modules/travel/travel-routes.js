@@ -17,8 +17,7 @@ const upload = multer({ storage })
 
 const routes = express.Router()
 
-routes.get('/travels', 
-  security([ 'admin', 'regular' ]),
+routes.get('/travels',
   getMany
 )
 

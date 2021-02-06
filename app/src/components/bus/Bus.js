@@ -60,10 +60,9 @@ function Bus(props) {
 
       history.push('/onibus')
     } catch (error) {
+      setLoadingSave(false)
       setError(error.response.data)
-    }
-
-    setLoadingSave(false)
+    }    
   }
 
   const handleDestroy = async () => {

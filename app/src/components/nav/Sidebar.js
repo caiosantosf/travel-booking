@@ -5,9 +5,10 @@ function Sidebar(props) {
 
   let links = []
 
-  if (props.pageType === 'register') {
+  if (!props.pageType) {
     links = [
-              { key: 1, name: 'Login', to: '/' },
+              { key: 1, name: 'Login', to: '/login' },
+              { key: 2, name: 'Cadastrar', to: '/registro' }
             ]
   }
 
@@ -21,9 +22,9 @@ function Sidebar(props) {
             ]
   }
 
-  if (props.pageType === 'user') {
+  if (props.pageType === 'regular') {
     links = [
-              { key: 1, name: 'Página Inicial', to: '/inicial' },
+              { key: 1, name: 'Página Inicial', to: '/' },
               { key: 2, name: 'Meus Dados', to: '/usuario' },
               { key: 3, name: 'Minhas Viagens', to: '/minhas-viagens' },
               { key: 4, name: 'Sair', to: '/sair' }

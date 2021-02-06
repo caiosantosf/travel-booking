@@ -21,6 +21,10 @@ td {
   border-color: #434596 !important;
 }
 
+.bg-custom {
+  background-color: #434596 !important;
+}
+
 .btn-warning {
   background-color: #F06735 !important; 
   border-color: #F06735 !important;
@@ -133,4 +137,21 @@ a:link {
 
   display: flex;
   align-items: center;
+}
+
+/* Inicial */
+
+.center-cropped {
+  object-fit: cover;
+  object-position: center;
+  height: 200px;
+}
+
+.card:hover {
+  border-color: #F06735;
+}
+
+.card-link, .card-link:hover{
+    color: inherit; 
+    text-decoration: inherit;
 }

@@ -85,8 +85,8 @@ module.exports = {
 
   async post (req, res) {
     const data = req.body
+    data.type = 'regular'
     data.password = await encrypt(data.password)
-    data.departure = new Date(data.departure)
     try {
       const id = await db('users').insert(data).returning('id')
       return res.status(201).json({ id: id[0], token: token(id, 'regular'), type: 'regular' })
@@ -100,7 +100,6 @@ module.exports = {
     const { id } = req.params
     const data = req.body
     data.password = await encrypt(data.password)
-    data.departure = new Date(data.departure)
     try {
       const result = await db('users').where({ id }).update({ id, ...data })
       if (result) {

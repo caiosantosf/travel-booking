@@ -21,15 +21,15 @@ export default function Routes() {
   return (
     <BrowserRouter>
       <Switch>
-        <Route path="/" exact component={Login} />
+        <Route path="/login" exact component={Login} />
         <Route path="/admin" exact component={Login} />
         <Route path="/sair" exact component={Login} />
         <Route path="/email-redefine-senha" exact component={EmailResetPassword} />
         <Route path="/redefine-senha/:id" exact component={ResetPassword} />
         <Route path="/registro/" exact component={User} />
-        <Route path="/usuarios/" exact render={props => (getUserType() === 'admin' ? <Users { ...props }/> : <Forbidden />)}/>
+        <Route path="/usuarios/" exact render={props => (getUserType() === 'admin' ? <Users { ...props } userType={getUserType()}/> : <Forbidden />)}/>
         <Route path="/usuarios/:id" exact component={User} />
-        <Route path="/inicial/" exact component={UserHome} />
+        <Route path="/" exact render={props => <UserHome { ...props } userType={getUserType()} />} />
         <Route path="/admin-inicial/" exact render={props => (getUserType() === 'admin' ? <Admin { ...props }/> : <Forbidden />)}/>
         <Route path="/viagens/" exact render={props => (getUserType() === 'admin' ? <Travels { ...props }/> : <Forbidden />)}/>
         <Route path="/viagens/:id" exact render={props => (getUserType() === 'admin' ? <Travel { ...props }/> : <Forbidden />)}/>
