@@ -7,6 +7,8 @@ const busRoutes = require('./modules/bus/bus-routes')
 const travelRoutes = require('./modules/travel/travel-routes')
 const valueRoutes = require('./modules/travel/values/values-routes')
 const departurePlacesRoutes = require('./modules/travel/departurePlaces/departure-places-routes')
+const reservation = require('./modules/reservation/reservation-routes')
+const dependent = require('./modules/dependent/dependent-routes')
 
 const app = express()
 
@@ -20,6 +22,8 @@ app.use(busRoutes)
 app.use(travelRoutes)
 app.use(valueRoutes)
 app.use(departurePlacesRoutes)
+app.use(reservation)
+app.use(dependent)
 
 app.listen(process.env.PORT, () => {
   console.log(`API server running on port ${process.env.PORT}!`)

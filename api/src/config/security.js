@@ -15,9 +15,17 @@ module.exports = {
           return res.status(500).json({ auth: false, message: 'Não foi possível validar o Token de autenticação' })
         } 
 
-        if ((req.params.id) && (req.url.search('user') > -1)) {
+        if ((req.params.id) && (req.url.search('users') > -1)) {
           if ((req.params.id != decoded.id) && (decoded.type === 'regular')) {
             return res.status(401).json({ auth: false, message: 'Usuário não tem permissão nesse registro' })
+          }
+        }
+
+        if (req.url.search('reservations') > -1) {
+          if (req.body.user_id) {
+            if ((req.body.user_id != decoded.id) && (decoded.type === 'regular')) {
+              return res.status(401).json({ auth: false, message: 'Usuário não tem permissão nesse registro' })
+            }
           }
         }
 
