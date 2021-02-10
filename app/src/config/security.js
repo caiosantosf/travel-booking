@@ -1,11 +1,11 @@
 import jwt_decode from "jwt-decode";
 
-const getUserType = () => {
+const decodeToken = option => {
   try {
     const token = localStorage.getItem('token')
     if (token) {
       const decoded = jwt_decode(token)
-      return decoded.type || false
+      return decoded[option] || false
     }
     return false
   } catch (error) {
@@ -13,4 +13,12 @@ const getUserType = () => {
   }
 }
 
-export { getUserType }
+const getUserType = () => {
+  decodeToken('type')
+}
+
+const getUserId = () => {
+  decodeToken('id')
+}
+
+export { getUserType, getUserId }

@@ -6,7 +6,7 @@ import { Link, useHistory } from "react-router-dom"
 import { api, apiUrl } from '../../config/api'
 import { dateTimeBrazil } from '../../config/transformations'
 
-function AdminHome({ userType }) {
+function UserHome({ userType }) {
   const [travels, setTravels] = useState([])
 
   //let history = useHistory()
@@ -22,7 +22,7 @@ function AdminHome({ userType }) {
         if (res.status === 200) {
           setTravels(res.data)
         } else {
-          //fala que nao tem viagem em aberto
+          setTravels(false)
         }
       } catch (error) {  
         //fala que houve um erro
@@ -35,14 +35,14 @@ function AdminHome({ userType }) {
 
   return (
     <React.Fragment>
+      <NavHeader />
       <div className="container-fluid">
         <div className="row">
-          <NavHeader />
-          
+                    
           <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-4">
             <Sidebar pageType={userType}/>
 
-            {!travels.length ? noTravels : ''}
+            {!travels ? noTravels : ''}
 
             <div className="row row-cols-1 row-cols-md-2 row-cols-xl-3 row-cols-xxl-4 g-3">
 
@@ -52,13 +52,16 @@ function AdminHome({ userType }) {
 
                 return (
                   <div className="col">
-                    <Link key={id} className="card-link" to="/">
+                    <Link key={id} className="card-link" to={`/reserva/${id}`}>
                       <div className="card shadow-sm bg-light">
                         <img src={`${apiUrl}uploads/${imageName}`} className="card-img-top center-cropped" alt={destination} />
                         <div className="card-body">
                           <h5>{destination}</h5>
-                          <p className="card-text">{description}</p>
-                          <p className="text-danger">* Últimas Poltronas!</p>
+                          <p className="card-text">
+                            {description}
+                            <p className="text-danger">* Últimas Poltronas!</p>
+                          </p>
+                          
                           <hr />
                             {departurePlaces.map((place, i) => {
                               const { id, departureDate, returnDate, city } = place
@@ -72,11 +75,11 @@ function AdminHome({ userType }) {
                             })}
                           <hr />
                           <div >
-                            {values.map(val => {
-                              const { value, initialAge, finalAge, lapChild } = val
+                            {values.map((val, i) => {
+                              const { value, onlyDepartureValue, onlyReturnValue, initialAge, finalAge, lapChild } = val
                               
                               return (
-                                <span>
+                                <div className={i ? 'mt-2' : ''}>
                                   {
                                     onlyOneValue ?
                                       ''
@@ -89,10 +92,40 @@ function AdminHome({ userType }) {
                                         :
                                           `Até ${finalAge} anos`
                                   }
-                                  <div className="d-block">
-                                    <h5 className="badge bg-custom fs-5 values">{`R$ ${value.replace(".",",")}`}</h5>
+                                  <div className="d-flex">
+                                    <div className="badge bg-custom-primary fs-5">
+                                      { 
+                                        `R$ ${value.replace(".00","").replace(".",",")}`
+                                      }
+                                    </div>
+
+                                    <div className="ms-1 badge bg-custom-secondary price-secondary"
+                                         style={onlyDepartureValue > 0 ? { display: 'inline' } : { display: 'none' }}>
+
+                                      <span className="d-block fs-7 text-start">Só Ida </span>
+                                      <span className="d-block fs-6">
+                                      { Number.isInteger(onlyDepartureValue) ?
+                                          `R$ ${onlyDepartureValue.replace(".",",")}`
+                                        :
+                                          `R$ ${onlyDepartureValue.replace(".00","")}`
+                                      }
+                                      </span>
+                                    </div>
+
+                                    <div className="ms-1 badge bg-custom-secondary"
+                                         style={onlyReturnValue > 0 ? { display: 'inline' } : { display: 'none' }}>
+
+                                      <span className="d-block fs-7 text-start">Só Volta</span>
+                                      <span className="d-block fs-6">
+                                      { Number.isInteger(onlyReturnValue) ?
+                                          `R$ ${onlyReturnValue.replace(".",",")}`
+                                        :
+                                          `R$ ${onlyReturnValue.replace(".00","")}`
+                                      }
+                                      </span>
+                                    </div>
                                   </div>
-                                </span>
+                                </div>
                               )
                             })}                          
                           </div>
@@ -110,4 +143,4 @@ function AdminHome({ userType }) {
   )
 }
 
-export default AdminHome
+export default UserHome

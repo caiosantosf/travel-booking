@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { Link, useHistory } from "react-router-dom"
+import { Link, useHistory, useLocation } from "react-router-dom"
 import { api } from '../../config/api'
 import logo from '../../assets/logo.png'
+import { getUserType } from '../../config/security'
 
 function Login(props) {
   const [auth, setAuth] = useState({})
@@ -11,7 +12,8 @@ function Login(props) {
   const admin = props.match.url === '/admin' ? true : false
   const exit = props.match.url === '/sair' ? true : false
   const token = localStorage.getItem('token')
-  
+  const returnTo = localStorage.getItem('to')
+    
   let history = useHistory()
 
   useEffect(() => {
@@ -25,33 +27,34 @@ function Login(props) {
     const fetchData = async () => {
       try {
         if (token) {
-          const res = await api.get(`/users/type`, 
-            { headers :{
-              'x-access-token' : localStorage.getItem('token')
-            }})
 
-          const { type } = res.data
-
-          if (type === 'admin') {
-            history.push('/admin-inicial')
+          if (returnTo) {
+            localStorage.setItem('to', '')
+            history.push(returnTo)
           } else {
-            if (type === 'regular') {
-              history.push('/')
-            }
-          } 
+            const type = getUserType()
+
+            if (type === 'admin') {
+              history.push('/admin-inicial')
+            } else {
+              if (type === 'regular') {
+                history.push('/')
+              }
+            } 
+          }
         }
       } catch (error) {}
     }
     fetchData()
-  }, [token, history])
+  }, [token, history, returnTo])
 
   const handleLogin = async () => {
     try {
       setLoading(true)
       setError({})
       const res = await api.post(`/users/login/${admin ? 'admin' : ''}`, auth)
-      const { id, type, token } = res.data
-      finishLogin(id, type, token)
+      const { type, token } = res.data
+      finishLogin(type, token)
     } catch (err) {
       if ((err.hasOwnProperty('response')) && (err.response)) {
         setError(err.response.data)
@@ -62,15 +65,9 @@ function Login(props) {
     }
   }
 
-  const finishLogin = (id, type, token) => {
+  const finishLogin = (type, token) => {
     localStorage.setItem('token', token)
-    
     setLoading(false)
-    if (type === 'admin') {
-      history.push('/admin-inicial')
-    } else {
-      history.push('/')
-    }
   }
 
   return (

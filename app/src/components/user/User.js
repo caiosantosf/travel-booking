@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useHistory } from "react-router-dom"
+import { useHistory, useLocation } from "react-router-dom"
 import { api, apiCep } from '../../config/api'
 import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
@@ -11,6 +11,8 @@ function User(props) {
   const [message, setMessage] = useState('')
 
   let history = useHistory()
+
+  const returnTo = localStorage.getItem('to')
 
   const { id } = props.match.params
 
@@ -44,8 +46,8 @@ function User(props) {
       } else {
         const { passwordConfirmation, ...userData} = user
         const res = await api.post(`/users/`, userData)
-        const { id, type, token } = res.data
-        finishLogin(id, type, token)
+        const { type, token } = res.data
+        finishLogin(type, token)
       }
     } catch (err) {
       setError(err.response.data)
@@ -71,16 +73,20 @@ function User(props) {
     }
   }
 
-  const finishLogin = (id, type, token) => {
-    localStorage.setItem('id', id)
-    localStorage.setItem('type', type)
+  const finishLogin = (type, token) => {
     localStorage.setItem('token', token)
 
     setLoading(false)
-    if (type === 'admin') {
-      history.push('/admin-inicial')
+
+    if (returnTo) {
+      history.push(returnTo)
+      localStorage.setItem('to', '')
     } else {
-      history.push('/')
+      if (type === 'admin') {
+        history.push('/admin-inicial')
+      } else {
+        history.push('/')
+      }
     }
   }
 
@@ -442,7 +448,7 @@ function User(props) {
                         if (id) {
                           history.push('/usuarios')
                         } else {
-                          history.push('/')
+                          props.history.goBack()
                         }
                       }}>
                 Voltar

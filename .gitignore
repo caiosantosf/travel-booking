@@ -29,3 +29,5 @@ uploads
 
 # exception to the rule
 !uploads/.gitkeep 
+
+Attention.txt

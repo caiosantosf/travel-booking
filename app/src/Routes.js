@@ -15,7 +15,9 @@ import Travels            from './components/travel/Travels'
 import Travel             from './components/travel/Travel'
 import Value              from './components/travel/Value'
 import DeparturePlace     from './components/travel/DeparturePlace'
+import Reservation        from './components/reservation/Reservation'
 import Forbidden          from './components/environment/Forbidden'
+import ToRegister         from './components/environment/ToRegister'
 
 export default function Routes() {
   return (
@@ -37,6 +39,7 @@ export default function Routes() {
         <Route path="/viagens/:travel_id/saidas/:id" exact render={props => (getUserType() === 'admin' ? <DeparturePlace { ...props }/> : <Forbidden />)}/>
         <Route path="/onibus/" exact render={props => (getUserType() === 'admin' ? <Buses { ...props }/> : <Forbidden />)}/>
         <Route path="/onibus/:id" exact render={props => (getUserType() === 'admin' ? <Bus { ...props }/> : <Forbidden />)}/>
+        <Route path="/reserva/:travel_id" exact render={props => (getUserType() ? <Reservation { ...props }/> : <ToRegister { ...props }/>)}/>
       </Switch>
     </BrowserRouter>
   )

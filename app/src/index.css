@@ -21,8 +21,12 @@ td {
   border-color: #434596 !important;
 }
 
-.bg-custom {
+.bg-custom-primary {
   background-color: #434596 !important;
+}
+
+.bg-custom-secondary {
+  background-color: #F06735 !important;
 }
 
 .btn-warning {
@@ -154,4 +158,16 @@ a:link {
 .card-link, .card-link:hover{
     color: inherit; 
     text-decoration: inherit;
+}
+
+@media (max-width: 350px) {
+  .card-body {
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+  }
+
+  .badge {
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+  }
 }
