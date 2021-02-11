@@ -98,13 +98,36 @@ module.exports = {
 
   async put (req, res) {
     const { id } = req.params
-    const data = req.body
-    data.password = await encrypt(data.password)
+    let data = req.body
+    const { password : reqPassword, newPassword } = data
+
     try {
-      const result = await db('users').where({ id }).update({ id, ...data })
-      if (result) {
-        return res.status(200).json({ message : 'Usuário alterado'})
+
+      const user = await db('users').where({ id })
+
+      if (user.length) {
+        const { password: dbPassword } = user[0]
+
+        if (await compareCrypt(reqPassword, dbPassword)) {
+
+          if (newPassword) {
+            data.password = await encrypt(data.newPassword)
+          } else {
+            data.password = await encrypt(data.password)
+          }
+
+          delete data.newPassword
+
+          const result = await db('users').where({ id }).update({ id, ...data })
+
+          if (result) {
+            return res.status(200).json({ message : 'Usuário alterado'})
+          }
+        } else {
+          return res.status(404).json({ password: 'Senha atual está incorreta'})
+        }
       }
+
       return res.status(404).json({ message: 'Usuário não encontrado'})
     } catch (error) {
       const message = dbErrors(error)

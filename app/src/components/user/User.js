@@ -16,12 +16,11 @@ function User(props) {
   const returnTo = localStorage.getItem('to')
 
   const id = parseInt(props.match.params.id)
+  const admin = getUserType() === 'admin' ? true : false
 
-  if (id !== getUserId()) {
-    //history.push('/acesso-negado')
+  if ( (!admin) && (id) && (id !== getUserId()) ) {
+    history.push('/acesso-negado')
   }
-
-  //const admin = 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,16 +46,27 @@ function User(props) {
     try {
       setLoading(true)
       setError({})
-      if (user.password !== user.passwordConfirmation) {
+
+      if ( ((user.password !== user.passwordConfirmation) && (!id)) || 
+           ((user.newPassword !== user.passwordConfirmation) && (id)) ) {
+
         setError({passwordConfirmation: "Confirmação de Senha está diferente da Senha"})
         setLoading(false)
       } else {
-        const { passwordConfirmation, ...userData} = user
-        const res = await api.post(`/users/`, userData)
+        const { passwordConfirmation, id, ...userData} = user
+
+        const res = id ? await api.put(`/users/${id}`, userData, 
+                                { headers :{
+                                  'x-access-token' : localStorage.getItem('token')
+                                }})
+                       : await api.post('/users/', userData)
+
         const { type, token } = res.data
-        finishLogin(type, token)
+
+        finish(type, token)
       }
     } catch (err) {
+      setMessage(err.response.data.message)
       setError(err.response.data)
       setLoading(false)
     }
@@ -80,8 +90,10 @@ function User(props) {
     }
   }
 
-  const finishLogin = (type, token) => {
-    localStorage.setItem('token', token)
+  const finish = (type, token) => {
+    if (token) {
+      localStorage.setItem('token', token)
+    }
 
     setLoading(false)
 
@@ -115,7 +127,7 @@ function User(props) {
             <div className="col-lg-6">
               <label htmlFor="name" className="form-label">Nome</label>
               <input type="text" className={`form-control ${error.name ? 'is-invalid' : ''}`} id="name" maxLength="255" 
-                disabled={id}
+                disabled={admin}
                 value={user.name || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -132,7 +144,7 @@ function User(props) {
             <div className="col-lg-3">
               <label htmlFor="cpf" className="form-label">CPF</label>
               <input type="text" className={`form-control ${error.name ? 'is-invalid' : ''}`} id="cpf" maxLength="11" 
-                disabled={id}
+                disabled={admin}
                 value={user.cpf || ''}
                 onChange={e => {
                   const re = /^[0-9\b]+$/
@@ -152,7 +164,7 @@ function User(props) {
             <div className="col-lg-3">
               <label htmlFor="birth" className="form-label">Nascimento</label>
               <input type="date" className={`form-control ${error.birth ? 'is-invalid' : ''}`} id="birth" 
-                disabled={id}
+                disabled={admin}
                 value={user.birth || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -169,7 +181,7 @@ function User(props) {
             <div className="col-lg-2">
             <label htmlFor="documentType" className="form-label">Tipo de Documento</label>
               <select className={`form-select ${error.documentType ? 'is-invalid' : ''}`} id="documentType" 
-                disabled={id}
+                disabled={admin}
                 value={user.documentType || ''}
                 onChange={e => {
                     setUser({ ...user,
@@ -188,7 +200,7 @@ function User(props) {
             <div className="col-lg-3">
               <label htmlFor="document" className="form-label">Documento</label>
               <input type="text" className={`form-control ${error.document ? 'is-invalid' : ''}`} id="document" maxLength="14"
-                disabled={id}
+                disabled={admin}
                 value={user.document || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -205,7 +217,7 @@ function User(props) {
             <div className="col-lg-3">
               <label htmlFor="phone" className="form-label">Celular (WhatsApp)</label>
               <input type="text" className={`form-control ${error.phone ? 'is-invalid' : ''}`} id="phone" maxLength="11"
-                disabled={id}
+                disabled={admin}
                 value={user.phone || ''}
                 onChange={e => {
                   const re = /^[0-9\b]+$/
@@ -225,7 +237,7 @@ function User(props) {
             <div className="col-lg-4">
               <label htmlFor="email" className="form-label">Email</label>
               <input type="email" className={`form-control ${error.email ? 'is-invalid' : ''}`} id="email" maxLength="255" 
-                disabled={id}
+                disabled={admin}
                 value={user.email || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -243,7 +255,7 @@ function User(props) {
             <div className="col-lg-2">
               <label htmlFor="cep" className="form-label">CEP</label>
               <input type="text" className={`form-control ${error.cep ? 'is-invalid' : ''}`} id="cep" maxLength="8"
-                disabled={id}
+                disabled={admin}
                 value={user.cep || ''}
                 onChange={e => {
                   const re = /^[0-9\b]+$/
@@ -265,7 +277,7 @@ function User(props) {
             <div className="col-lg-6" >
               <label htmlFor="homeAddress" className="form-label">Endereço</label>
               <input type="text" className={`form-control ${error.homeAddress ? 'is-invalid' : ''}`} id="homeAddress" maxLength="255"
-                disabled={id}
+                disabled={admin}
                 value={user.homeAddress || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -283,7 +295,7 @@ function User(props) {
             <div className="col-lg-1">
               <label htmlFor="addressNumber" className="form-label">Número</label>
               <input type="text" className={`form-control ${error.addressNumber ? 'is-invalid' : ''}`} id="addressNumber" maxLength="5"
-                disabled={id}
+                disabled={admin}
                 value={user.addressNumber || ''}
                 onChange={e => {
                   const re = /^[0-9\b]+$/
@@ -304,7 +316,7 @@ function User(props) {
             <div className="col-lg-3">
               <label htmlFor="complement" className="form-label">Complemento</label>
               <input type="text" className={`form-control ${error.complement ? 'is-invalid' : ''}`} id="complement" maxLength="255"
-                disabled={id}
+                disabled={admin}
                 value={user.complement || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -322,7 +334,7 @@ function User(props) {
             <div className="col-lg-6" >
               <label htmlFor="neighborhood" className="form-label">Bairro</label>
               <input type="text" className={`form-control ${error.neighborhood ? 'is-invalid' : ''}`} id="neighborhood" maxLength="255"
-                disabled={id}
+                disabled={admin}
                 value={user.neighborhood || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -340,7 +352,7 @@ function User(props) {
             <div className="col-lg-3">
               <label htmlFor="state" className="form-label">Estado</label>
               <select className={`form-select ${error.state ? 'is-invalid' : ''}`} id="state"
-                disabled={id}
+                disabled={admin}
                 value={user.state || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -386,7 +398,7 @@ function User(props) {
             <div className="col-lg-3">
               <label htmlFor="city" className="form-label">Cidade</label>
               <input type="text" className={`form-control ${error.city ? 'is-invalid' : ''}`} id="city" maxLength="255"
-                disabled={id}
+                disabled={admin}
                 value={user.city || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -402,9 +414,9 @@ function User(props) {
             </div>
 
             <div className="col-lg-4">
-              <label htmlFor="password" className="form-label">Senha</label>
+              <label htmlFor="password" className="form-label">{`Senha ${id ? 'Atual' : ''}`}</label>
               <input type="password" className={`form-control ${error.password ? 'is-invalid' : ''}`} id="password"
-                disabled={id}
+                disabled={admin}
                 value={user.password || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -418,10 +430,29 @@ function User(props) {
                 {error.password}
               </div>
             </div>
+
+            <div className="col-lg-4" style={id ? { display: 'inline-block'} : { display : 'none'}}>
+              <label htmlFor="newPassword" className="form-label">Nova Senha</label>
+              <input type="password" className={`form-control ${error.newPassword ? 'is-invalid' : ''}`} id="newPassword"
+                disabled={admin}
+                value={user.newPassword || ''}
+                onChange={e => {
+                  setUser({ ...user,
+                    newPassword: e.target.value
+                  })
+                }}/>
+
+              <div id="validationNewPassword" 
+                className="invalid-feedback" 
+                style={error.newPassword ? { display: 'inline' } : { display: 'none' }}>
+                {error.newPassword}
+              </div>
+            </div>
+
             <div className="col-lg-4">
               <label htmlFor="passwordConfirmation" className="form-label">Confirme a Senha</label>
               <input type="password" className={`form-control ${error.passwordConfirmation ? 'is-invalid' : ''}`} id="passwordConfirmation" 
-                disabled={id}
+                disabled={admin}
                 value={user.passwordConfirmation || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -441,22 +472,18 @@ function User(props) {
                       className="btn btn-primary"
                       onClick={handleSave}
                       disabled={loading}
-                      style={id ? { display: 'none'} : { display : 'inline-block'}}>
+                      style={admin ? { display: 'none'} : { display : 'inline-block'}}>
                 <span className="spinner-border spinner-border-sm mx-1" 
                       role="status" 
                       aria-hidden="true"
                       style={false ? { display: 'inline-block'} : { display : 'none' }}>
                 </span>
-                Cadastrar
+                Confirmar
               </button>
               <button type="button" 
                       className="btn btn-warning text-white mb-4"
                       onClick={() => {
-                        if (id) {
-                          history.push('/usuarios')
-                        } else {
-                          props.history.goBack()
-                        }
+                        props.history.goBack()
                       }}>
                 Voltar
               </button>

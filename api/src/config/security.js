@@ -58,7 +58,7 @@ module.exports = {
   },
 
   token(id, type) {
-    return jwt.sign({ id, type }, process.env.SECRET, { expiresIn: 86400 })
+    return jwt.sign({ id, type }, process.env.SECRET)
   },
 
   async encrypt (value){

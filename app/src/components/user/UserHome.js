@@ -27,7 +27,7 @@ function UserHome() {
       }
     }
     fetchData()
-  })
+  }, [])
 
   const noTravels = <h1>No momento não temos viagens em aberto!</h1>
 
