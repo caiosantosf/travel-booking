@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Link, useHistory, useLocation } from "react-router-dom"
+import { Link, useHistory } from "react-router-dom"
 import { api } from '../../config/api'
 import logo from '../../assets/logo.png'
 import { getUserType } from '../../config/security'

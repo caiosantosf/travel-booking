@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { useHistory } from "react-router-dom"
+import { useHistory, Link } from "react-router-dom"
 import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
 import { api } from '../../config/api'
 import { dateTimeBrazil } from '../../config/transformations'
 import { getUserId } from '../../config/security'
+import { PersonXFill } from 'react-bootstrap-icons'
 
 function Reservation(props) {
   const [message, setMessage] = useState('')
@@ -14,7 +15,8 @@ function Reservation(props) {
   const [departurePlaces, setDeparturePlaces] = useState([])
   const [hasOnlyDeparture, setHasOnlyDeparture] = useState(false)
   const [hasOnlyReturn, setHasOnlyReturn] = useState(false)
-  const [user, setUser] = useState({})
+  const [user, setUser] = useState({name: '', document: '', documentType: ''})
+  const [dependents, setDependents] = useState([])
 
   let { travel_id } = props.match.params
 
@@ -38,9 +40,7 @@ function Reservation(props) {
             if (val.onlyDepartureValue > 0) {
               setHasOnlyDeparture(true)
             }
-            console.log(val.onlyReturnValue)
             if (val.onlyReturnValue > 0) {
-              console.log('oi')
               setHasOnlyReturn(true)
             }
           }
@@ -51,7 +51,7 @@ function Reservation(props) {
         setMessage(error.response.data.message)
       }
 
-      /*try {
+      try {
         const res = await api.get(`/users/${getUserId()}`, 
           { headers :{
             'x-access-token' : localStorage.getItem('token')
@@ -63,7 +63,7 @@ function Reservation(props) {
         setUser(data)
       } catch (error) {
         setMessage(error.response.data.message)
-      }*/
+      }
     }
 
     fetchData()
@@ -74,7 +74,15 @@ function Reservation(props) {
   }
 
   const handleAddPerson = async () => {
+    let dependentsAux = dependents.slice(0)
+    dependentsAux.push({name: '', document: '', documentType: 'RG', birth: ''})
+    setDependents(dependentsAux)
+  }
 
+  const handleDestroyPerson = async i => {
+    let dependentsAux = dependents.slice(0)
+    dependentsAux.splice(i, 1)
+    setDependents(dependentsAux)
   }
 
   const onlyDeparture = <div className="form-check">
@@ -84,19 +92,19 @@ function Reservation(props) {
                           </label>
                         </div>
 
-const onlyReturn = <div className="form-check">
-                      <input className="form-check-input" type="radio" name="radioTravelType" id="radioReturn" />
-                      <label className="form-check-label" htmlFor="radioReturn">
-                        Só Volta
-                      </label>
-                    </div>
+  const onlyReturn = <div className="form-check">
+                        <input className="form-check-input" type="radio" name="radioTravelType" id="radioReturn" />
+                        <label className="form-check-label" htmlFor="radioReturn">
+                          Só Volta
+                        </label>
+                      </div>
 
   return (
     <React.Fragment>
       <NavHeader />
       <div className="container-fluid">
         <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-4">
-        <Sidebar pageType="admin"/>
+        <Sidebar />
 
         <h5>Reserva</h5>
 
@@ -142,16 +150,65 @@ const onlyReturn = <div className="form-check">
 
           <div className="col-md-12">
             <h6>Passageiros</h6>
+            <span className="d-block mb-2">{`${user.name} - ${user.documentType} ${user.document}`}</span>
 
-            
-          </div>
-
-          <div className="col-md-12">
             <button type="button" 
-                    className="btn btn-primary"
+                    className="btn btn-primary mb-3"
                     onClick={handleAddPerson}>
               Adicionar Passageiro
             </button>
+
+            {dependents.map((dependent, i) => {
+
+              return (
+                <div className="row g-3" key={i}>
+                  
+                  <div className="col-lg-4 d-flex">
+                    <Link onClick={() => {handleDestroyPerson(i)}}>
+                      <PersonXFill className="icon me-2" size={30}/>
+                    </Link>
+                    <input type="text" className='form-control form-control-sm' maxLength='255' placeholder="Nome"
+                            value={dependents[i].name || ''}
+                            onChange={e => {
+                              let dependentsAux = dependents.slice(0)
+                              dependentsAux[i].name = e.target.value
+                              setDependents(dependentsAux)
+                            }}/>
+                  </div>
+                  <div className="col-lg-3">
+                    <input type="date" className='form-control form-control-sm' maxLength='255' placeholder="Nascimento"
+                            value={dependents[i].birth || ''}
+                            onChange={e => {
+                              let dependentsAux = dependents.slice(0)
+                              dependentsAux[i].name = e.target.value
+                              setDependents(dependentsAux)
+                            }}/>
+                  </div>
+                  <div className="col-lg-2">
+                    <select type="text" className='form-select form-select-sm'
+                            value={dependents[i].documentType || ''}
+                            onChange={e => {
+                              let dependentsAux = dependents.slice(0)
+                              dependentsAux[i].name = e.target.value
+                              setDependents(dependentsAux)
+                            }}>
+                      <option value="RG">RG</option>
+                      <option value="CNH">CNH</option>
+                    </select>
+                  </div>
+                  <div className="col-lg-3">
+                    <input type="text" className='form-control form-control-sm' maxLength='14' placeholder="Documento"
+                            value={dependents[i].document || ''}
+                            onChange={e => {
+                              let dependentsAux = dependents.slice(0)
+                              dependentsAux[i].name = e.target.value
+                              setDependents(dependentsAux)
+                            }}/>
+                  </div>
+                  <hr />
+                </div>
+              )
+            })}
           </div>
 
         </form>

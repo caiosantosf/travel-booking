@@ -10,7 +10,7 @@ function AdminHome() {
           <NavHeader />
           
           <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <Sidebar pageType="admin"/>
+            <Sidebar />
 
             <h1>Area do administrador</h1>
             <h5>Acesse a funcionalidade desejada pelo menu</h5>

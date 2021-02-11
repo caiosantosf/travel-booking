@@ -6,10 +6,8 @@ import { Link, useHistory } from "react-router-dom"
 import { api, apiUrl } from '../../config/api'
 import { dateTimeBrazil } from '../../config/transformations'
 
-function UserHome({ userType }) {
+function UserHome() {
   const [travels, setTravels] = useState([])
-
-  //let history = useHistory()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,7 +38,7 @@ function UserHome({ userType }) {
         <div className="row">
                     
           <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <Sidebar pageType={userType}/>
+            <Sidebar />
 
             {!travels ? noTravels : ''}
 
@@ -51,15 +49,16 @@ function UserHome({ userType }) {
                 const onlyOneValue = values.length === 1 ? true : false
 
                 return (
-                  <div className="col">
-                    <Link key={id} className="card-link" to={`/reserva/${id}`}>
+                  <div key={id} className="col">
+                    <Link className="card-link" to={`/reserva/${id}`}>
                       <div className="card shadow-sm bg-light">
                         <img src={`${apiUrl}uploads/${imageName}`} className="card-img-top center-cropped" alt={destination} />
                         <div className="card-body">
                           <h5>{destination}</h5>
                           <p className="card-text">
                             {description}
-                            <p className="text-danger">* Últimas Poltronas!</p>
+                            <br />
+                            <span className="text-danger">* Últimas Poltronas!</span>
                           </p>
                           
                           <hr />
@@ -76,10 +75,10 @@ function UserHome({ userType }) {
                           <hr />
                           <div >
                             {values.map((val, i) => {
-                              const { value, onlyDepartureValue, onlyReturnValue, initialAge, finalAge, lapChild } = val
+                              const { id, value, onlyDepartureValue, onlyReturnValue, initialAge, finalAge, lapChild } = val
                               
                               return (
-                                <div className={i ? 'mt-2' : ''}>
+                                <div key={id} className={i ? 'mt-2' : ''}>
                                   {
                                     onlyOneValue ?
                                       ''

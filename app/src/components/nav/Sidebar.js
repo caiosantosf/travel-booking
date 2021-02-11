@@ -1,18 +1,20 @@
 import React from 'react'
 import { Link } from "react-router-dom"
+import { getUserId, getUserType } from '../../config/security'
 
-function Sidebar(props) {
-
+function Sidebar() {
   let links = []
 
-  if (!props.pageType) {
+  const type = getUserType()
+
+  if (!type) {
     links = [
               { key: 1, name: 'Login', to: '/login' },
               { key: 2, name: 'Cadastrar', to: '/registro' }
             ]
   }
 
-  if (props.pageType === 'admin') {
+  if (type === 'admin') {
     links = [
               { key: 1, name: 'Página Inicial', to: '/admin-inicial' },
               { key: 2, name: 'Visualização de Usuários', to: '/usuarios' },
@@ -22,10 +24,10 @@ function Sidebar(props) {
             ]
   }
 
-  if (props.pageType === 'regular') {
+  if (type === 'regular') {
     links = [
               { key: 1, name: 'Página Inicial', to: '/' },
-              { key: 2, name: 'Meus Dados', to: '/usuario' },
+              { key: 2, name: 'Meus Dados', to: `/usuarios/${getUserId()}` },
               { key: 3, name: 'Minhas Viagens', to: '/minhas-viagens' },
               { key: 4, name: 'Sair', to: '/sair' }
             ]

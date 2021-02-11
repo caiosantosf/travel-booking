@@ -23,23 +23,24 @@ export default function Routes() {
   return (
     <BrowserRouter>
       <Switch>
-        <Route path="/login" exact component={Login} />
-        <Route path="/admin" exact component={Login} />
-        <Route path="/sair" exact component={Login} />
-        <Route path="/email-redefine-senha" exact component={EmailResetPassword} />
-        <Route path="/redefine-senha/:id" exact component={ResetPassword} />
-        <Route path="/registro/" exact component={User} />
-        <Route path="/usuarios/" exact render={props => (getUserType() === 'admin' ? <Users { ...props } userType={getUserType()}/> : <Forbidden />)}/>
-        <Route path="/usuarios/:id" exact component={User} />
-        <Route path="/" exact render={props => <UserHome { ...props } userType={getUserType()} />} />
-        <Route path="/admin-inicial/" exact render={props => (getUserType() === 'admin' ? <Admin { ...props }/> : <Forbidden />)}/>
-        <Route path="/viagens/" exact render={props => (getUserType() === 'admin' ? <Travels { ...props }/> : <Forbidden />)}/>
-        <Route path="/viagens/:id" exact render={props => (getUserType() === 'admin' ? <Travel { ...props }/> : <Forbidden />)}/>
+        <Route path="/acesso-negado"                  exact component={Forbidden} />
+        <Route path="/login"                          exact component={Login} />
+        <Route path="/admin"                          exact component={Login} />
+        <Route path="/sair"                           exact component={Login} />
+        <Route path="/email-redefine-senha"           exact component={EmailResetPassword} />
+        <Route path="/redefine-senha/:id"             exact component={ResetPassword} />
+        <Route path="/registro/"                      exact component={User} />
+        <Route path="/usuarios/"                      exact render={props => (getUserType() === 'admin' ? <Users { ...props } /> : <Forbidden />)}/>
+        <Route path="/usuarios/:id"                   exact component={User} />
+        <Route path="/"                               exact render={props => <UserHome { ...props } />} />
+        <Route path="/admin-inicial/"                 exact render={props => (getUserType() === 'admin' ? <Admin { ...props }/> : <Forbidden />)}/>
+        <Route path="/viagens/"                       exact render={props => (getUserType() === 'admin' ? <Travels { ...props }/> : <Forbidden />)}/>
+        <Route path="/viagens/:id"                    exact render={props => (getUserType() === 'admin' ? <Travel { ...props }/> : <Forbidden />)}/>
         <Route path="/viagens/:travel_id/valores/:id" exact render={props => (getUserType() === 'admin' ? <Value { ...props }/> : <Forbidden />)}/>
-        <Route path="/viagens/:travel_id/saidas/:id" exact render={props => (getUserType() === 'admin' ? <DeparturePlace { ...props }/> : <Forbidden />)}/>
-        <Route path="/onibus/" exact render={props => (getUserType() === 'admin' ? <Buses { ...props }/> : <Forbidden />)}/>
-        <Route path="/onibus/:id" exact render={props => (getUserType() === 'admin' ? <Bus { ...props }/> : <Forbidden />)}/>
-        <Route path="/reserva/:travel_id" exact render={props => (getUserType() ? <Reservation { ...props }/> : <ToRegister { ...props }/>)}/>
+        <Route path="/viagens/:travel_id/saidas/:id"  exact render={props => (getUserType() === 'admin' ? <DeparturePlace { ...props }/> : <Forbidden />)}/>
+        <Route path="/onibus/"                        exact render={props => (getUserType() === 'admin' ? <Buses { ...props }/> : <Forbidden />)}/>
+        <Route path="/onibus/:id"                     exact render={props => (getUserType() === 'admin' ? <Bus { ...props }/> : <Forbidden />)}/>
+        <Route path="/reserva/:travel_id"             exact render={props => (getUserType() ? <Reservation { ...props }/> : <ToRegister { ...props }/>)}/>
       </Switch>
     </BrowserRouter>
   )

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { useHistory, useLocation } from "react-router-dom"
+import { useHistory } from "react-router-dom"
 import { api, apiCep } from '../../config/api'
 import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
+import { getUserType, getUserId } from '../../config/security'
 
 function User(props) {
   const [user, setUser] = useState({documentType: 'RG', state: 'AC'})
@@ -14,7 +15,13 @@ function User(props) {
 
   const returnTo = localStorage.getItem('to')
 
-  const { id } = props.match.params
+  const id = parseInt(props.match.params.id)
+
+  if (id !== getUserId()) {
+    //history.push('/acesso-negado')
+  }
+
+  //const admin = 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -95,7 +102,7 @@ function User(props) {
       <NavHeader />
       <div className="container-fluid">
         <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-4">
-          <Sidebar pageType={props.userType}/>
+          <Sidebar />
 
           <h5>{id ? "Dados do usuário" : "Informe seus dados para o cadastro"}</h5>
 

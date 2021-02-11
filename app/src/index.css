@@ -34,7 +34,7 @@ td {
   border-color: #F06735 !important;
 }
 
-.btn-outline-primary {
+.btn-outline-primary, .icon {
   color: #434596 !important; 
   border-color: #434596 !important;
 }
@@ -94,10 +94,6 @@ td {
   color:#F06735;
 }
 
-.sidebar .nav-link.active {
-  color: #007bff;
-}
-
 .sidebar-heading {
   font-size: .75rem;
   text-transform: uppercase;
@@ -153,6 +149,10 @@ a:link {
 
 .card:hover {
   border-color: #F06735;
+}
+
+.icon:hover {
+  color:#F06735 !important;
 }
 
 .card-link, .card-link:hover{

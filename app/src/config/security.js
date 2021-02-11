@@ -14,11 +14,11 @@ const decodeToken = option => {
 }
 
 const getUserType = () => {
-  decodeToken('type')
+  return decodeToken('type')
 }
 
 const getUserId = () => {
-  decodeToken('id')
+  return decodeToken('id')
 }
 
 export { getUserType, getUserId }
