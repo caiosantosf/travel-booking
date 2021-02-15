@@ -4,7 +4,7 @@ import Sidebar from '../nav/Sidebar'
 import { CalendarCheck } from 'react-bootstrap-icons'
 import { Link, useHistory } from "react-router-dom"
 import { api, apiUrl } from '../../config/api'
-import { dateTimeBrazil } from '../../config/transformations'
+import { dateTimeBrazil } from '../../config/util'
 
 function UserHome() {
   const [travels, setTravels] = useState([])
@@ -58,7 +58,7 @@ function UserHome() {
                           <p className="card-text">
                             {description}
                             <br />
-                            <span className="text-danger">* Últimas Poltronas!</span>
+                            <span className="text-danger">* Últimas 4 Poltronas!</span>
                           </p>
                           
                           <hr />

@@ -4,7 +4,7 @@ import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
 import { api } from '../../config/api'
 import { PencilSquare } from 'react-bootstrap-icons'
-import { dateTimeBrazil } from '../../config/transformations'
+import { dateTimeBrazil } from '../../config/util'
 
 function Travel(props) {
   const [loadingSave, setLoadingSave] = useState(false)

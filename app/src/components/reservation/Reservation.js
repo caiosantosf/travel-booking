@@ -3,7 +3,7 @@ import { useHistory, Link } from "react-router-dom"
 import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
 import { api } from '../../config/api'
-import { dateTimeBrazil } from '../../config/transformations'
+import { dateTimeBrazil, calculateAge, calculateValue } from '../../config/util'
 import { getUserId } from '../../config/security'
 import { PersonXFill } from 'react-bootstrap-icons'
 
@@ -15,8 +15,11 @@ function Reservation(props) {
   const [departurePlaces, setDeparturePlaces] = useState([])
   const [hasOnlyDeparture, setHasOnlyDeparture] = useState(false)
   const [hasOnlyReturn, setHasOnlyReturn] = useState(false)
-  const [user, setUser] = useState({name: '', document: '', documentType: ''})
+  const [user, setUser] = useState({name: '', document: '', documentType: '', value: '0.00'})
   const [dependents, setDependents] = useState([])
+  const [travelType, setTravelType] = useState('normal')
+  const [departurePlace, setDeparturePlace] = useState()
+  const [total, setTotal] = useState('0.00')
 
   let { travel_id } = props.match.params
 
@@ -35,6 +38,8 @@ function Reservation(props) {
         setValues(data.values)
         setDeparturePlaces(data.departurePlaces)
 
+        setDeparturePlace(data.departurePlaces[0].id)
+
         data.values.forEach(val => {
           if (val.finalAge === 99) {
             if (val.onlyDepartureValue > 0) {
@@ -48,9 +53,16 @@ function Reservation(props) {
 
         setTravel(data)
       } catch (error) {
-        setMessage(error.response.data.message)
+        console.log(error)
+        //setMessage(error.response.data.message)
       }
+    }
 
+    fetchData()
+  }, [travel_id])
+
+  useEffect(() => {
+    const fetchData = async () => {
       try {
         const res = await api.get(`/users/${getUserId()}`, 
           { headers :{
@@ -59,15 +71,21 @@ function Reservation(props) {
 
         const { data } = res
         data.birth = dateTimeBrazil(data.birth).substr(0, 10)
+        data.age = calculateAge(data.birth)
+        data.value = calculateValue(values, data.age, travelType, false).value
 
         setUser(data)
       } catch (error) {
-        setMessage(error.response.data.message)
+        //setMessage(error.response.data.message)
       }
     }
 
     fetchData()
-  }, [travel_id])
+  }, [travelType, values])
+
+  useEffect(() => {
+    setTotal(dependents.reduce((tot, dependent) => tot + Number(dependent.value), 0) + Number(user.value))
+  }, [dependents, user])
 
   const handleSave = async () => {
 
@@ -75,7 +93,7 @@ function Reservation(props) {
 
   const handleAddPerson = async () => {
     let dependentsAux = dependents.slice(0)
-    dependentsAux.push({name: '', document: '', documentType: 'RG', birth: ''})
+    dependentsAux.push({name: '', document: '', documentType: 'RG', birth: '', error: {}, value: '0.00', optionLapChild: false})
     setDependents(dependentsAux)
   }
 
@@ -85,19 +103,78 @@ function Reservation(props) {
     setDependents(dependentsAux)
   }
 
-  const onlyDeparture = <div className="form-check">
-                          <input className="form-check-input" type="radio" name="radioTravelType" id="radioDeparture" />
-                          <label className="form-check-label" htmlFor="radioDeparture">
-                            Só Ida
-                          </label>
-                        </div>
+  const handleAgeCalculations = i => {
+    try {
+      const { birth } = dependents[i]
+      const age = calculateAge(birth)
+      const { value, optionLapChild } = calculateValue(values, age, travelType, false)
 
-  const onlyReturn = <div className="form-check">
-                        <input className="form-check-input" type="radio" name="radioTravelType" id="radioReturn" />
-                        <label className="form-check-label" htmlFor="radioReturn">
-                          Só Volta
-                        </label>
-                      </div>
+      let dependentsAux = dependents.slice(0)
+      dependentsAux[i].age = age
+      dependentsAux[i].optionLapChild = optionLapChild
+      dependentsAux[i].value = value
+
+      setDependents(dependentsAux)
+    } catch (err) {
+      let dependentsAux = dependents.slice(0)
+      const birth = err.message
+      dependentsAux[i].error = { birth }
+      setDependents(dependentsAux)
+    }
+  }
+
+  const handleLapChildOption = i => {
+    const { age, lapChild } = dependents[i]
+    const { value } = calculateValue(values, age, travelType, lapChild)
+
+    let dependentsAux = dependents.slice(0)
+    dependentsAux[i].value = value
+
+    setDependents(dependentsAux)
+  }
+
+  const onlyDepartureReturn = option => {
+    return (<div className="form-check">
+              <input  className="form-check-input" 
+                      type="radio" 
+                      name="radioTravelType" 
+                      id={`radio${option}`}
+                      value={option}
+                      onChange={e => {
+                        setTravelType(e.target.value)
+                      }}
+              />
+              <label className="form-check-label" htmlFor="radioDeparture">
+                {option === 'departure' ? 'Só Ida' : 'Só Volta'}
+              </label>
+            </div>
+    )
+  }
+
+  const lapChild = (dependent, i) => {
+    return  (<div className="col-lg-2">
+              <select type="text" 
+                      className={`form-select form-select-sm ${dependent.error.lapChild ? 'is-invalid' : ''}`}
+                      value={dependents[i].lapChild || false}
+                      onChange={e => {
+                        let dependentsAux = dependents.slice(0)
+                        dependentsAux[i].lapChild = e.target.value === 'true' ? true : false
+                        setDependents(dependentsAux)
+                        handleLapChildOption(i)
+                      }}
+              >
+                <option value={true}>Vai no Colo</option>
+                <option value={false}>Vai em Poltrona</option>
+              </select>
+
+              <div id="validationLapChild" 
+                className="invalid-feedback" 
+                style={dependent.error.lapChild ? { display: 'inline' } : { display: 'none' }}>
+                {dependent.error.lapChild}
+              </div>
+            </div>
+    )
+  }
 
   return (
     <React.Fragment>
@@ -118,14 +195,22 @@ function Reservation(props) {
             <h6>Tipo de viagem</h6>
 
             <div className="form-check">
-              <input className="form-check-input" type="radio" name="radioTravelType" id="radioDepartureReturn" />
+              <input className="form-check-input" type="radio" name="radioTravelType" id="radioDepartureReturn" 
+                value="normal"
+                onChange={e => {
+                  setTravelType(e.target.value)
+                }}
+                defaultChecked
+                disabled={!hasOnlyDeparture && !hasOnlyReturn ? true : false} 
+              />
+
               <label className="form-check-label" htmlFor="radioDepartureReturn">
                 Ida e Volta
               </label>
             </div>
 
-            {hasOnlyDeparture ? onlyDeparture : ''}
-            {hasOnlyReturn ? onlyReturn : ''}
+            {hasOnlyDeparture ? onlyDepartureReturn('departure') : ''}
+            {hasOnlyReturn ? onlyDepartureReturn('return') : ''}
             
           </div>
 
@@ -137,7 +222,14 @@ function Reservation(props) {
 
               return (
                 <div className="form-check" key={id}>
-                  <input className="form-check-input" type="radio" name="radioPlace" id={`radioPlace${id}`} />
+                  <input className="form-check-input" type="radio" name="radioPlace" id={`radioPlace${id}`} 
+                    defaultChecked={i === 0 ? true : false} 
+                    disabled={departurePlaces.length === 1 ? true : false} 
+                    value={id}
+                    onChange={e => {
+                      setDeparturePlace(e.target.value)
+                    }}
+                  />
                   <label className="form-check-label" htmlFor={`radioPlace${id}`}>
                     {`${homeAddress}, ${addressNumber}, ${city}-${state}`}
                     <br /> 
@@ -150,10 +242,10 @@ function Reservation(props) {
 
           <div className="col-md-12">
             <h6>Passageiros</h6>
-            <span className="d-block mb-2">{`${user.name} - ${user.documentType} ${user.document}`}</span>
-
+            <span className="d-block mb-1">{`${user.name} - ${user.documentType} ${user.document}`}</span>
+            <span className="d-block mb-2">{`R$ ${user.value.toString().replace(".",",")}`}</span>
             <button type="button" 
-                    className="btn btn-primary mb-3"
+                    className="btn btn-primary mb-4"
                     onClick={handleAddPerson}>
               Adicionar Passageiro
             </button>
@@ -163,54 +255,103 @@ function Reservation(props) {
               return (
                 <div className="row g-3" key={i}>
                   
-                  <div className="col-lg-4 d-flex">
-                    <Link onClick={() => {handleDestroyPerson(i)}}>
-                      <PersonXFill className="icon me-2" size={30}/>
-                    </Link>
-                    <input type="text" className='form-control form-control-sm' maxLength='255' placeholder="Nome"
-                            value={dependents[i].name || ''}
-                            onChange={e => {
-                              let dependentsAux = dependents.slice(0)
-                              dependentsAux[i].name = e.target.value
-                              setDependents(dependentsAux)
-                            }}/>
+                  <div className="col-lg-4">
+                    <div className="d-flex">
+                      <Link onClick={() => {handleDestroyPerson(i)}} to="#">
+                        <PersonXFill className="icon me-2" size={30}/>
+                      </Link>
+                      <input  type="text" 
+                              className={`form-control form-control-sm ${dependent.error.name ? 'is-invalid' : ''}`}
+                              maxLength='255' 
+                              placeholder="Nome"
+                              value={dependents[i].name || ''}
+                              onChange={e => {
+                                let dependentsAux = dependents.slice(0)
+                                dependentsAux[i].name = e.target.value
+                                setDependents(dependentsAux)
+                              }}
+                      />
+                    </div>
+                    
+                    <div id="validationName" 
+                      className="invalid-feedback" 
+                      style={dependent.error.name ? { display: 'inline' } : { display: 'none' }}>
+                      {dependent.error.name}
+                    </div>
                   </div>
+
                   <div className="col-lg-3">
-                    <input type="date" className='form-control form-control-sm' maxLength='255' placeholder="Nascimento"
+                    <input  type="date" 
+                            className={`form-control form-control-sm ${dependent.error.birth ? 'is-invalid' : ''}`}
+                            maxLength='255' 
+                            placeholder="Nascimento"
                             value={dependents[i].birth || ''}
+                            onBlur={() => handleAgeCalculations(i)}
                             onChange={e => {
                               let dependentsAux = dependents.slice(0)
-                              dependentsAux[i].name = e.target.value
+                              dependentsAux[i].birth = e.target.value
                               setDependents(dependentsAux)
-                            }}/>
+                            }}
+                    />
+            
+                    <div id="validationBirth" 
+                      className="invalid-feedback" 
+                      style={dependent.error.birth ? { display: 'inline' } : { display: 'none' }}>
+                      {dependent.error.birth}
+                    </div>
                   </div>
-                  <div className="col-lg-2">
-                    <select type="text" className='form-select form-select-sm'
+
+                  { dependent.optionLapChild ? lapChild(dependent, i) : '' }
+
+                  <div className="col-lg-1">
+                    <select type="text" 
+                            className={`form-select form-select-sm ${dependent.error.documentType ? 'is-invalid' : ''}`}
                             value={dependents[i].documentType || ''}
                             onChange={e => {
                               let dependentsAux = dependents.slice(0)
-                              dependentsAux[i].name = e.target.value
+                              dependentsAux[i].documentType = e.target.value
                               setDependents(dependentsAux)
-                            }}>
+                            }}
+                    >
                       <option value="RG">RG</option>
                       <option value="CNH">CNH</option>
                     </select>
+
+                    <div id="validationDocumentType" 
+                      className="invalid-feedback" 
+                      style={dependent.error.documentType ? { display: 'inline' } : { display: 'none' }}>
+                      {dependent.error.documentType}
+                    </div>
                   </div>
-                  <div className="col-lg-3">
-                    <input type="text" className='form-control form-control-sm' maxLength='14' placeholder="Documento"
+
+                  <div className="col-lg-2">
+                    <input  type="text" 
+                            className={`form-control form-control-sm ${dependent.error.document ? 'is-invalid' : ''}`} 
+                            maxLength='14' 
+                            placeholder="Documento"
                             value={dependents[i].document || ''}
                             onChange={e => {
                               let dependentsAux = dependents.slice(0)
-                              dependentsAux[i].name = e.target.value
+                              dependentsAux[i].document = e.target.value
                               setDependents(dependentsAux)
-                            }}/>
+                            }}
+                    />
+
+                    <div id="validationDocument" 
+                      className="invalid-feedback" 
+                      style={dependent.error.document ? { display: 'inline' } : { display: 'none' }}>
+                      {dependent.error.document}
+                    </div>
                   </div>
-                  <hr />
+
+                  <span className="d-block value-span">{`R$ ${dependent.value.toString().replace(".",",")}`}</span>
+                  <hr className={`value-separator ${i + 1 === dependents.length ? 'd-none' : ''}`} />
                 </div>
               )
             })}
           </div>
-
+          
+          <span className="d-block fs-5">{`Total R$ ${total.toString().replace(".",",")}`}</span>
         </form>
 
         <div className="text-center d-grid gap-2">

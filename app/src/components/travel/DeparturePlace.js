@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom"
 import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
 import { api, apiCep } from '../../config/api'
-import { dateTimeDefault } from '../../config/transformations'
+import { dateTimeDefault } from '../../config/util'
 
 function DeparturePlace(props) {
   const [loadingSave, setLoadingSave] = useState(false)

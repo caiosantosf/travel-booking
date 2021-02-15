@@ -171,3 +171,14 @@ a:link {
     padding-right: 5px !important;
   }
 }
+
+/* reservation */
+
+.value-span {
+  margin-top: 6px !important;
+}
+
+.value-separator {
+  margin-top: 6px !important;
+  margin-bottom: 15px !important;
+}

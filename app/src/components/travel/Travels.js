@@ -4,7 +4,7 @@ import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
 import { PencilSquare, ChevronDoubleLeft, ChevronDoubleRight, ChevronRight, ChevronLeft } from 'react-bootstrap-icons'
 import { api } from '../../config/api'
-import { dateTimeBrazil } from '../../config/transformations'
+import { dateTimeBrazil } from '../../config/util'
 
 function Travels() {
   const [travels, setTravels] = useState([])
