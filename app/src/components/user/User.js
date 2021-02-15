@@ -126,7 +126,7 @@ function User(props) {
 
             <div className="col-lg-6">
               <label htmlFor="name" className="form-label">Nome</label>
-              <input type="text" className={`form-control ${error.name ? 'is-invalid' : ''}`} id="name" maxLength="255" 
+              <input type="text" className={`form-control ${error.userName ? 'is-invalid' : ''}`} id="name" maxLength="255" 
                 disabled={admin}
                 value={user.name || ''}
                 onChange={e => {
@@ -137,13 +137,13 @@ function User(props) {
 
               <div id="validationName" 
                 className="invalid-feedback" 
-                style={error.name ? { display: 'inline' } : { display: 'none' }}>
-                {error.name}
+                style={error.userName ? { display: 'inline' } : { display: 'none' }}>
+                {error.userName}
               </div>
             </div>
             <div className="col-lg-3">
               <label htmlFor="cpf" className="form-label">CPF</label>
-              <input type="text" className={`form-control ${error.name ? 'is-invalid' : ''}`} id="cpf" maxLength="11" 
+              <input type="text" className={`form-control ${error.cpf ? 'is-invalid' : ''}`} id="cpf" maxLength="11" 
                 disabled={admin}
                 value={user.cpf || ''}
                 onChange={e => {

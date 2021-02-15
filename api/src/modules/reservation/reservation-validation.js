@@ -26,7 +26,7 @@ const validation = (fields) => {
     if (fields.includes('dependent_id')) {
       if (typeof dependent_id !== 'undefined') {
         if (isNaN(dependent_id) || (!dependent_id)) {
-          messages.dependent_id = 'O Ônibus não é valido'
+          messages.dependent_id = 'O Dependente não é valido'
         }
       }
     }

@@ -19,10 +19,10 @@ const validation = (fields) => {
     if (fields.includes('name')) {
       if ( (typeof name !== 'undefined') && (name.trim() !== '') ) {
         if (name.length > 255) {
-          messages.name = 'O Nome não pode ter mais do que 255 caracteres'
+          messages.userName = 'O Nome não pode ter mais do que 255 caracteres'
         }
       } else {
-        messages.name = 'O Nome é obrigatório'
+        messages.userName = 'O Nome é obrigatório'
       }
     }
 

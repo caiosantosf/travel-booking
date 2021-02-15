@@ -4,7 +4,6 @@ const { routeSecurity : security } = require('../../config/security')
 const validation = require('./reservation-validation')
 
 const routes = express.Router()
-const columns = ['travel_id', 'user_id', 'dependent_id', 'departureSeat', 'returnSeat']
 
 routes.get('/reservations',
   security(['admin']),
@@ -13,7 +12,7 @@ routes.get('/reservations',
 
 routes.post('/reservations', 
   security(['admin', 'regular']),
-  validation(columns),
+  validation(['travel_id', 'user_id']),
   post
 )
 
@@ -23,8 +22,8 @@ routes.get('/reservations/:id',
 )
 
 routes.put('/reservations/:id', 
-  security(['admin']), 
-  validation(columns),
+  security(['admin', 'regular']), 
+  validation(['travel_id', 'user_id', 'dependent_id', 'departureSeat', 'returnSeat']),
   put
 )
 

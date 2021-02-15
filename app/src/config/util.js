@@ -26,7 +26,6 @@ const calculateAge = dt => {
     throw new Error("A Data de nascimento não é valida")
   }
   const ageDt = new Date(diffMs)
-  console.log(Math.abs(ageDt.getUTCFullYear() - 1970))
   return Math.abs(ageDt.getUTCFullYear() - 1970)
 }
 
