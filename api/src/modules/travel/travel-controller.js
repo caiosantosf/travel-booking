@@ -29,9 +29,31 @@ const getSeatsWithReserves = async (id, travel_id) => {
   const reservations = await db('reservations').where({ travel_id })
   const seatsWithReserves = []
 
-  for (const seat of seats) {
+  const corridorLeft = Array.from({length: 20}, (j, i) => i * 4 + 1)
+  const corridorRight = Array.from({length: 20}, (j, i) => i * 4 + 2)
+  const windowRight = Array.from({length: 20}, (j, i) => i * 4 + 3)
+  const windowLeft = Array.from({length: 20}, (j, i) => i * 4 + 4)
+
+  for (const [i, seat] of seats.entries()) {
     let departureAvailable = true
     let returnAvailable = true
+    let place = ''
+
+    if (corridorLeft.includes(i)) {
+      place = 'corridorLeft'
+    }
+
+    if (corridorRight.includes(i)) {
+      place = 'corridorRight'
+    }
+
+    if (windowRight.includes(i)) {
+      place = 'windowRight'
+    }
+
+    if (windowLeft.includes(i) || (!i)) {
+      place = 'windowLeft'
+    }
 
     for (const reservation of reservations) {
       if (seat) {
@@ -45,7 +67,8 @@ const getSeatsWithReserves = async (id, travel_id) => {
         } 
       }
     }
-    seatsWithReserves.push({seat, departureAvailable, returnAvailable})
+
+    seatsWithReserves.push({ seat, departureAvailable, returnAvailable, place })
   }
   return seatsWithReserves
 }
