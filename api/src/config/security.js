@@ -41,20 +41,13 @@ module.exports = {
     }
   },
 
-  getUserType(req, res) {
+  async getUserType(req) {
     const token = req.headers['x-access-token'] || req.query.token
-
-    if (!token) {
-      return res.status(401).json({ type: false, message: 'Requisição sem Token de autenticação' })
+    if (token) {
+      const decoded = await jwt.verify(token, process.env.SECRET)
+      return decoded.type
     }
-
-    jwt.verify(token, process.env.SECRET, function(err, decoded) {
-      if (err) {
-        return res.status(500).json({ type: false, message: 'Não foi possível validar o Token de autenticação' })
-      } 
-
-      return res.status(200).json({ type: decoded.type })
-    })
+    return false
   },
 
   token(id, type) {

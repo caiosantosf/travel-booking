@@ -349,6 +349,18 @@ function Travel(props) {
 
           <button type="button" 
                   className="btn btn-primary"
+                  onClick={handleSave}>
+            Fazer Reserva
+          </button>
+
+          <button type="button" 
+                  className="btn btn-primary"
+                  onClick={handleSave}>
+            Lista de Passageiros
+          </button>
+
+          <button type="button" 
+                  className="btn btn-primary"
                   style={travel_id !== 'novo' ? { display: 'inline-block'} : { display : 'none' }}
                   onClick={handleDestroy}
                   disabled={loadingDestroy}>

@@ -1,10 +1,14 @@
+const { getUserType } = require('../../config/security')
+
 const validation = (fields) => {
-  return (req, res, next) => {
+  return async (req, res, next) => {
     const { id, name, cpf, phone, email, password, documentType, document, cep, homeAddress, 
             addressNumber, complement, neighborhood, city, state, birth } = req.body
     const messages = {}
     const regExpNumbers = /^[0-9]+$/
     const regExpEmail = /\S+@\S+\.\S+/
+
+    const userType = await getUserType(req)
 
     if (fields.includes('id')) {
       if ( (typeof id !== 'undefined') && (id != 0) ) {
@@ -74,7 +78,7 @@ const validation = (fields) => {
       }
     }
 
-    if (fields.includes('documentType')) {
+    if (fields.includes('documentType') && userType !== 'admin') {
       if ( (typeof documentType !== 'undefined') && (documentType.trim() !== '') ) {
         if (!['CNH', 'RG'].includes(documentType)) {
           messages.documentType = 'O Tipo de Documento só pode ser CNH ou RG'
@@ -94,7 +98,7 @@ const validation = (fields) => {
       }
     }
 
-    if (fields.includes('cep')) {
+    if (fields.includes('cep') && userType !== 'admin') {
       if ( (typeof cep !== 'undefined') && (cep.trim() !== '') ) {
         if (cep.length !== 8) {
           messages.cep = 'O CEP deve ter 8 caracteres'
@@ -108,7 +112,7 @@ const validation = (fields) => {
       }
     }
 
-    if (fields.includes('homeAddress')) {
+    if (fields.includes('homeAddress') && userType !== 'admin') {
       if ( (typeof homeAddress !== 'undefined') && (homeAddress.trim() !== '') ) {
         if (homeAddress.length > 255) {
           messages.homeAddress = 'O Endereço não pode ter mais do que 255 caracteres'
@@ -118,7 +122,7 @@ const validation = (fields) => {
       }
     }
 
-    if (fields.includes('addressNumber')) {
+    if (fields.includes('addressNumber') && userType !== 'admin') {
       if ( (typeof addressNumber !== 'undefined') && (addressNumber !== 0) ) {
         if (addressNumber.length > 8) {
           messages.addressNumber = 'A senha não pode ter mais do que 8 caracteres'
@@ -132,7 +136,7 @@ const validation = (fields) => {
       }
     }
 
-    if (fields.includes('complement')) {
+    if (fields.includes('complement') && userType !== 'admin') {
       if ( (typeof complement !== 'undefined') && (complement.trim() !== '') ) {
         if (complement.length > 255) {
           messages.complement = 'O Complemento não pode ter mais do que 255 caracteres'
@@ -142,7 +146,7 @@ const validation = (fields) => {
       }
     }
 
-    if (fields.includes('neighborhood')) {
+    if (fields.includes('neighborhood') && userType !== 'admin') {
       if ( (typeof neighborhood !== 'undefined') && (neighborhood.trim() !== '') ) {
         if (neighborhood.length > 255) {
           messages.neighborhood = 'O Bairro não pode ter mais do que 255 caracteres'
@@ -152,7 +156,7 @@ const validation = (fields) => {
       }
     }
 
-    if (fields.includes('city')) {
+    if (fields.includes('city') && userType !== 'admin') {
       if ( (typeof city !== 'undefined') && (city.trim() !== '') ) {
         if (city.length > 255) {
           messages.city = 'A Cidade não pode ter mais do que 255 caracteres'
@@ -162,7 +166,7 @@ const validation = (fields) => {
       }
     }
 
-    if (fields.includes('state')) {
+    if (fields.includes('state') && userType !== 'admin') {
       if ( (typeof state !== 'undefined') && (state.trim() !== '') ) {
         if (state.length !== 2) {
           messages.state = 'O Estado deve ter 2 caracteres'
@@ -172,7 +176,7 @@ const validation = (fields) => {
       }
     }
 
-    if (fields.includes('birth')) {
+    if (fields.includes('birth') && userType !== 'admin') {
       if ( (typeof birth !== 'undefined') && (birth.trim() !== '') ) {
         if (new Date(birth) === 'Invalid Date') {
           messages.birth = 'A Data de nascimento não é valida'

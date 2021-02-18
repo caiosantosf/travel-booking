@@ -4,6 +4,7 @@ const sendMail = require('../../config/email')
 
 const dbErrors = error => {
   let message = { message : 'Ocorreu um erro não identificado', error}
+  console.log(error)
   if (error.hasOwnProperty('constraint')) {
     if (error.constraint === 'users_cpf_unique') {
       message = { cpf : 'CPF já cadastrado!' }
@@ -47,9 +48,12 @@ module.exports = {
             type
           }).returning('id')
 
-          const id = await db('adminData').insert({
-            user_id : id
-          }).returning('id')
+          await db('adminData').insert({
+            user_id : id[0],
+            infinitePay: true,
+            companyPayment: false,
+            companyPaymentLink: ''
+          })
     
           return res.status(201).json({ id: id[0], type, token: token(id, type) })
         } catch (error) {
@@ -65,7 +69,7 @@ module.exports = {
   async getMany (req, res) {
     const { currentPage } = req.headers
     const users = await db('users')
-                          .whereNot({ 'name' : 'admin'})
+                          .whereNot({ 'type' : 'admin'})
                           .orderBy('name')
                           .paginate({ perPage: 10, currentPage, isLengthAware: true  })
 
@@ -105,7 +109,7 @@ module.exports = {
     let data = req.body
 
     try {
-      const result = await db('adminData').where({ user_id: id }).update({ data })
+      const result = await db('adminData').where({ user_id: id }).update({ ...data })
 
       if (result) {
         return res.status(200).json({ message : 'Dados do administrador alterados'})

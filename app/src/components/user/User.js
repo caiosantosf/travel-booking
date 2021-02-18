@@ -22,14 +22,14 @@ function User(props) {
   let adminViewUser = false
 
   if (getUserType() === 'admin') {
-    if (getUserId() === id) {
+    if (parseInt(getUserId()) === id) {
       adminData = true
     } else {
       adminViewUser = true
     }
   }
   
-  if (!adminData && !adminViewUser && id && id !== getUserId()) {
+  if (!adminData && !adminViewUser && id && id !== parseInt(getUserId())) {
     history.push('/acesso-negado')
   }
 
@@ -67,7 +67,7 @@ function User(props) {
         const { passwordConfirmation, id, ...userData} = user
 
         const config = { headers :{
-          'x-access-token' : localStorage.getItem('token')
+          'x-access-token' : localStorage.getItem('token'),
         }}
 
         const res = id ? await api.put(`/users/${id}`, userData, config)
@@ -76,6 +76,7 @@ function User(props) {
         const { type, token } = res.data
 
         if (adminData) {
+          setAdmin({ ...admin, user_id: id })
           await api.put(`/users/admin-data/${id}`, admin, config)
         }
 
@@ -486,10 +487,10 @@ function User(props) {
             <div className="col-lg-3" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}>
               <label htmlFor="infinitePay" className="form-label">InfinitePay</label>
               <select className={`form-select ${error.infinitePay ? 'is-invalid' : ''}`} id="infinitePay"
-                value={admin.infinitePay || ''}
+                value={admin.infinitePay.toString() || 'false'}
                 onChange={e => {
                   setAdmin({ ...admin,
-                    infinitePay: e.target.value
+                    infinitePay: e.target.value === 'true' ? true : false
                   })
                 }}>
                 <option value={true}>Sim</option>
@@ -506,10 +507,10 @@ function User(props) {
             <div className="col-lg-3" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}>
               <label htmlFor="companyPayment" className="form-label">Pagamento Direto</label>
               <select className={`form-select ${error.companyPayment ? 'is-invalid' : ''}`} id="companyPayment"
-                value={admin.companyPayment || ''}
+                value={admin.companyPayment.toString() || 'false'}
                 onChange={e => {
                   setAdmin({ ...admin,
-                    companyPayment: e.target.value
+                    companyPayment: e.target.value === 'true' ? true : false
                   })
                 }}>
                 <option value={true}>Sim</option>
@@ -549,7 +550,7 @@ function User(props) {
                 <span className="spinner-border spinner-border-sm mx-1" 
                       role="status" 
                       aria-hidden="true"
-                      style={false ? { display: 'inline-block'} : { display : 'none' }}>
+                      style={loading ? { display: 'inline-block'} : { display : 'none' }}>
                 </span>
                 Confirmar
               </button>
