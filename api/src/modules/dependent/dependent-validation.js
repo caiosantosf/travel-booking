@@ -25,8 +25,8 @@ const validation = (fields) => {
 
     if (fields.includes('documentType')) {
       if ( (typeof documentType !== 'undefined') && (documentType.trim() !== '') ) {
-        if (!['CNH', 'RG'].includes(documentType)) {
-          messages.documentType = 'O Tipo de Documento só pode ser CNH ou RG'
+        if (!['CNH', 'RG', 'CN'].includes(documentType)) {
+          messages.documentType = 'O Tipo de Documento só pode ser CNH ou RG ou Certidão de Nascimento'
         }
       } else {
         messages.documentType = 'O Tipo de Documento é obrigatório'
@@ -36,7 +36,7 @@ const validation = (fields) => {
     if (fields.includes('document')) {
       if ( (typeof document !== 'undefined') && (document.trim() !== '') ) {
         if (document.length > 14) {
-          messages.document = 'O Documento não pode ter mais do que 14 caracteres'
+          messages.document = 'O Documento não pode ter mais do que 32 caracteres'
         }
       } else {
         messages.document = 'O Documento é obrigatório'

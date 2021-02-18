@@ -68,8 +68,8 @@ module.exports = {
   },
 
   async getOne (req, res) {
-    const { id } = req.params
-    let reservation = await db('reservations').where({ id })
+    const { travel_id } = req.params
+    let reservation = await db('reservations').where({ travel_id })
     reservation = reservation[0]
 
     if (reservation) {

@@ -16,7 +16,7 @@ routes.post('/reservations',
   post
 )
 
-routes.get('/reservations/:id', 
+routes.get('/reservations/:travel_id', 
   security(['admin']), 
   getOne
 )
