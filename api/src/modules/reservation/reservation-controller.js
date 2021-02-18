@@ -35,13 +35,17 @@ const getPerson = async reservation => {
 module.exports = {
 
   async getMany (req, res) {
-    const { currentpage: currentPage } = req.headers
+    const { currentpage: currentPage, user_id, datetime } = req.headers
     
-    let reservations = currentPage ? await db('reservations')
-                                .orderBy('id', 'desc')
-                                .paginate({ perPage: 10, currentPage, isLengthAware: true })
-                              : await db('reservations')
-                                .orderBy('id', 'desc')
+    let reservations = await db('reservations')
+                              .modify(q => {
+                                if (user_id) q.where({ user_id })
+                                if (datetime) q.where({ datetime })
+                              })   
+                              .orderBy('id', 'desc')
+                              .modify(q => {
+                                if (currentPage) q.paginate({ perPage: 10, currentPage, isLengthAware: true })
+                              })
 
     if (reservations.hasOwnProperty('data')) {
       if (reservations.data.length) {

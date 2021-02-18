@@ -6,7 +6,7 @@ const validation = require('./reservation-validation')
 const routes = express.Router()
 
 routes.get('/reservations',
-  security(['admin']),
+  security(['admin', 'regular']),
   getMany
 )
 

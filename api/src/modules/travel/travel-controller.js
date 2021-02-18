@@ -22,6 +22,34 @@ const getDeparturePlaces = async id => {
                 .orderBy('departureDate', 'asc')
 }
 
+const getSeatsWithReserves = async (id, travel_id) => {
+  const bus = await db('buses').where({ id })
+  const { seats } = bus[0].layout
+
+  const reservations = await db('reservations').where({ travel_id })
+  const seatsWithReserves = []
+
+  for (const seat of seats) {
+    let departureAvailable = true
+    let returnAvailable = true
+
+    for (const reservation of reservations) {
+      if (seat) {
+        if (seat === reservation.departureSeat) {
+          departureAvailable = false
+          break
+        } 
+        if (seat === reservation.returnSeat) {
+          returnAvailable = false
+          break
+        } 
+      }
+    }
+    seatsWithReserves.push({seat, departureAvailable, returnAvailable})
+  }
+  return seatsWithReserves
+}
+
 module.exports = {
 
   async getMany (req, res) {
@@ -71,6 +99,9 @@ module.exports = {
     if (travel.length) {
       travel[0].values = await getValues(travel[0].id)
       travel[0].departurePlaces = await getDeparturePlaces(travel[0].id)
+      travel[0].seats = await getSeatsWithReserves(travel[0].bus_id, id)
+      
+      delete travel[0].bus_id
       
       return res.status(200).json(travel[0])
     }
