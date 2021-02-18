@@ -14,6 +14,12 @@ routes.get('/users/type',
   getType
 )
 
+routes.put('/users/admin-data/:id', 
+  security(['regular', 'admin']), 
+  validation(['name', 'cpf', 'phone', 'email', 'password']),
+  put
+)
+
 routes.post('/users/login/admin', 
   validation(['cpf', 'password']), 
   auth

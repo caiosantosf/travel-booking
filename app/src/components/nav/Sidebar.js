@@ -17,10 +17,12 @@ function Sidebar() {
   if (type === 'admin') {
     links = [
               { key: 1, name: 'Página Inicial', to: '/admin-inicial' },
-              { key: 2, name: 'Visualização de Usuários', to: '/usuarios' },
-              { key: 3, name: 'Cadastro de Viagens', to: '/viagens' },
-              { key: 4, name: 'Cadastro de Ônibus', to: '/onibus' },
-              { key: 5, name: 'Sair', to: '/sair' }
+              { key: 2, name: 'Dados Admin', to: `/usuarios/${getUserId()}`},
+              { key: 3, name: 'Reservas', to: '/reservas'},
+              { key: 4, name: 'Visualização de Usuários', to: '/usuarios' },
+              { key: 5, name: 'Cadastro de Viagens', to: '/viagens' },
+              { key: 6, name: 'Cadastro de Ônibus', to: '/onibus' },
+              { key: 7, name: 'Sair', to: '/sair' }
             ]
   }
 
@@ -28,7 +30,7 @@ function Sidebar() {
     links = [
               { key: 1, name: 'Página Inicial', to: '/' },
               { key: 2, name: 'Meus Dados', to: `/usuarios/${getUserId()}` },
-              { key: 3, name: 'Minhas Viagens', to: '/minhas-viagens' },
+              { key: 3, name: 'Minhas Reservas', to: '/minhas-reservas' },
               { key: 4, name: 'Sair', to: '/sair' }
             ]
   }

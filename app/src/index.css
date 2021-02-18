@@ -182,3 +182,7 @@ a:link {
   margin-top: 6px !important;
   margin-bottom: 15px !important;
 }
+
+.windowLeft {
+  margin: .25rem .25rem .25rem 0px !important;
+}

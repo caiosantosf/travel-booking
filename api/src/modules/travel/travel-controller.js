@@ -37,22 +37,22 @@ const getSeatsWithReserves = async (id, travel_id) => {
   for (const [i, seat] of seats.entries()) {
     let departureAvailable = true
     let returnAvailable = true
-    let place = ''
+    let position = ''
 
     if (corridorLeft.includes(i)) {
-      place = 'corridorLeft'
+      position = 'corridorLeft'
     }
 
     if (corridorRight.includes(i)) {
-      place = 'corridorRight'
+      position = 'corridorRight'
     }
 
     if (windowRight.includes(i)) {
-      place = 'windowRight'
+      position = 'windowRight'
     }
 
     if (windowLeft.includes(i) || (!i)) {
-      place = 'windowLeft'
+      position = 'windowLeft'
     }
 
     for (const reservation of reservations) {
@@ -68,7 +68,7 @@ const getSeatsWithReserves = async (id, travel_id) => {
       }
     }
 
-    seatsWithReserves.push({ seat, departureAvailable, returnAvailable, place })
+    seatsWithReserves.push({ seat, departureAvailable, returnAvailable, position })
   }
   return seatsWithReserves
 }

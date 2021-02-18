@@ -41,10 +41,14 @@ module.exports = {
         const type = 'admin'
         try {
           const id = await db('users').insert({
-            name : 'admin',
+            name : '',
             cpf,
             password,
             type
+          }).returning('id')
+
+          const id = await db('adminData').insert({
+            user_id : id
           }).returning('id')
     
           return res.status(201).json({ id: id[0], type, token: token(id, type) })
@@ -93,6 +97,22 @@ module.exports = {
     } catch (error) {
       const message = dbErrors(error)
       return res.status(400).json(message)
+    }
+  },
+
+  async putAdminData (req, res) {
+    const { id } = req.params
+    let data = req.body
+
+    try {
+      const result = await db('adminData').where({ user_id: id }).update({ data })
+
+      if (result) {
+        return res.status(200).json({ message : 'Dados do administrador alterados'})
+      }
+    } catch (error) {
+      const message = dbErrors(error)
+      return res.status(500).json(message)   
     }
   },
 

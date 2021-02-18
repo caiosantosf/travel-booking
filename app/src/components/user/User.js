@@ -7,6 +7,7 @@ import { getUserType, getUserId } from '../../config/security'
 
 function User(props) {
   const [user, setUser] = useState({documentType: 'RG', state: 'AC'})
+  const [admin, setAdmin] = useState({infinitePay: true, companyPayment: false})
   const [error, setError] = useState({})
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
@@ -16,9 +17,19 @@ function User(props) {
   const returnTo = localStorage.getItem('to')
 
   const id = parseInt(props.match.params.id)
-  const admin = getUserType() === 'admin' ? true : false
 
-  if ( (!admin) && (id) && (id !== getUserId()) ) {
+  let adminData = false
+  let adminViewUser = false
+
+  if (getUserType() === 'admin') {
+    if (getUserId() === id) {
+      adminData = true
+    } else {
+      adminViewUser = true
+    }
+  }
+  
+  if (!adminData && !adminViewUser && id && id !== getUserId()) {
     history.push('/acesso-negado')
   }
 
@@ -55,13 +66,18 @@ function User(props) {
       } else {
         const { passwordConfirmation, id, ...userData} = user
 
-        const res = id ? await api.put(`/users/${id}`, userData, 
-                                { headers :{
-                                  'x-access-token' : localStorage.getItem('token')
-                                }})
+        const config = { headers :{
+          'x-access-token' : localStorage.getItem('token')
+        }}
+
+        const res = id ? await api.put(`/users/${id}`, userData, config)
                        : await api.post('/users/', userData)
 
         const { type, token } = res.data
+
+        if (adminData) {
+          await api.put(`/users/admin-data/${id}`, admin, config)
+        }
 
         finish(type, token)
       }
@@ -125,9 +141,9 @@ function User(props) {
             </div>
 
             <div className="col-lg-6">
-              <label htmlFor="name" className="form-label">Nome</label>
+              <label htmlFor="name" className="form-label">{`Nome ${adminData ? 'da Empresa' : ''}`}</label>
               <input type="text" className={`form-control ${error.userName ? 'is-invalid' : ''}`} id="name" maxLength="255" 
-                disabled={admin}
+                disabled={adminViewUser}
                 value={user.name || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -142,9 +158,9 @@ function User(props) {
               </div>
             </div>
             <div className="col-lg-3">
-              <label htmlFor="cpf" className="form-label">CPF</label>
+              <label htmlFor="cpf" className="form-label">{`CPF ${adminData ? 'do Responsável' : ''}`}</label>
               <input type="text" className={`form-control ${error.cpf ? 'is-invalid' : ''}`} id="cpf" maxLength="11" 
-                disabled={admin}
+                disabled={adminViewUser}
                 value={user.cpf || ''}
                 onChange={e => {
                   const re = /^[0-9\b]+$/
@@ -161,10 +177,10 @@ function User(props) {
                 {error.cpf}
               </div>
             </div>
-            <div className="col-lg-3">
+            <div className="col-lg-3" style={adminData ? { display: 'none'} : { display : 'inline-block'}}>
               <label htmlFor="birth" className="form-label">Nascimento</label>
               <input type="date" className={`form-control ${error.birth ? 'is-invalid' : ''}`} id="birth" 
-                disabled={admin}
+                disabled={adminViewUser}
                 value={user.birth || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -178,10 +194,10 @@ function User(props) {
                 {error.birth}
               </div>
             </div>
-            <div className="col-lg-2">
+            <div className="col-lg-2" style={adminData ? { display: 'none'} : { display : 'inline-block'}}>
             <label htmlFor="documentType" className="form-label">Tipo de Documento</label>
               <select className={`form-select ${error.documentType ? 'is-invalid' : ''}`} id="documentType" 
-                disabled={admin}
+                disabled={adminViewUser}
                 value={user.documentType || ''}
                 onChange={e => {
                     setUser({ ...user,
@@ -198,9 +214,9 @@ function User(props) {
               </div>
             </div>
             <div className="col-lg-3">
-              <label htmlFor="document" className="form-label">Documento</label>
+              <label htmlFor="document" className="form-label">{`${adminData ? 'CNPJ' : 'Documento'}`}</label>
               <input type="text" className={`form-control ${error.document ? 'is-invalid' : ''}`} id="document" maxLength="14"
-                disabled={admin}
+                disabled={adminViewUser}
                 value={user.document || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -217,7 +233,7 @@ function User(props) {
             <div className="col-lg-3">
               <label htmlFor="phone" className="form-label">Celular (WhatsApp)</label>
               <input type="text" className={`form-control ${error.phone ? 'is-invalid' : ''}`} id="phone" maxLength="11"
-                disabled={admin}
+                disabled={adminViewUser}
                 value={user.phone || ''}
                 onChange={e => {
                   const re = /^[0-9\b]+$/
@@ -237,7 +253,7 @@ function User(props) {
             <div className="col-lg-4">
               <label htmlFor="email" className="form-label">Email</label>
               <input type="email" className={`form-control ${error.email ? 'is-invalid' : ''}`} id="email" maxLength="255" 
-                disabled={admin}
+                disabled={adminViewUser}
                 value={user.email || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -252,10 +268,10 @@ function User(props) {
               </div>
             </div>
 
-            <div className="col-lg-2">
+            <div className="col-lg-2" style={adminData ? { display: 'none'} : { display : 'inline-block'}}>
               <label htmlFor="cep" className="form-label">CEP</label>
               <input type="text" className={`form-control ${error.cep ? 'is-invalid' : ''}`} id="cep" maxLength="8"
-                disabled={admin}
+                disabled={adminViewUser}
                 value={user.cep || ''}
                 onChange={e => {
                   const re = /^[0-9\b]+$/
@@ -274,10 +290,10 @@ function User(props) {
               </div>
             </div>
 
-            <div className="col-lg-6" >
+            <div className="col-lg-6" style={adminData ? { display: 'none'} : { display : 'inline-block'}}>
               <label htmlFor="homeAddress" className="form-label">Endereço</label>
               <input type="text" className={`form-control ${error.homeAddress ? 'is-invalid' : ''}`} id="homeAddress" maxLength="255"
-                disabled={admin}
+                disabled={adminViewUser}
                 value={user.homeAddress || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -292,10 +308,10 @@ function User(props) {
               </div>
             </div>
 
-            <div className="col-lg-1">
+            <div className="col-lg-1" style={adminData ? { display: 'none'} : { display : 'inline-block'}}>
               <label htmlFor="addressNumber" className="form-label">Número</label>
               <input type="text" className={`form-control ${error.addressNumber ? 'is-invalid' : ''}`} id="addressNumber" maxLength="5"
-                disabled={admin}
+                disabled={adminViewUser}
                 value={user.addressNumber || ''}
                 onChange={e => {
                   const re = /^[0-9\b]+$/
@@ -313,10 +329,10 @@ function User(props) {
               </div>
             </div>
 
-            <div className="col-lg-3">
+            <div className="col-lg-3" style={adminData ? { display: 'none'} : { display : 'inline-block'}}>
               <label htmlFor="complement" className="form-label">Complemento</label>
               <input type="text" className={`form-control ${error.complement ? 'is-invalid' : ''}`} id="complement" maxLength="255"
-                disabled={admin}
+                disabled={adminViewUser}
                 value={user.complement || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -331,10 +347,10 @@ function User(props) {
               </div>
             </div>
 
-            <div className="col-lg-6" >
+            <div className="col-lg-6" style={adminData ? { display: 'none'} : { display : 'inline-block'}}>
               <label htmlFor="neighborhood" className="form-label">Bairro</label>
               <input type="text" className={`form-control ${error.neighborhood ? 'is-invalid' : ''}`} id="neighborhood" maxLength="255"
-                disabled={admin}
+                disabled={adminViewUser}
                 value={user.neighborhood || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -349,10 +365,10 @@ function User(props) {
               </div>
             </div>
 
-            <div className="col-lg-3">
+            <div className="col-lg-3" style={adminData ? { display: 'none'} : { display : 'inline-block'}}>
               <label htmlFor="state" className="form-label">Estado</label>
               <select className={`form-select ${error.state ? 'is-invalid' : ''}`} id="state"
-                disabled={admin}
+                disabled={adminViewUser}
                 value={user.state || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -395,10 +411,10 @@ function User(props) {
               </div>
             </div>
 
-            <div className="col-lg-3">
+            <div className="col-lg-3" style={adminData ? { display: 'none'} : { display : 'inline-block'}}>
               <label htmlFor="city" className="form-label">Cidade</label>
               <input type="text" className={`form-control ${error.city ? 'is-invalid' : ''}`} id="city" maxLength="255"
-                disabled={admin}
+                disabled={adminViewUser}
                 value={user.city || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -416,7 +432,7 @@ function User(props) {
             <div className="col-lg-4">
               <label htmlFor="password" className="form-label">{`Senha ${id ? 'Atual' : ''}`}</label>
               <input type="password" className={`form-control ${error.password ? 'is-invalid' : ''}`} id="password"
-                disabled={admin}
+                disabled={adminViewUser}
                 value={user.password || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -434,7 +450,7 @@ function User(props) {
             <div className="col-lg-4" style={id ? { display: 'inline-block'} : { display : 'none'}}>
               <label htmlFor="newPassword" className="form-label">Nova Senha</label>
               <input type="password" className={`form-control ${error.newPassword ? 'is-invalid' : ''}`} id="newPassword"
-                disabled={admin}
+                disabled={adminViewUser}
                 value={user.newPassword || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -452,7 +468,7 @@ function User(props) {
             <div className="col-lg-4">
               <label htmlFor="passwordConfirmation" className="form-label">Confirme a Senha</label>
               <input type="password" className={`form-control ${error.passwordConfirmation ? 'is-invalid' : ''}`} id="passwordConfirmation" 
-                disabled={admin}
+                disabled={adminViewUser}
                 value={user.passwordConfirmation || ''}
                 onChange={e => {
                   setUser({ ...user,
@@ -467,12 +483,69 @@ function User(props) {
               </div>
             </div>
 
+            <div className="col-lg-3" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}>
+              <label htmlFor="infinitePay" className="form-label">InfinitePay</label>
+              <select className={`form-select ${error.infinitePay ? 'is-invalid' : ''}`} id="infinitePay"
+                value={admin.infinitePay || ''}
+                onChange={e => {
+                  setAdmin({ ...admin,
+                    infinitePay: e.target.value
+                  })
+                }}>
+                <option value={true}>Sim</option>
+                <option value={false}>Não</option>
+              </select>
+
+              <div id="validationInfinitePay" 
+                className="invalid-feedback" 
+                style={error.infinitePay ? { display: 'inline' } : { display: 'none' }}>
+                {error.infinitePay}
+              </div>
+            </div>
+
+            <div className="col-lg-3" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}>
+              <label htmlFor="companyPayment" className="form-label">Pagamento Direto</label>
+              <select className={`form-select ${error.companyPayment ? 'is-invalid' : ''}`} id="companyPayment"
+                value={admin.companyPayment || ''}
+                onChange={e => {
+                  setAdmin({ ...admin,
+                    companyPayment: e.target.value
+                  })
+                }}>
+                <option value={true}>Sim</option>
+                <option value={false}>Não</option>
+              </select>
+
+              <div id="validationCompanyPayment" 
+                className="invalid-feedback" 
+                style={error.companyPayment ? { display: 'inline' } : { display: 'none' }}>
+                {error.companyPayment}
+              </div>
+            </div>
+
+            <div className="col-lg-9" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}>
+              <label htmlFor="companyPaymentLink" className="form-label">Pagamento Direto Link</label>
+              <input type="text" className={`form-control ${error.companyPaymentLink ? 'is-invalid' : ''}`} id="companyPaymentLink" maxLength="255"
+                value={admin.companyPaymentLink || ''}
+                onChange={e => {
+                  setAdmin({ ...admin,
+                    companyPaymentLink: e.target.value
+                  })
+                }}/>
+
+              <div id="validationCompanyPaymentLink" 
+                className="invalid-feedback" 
+                style={error.companyPaymentLink ? { display: 'inline' } : { display: 'none' }}>
+                {error.companyPaymentLink}
+              </div>
+            </div>
+
             <div className="text-center d-grid gap-2">
               <button type="button" 
                       className="btn btn-primary"
                       onClick={handleSave}
                       disabled={loading}
-                      style={admin ? { display: 'none'} : { display : 'inline-block'}}>
+                      style={adminViewUser ? { display: 'none'} : { display : 'inline-block'}}>
                 <span className="spinner-border spinner-border-sm mx-1" 
                       role="status" 
                       aria-hidden="true"

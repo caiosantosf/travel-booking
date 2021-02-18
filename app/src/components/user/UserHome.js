@@ -2,7 +2,7 @@ import React, { useState, useEffect} from 'react'
 import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
 import { CalendarCheck } from 'react-bootstrap-icons'
-import { Link, useHistory } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { api, apiUrl } from '../../config/api'
 import { dateTimeBrazil } from '../../config/util'
 
@@ -34,12 +34,13 @@ function UserHome() {
   return (
     <React.Fragment>
       <NavHeader />
+      
       <div className="container-fluid">
         <div className="row">
                     
           <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-4">
             <Sidebar />
-
+            
             {!travels ? noTravels : ''}
 
             <div className="row row-cols-1 row-cols-md-2 row-cols-xl-3 row-cols-xxl-4 g-3">
