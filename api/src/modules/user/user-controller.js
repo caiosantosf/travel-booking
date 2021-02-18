@@ -29,7 +29,11 @@ module.exports = {
       const { id , password: dbPassword, type } = user[0]
 
       if (await compareCrypt(reqPassword, dbPassword)) {
-        return res.status(200).json({ auth: true, token: token(id, type), id, type })
+
+        const userAdmin = await db('users').where({ type: 'admin' })
+        const { phone: companyPhone, name: companyName } = userAdmin[0]
+
+        return res.status(200).json({ auth: true, token: token(id, type), id, type, companyName, companyPhone })
       }
       return res.status(400).json({ password: 'Senha inválida' })
     }

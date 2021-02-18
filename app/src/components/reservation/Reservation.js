@@ -26,6 +26,7 @@ function Reservation(props) {
   const [windowAllowed, setWindowAllowed] = useState(0)
   const [windowAmount, setWindowAmount] = useState({ departureSelected: 0, returnSelected: 0 })
   const [seatsSelected, setSeatsSelected] = useState({ departure: [], return: [] })
+
   const { travel_id } = props.match.params
 
   let history = useHistory()
@@ -76,6 +77,7 @@ function Reservation(props) {
           }})
 
         const { data } = res
+
         data.birth = dateTimeBrazil(data.birth).substr(0, 10)
         data.age = calculateAge(data.birth)
         data.value = calculateValue(values, data.age, travelType, false).value
@@ -122,8 +124,11 @@ function Reservation(props) {
         }
 
         if (!hasError) {
-          peopleSeatsAux.push({ index: dependents.length, person: user, seats: seats.slice(0), departurePosition: '', returnPosition: '' })
-          setPeopleSeats(peopleSeatsAux)
+
+          if (user.type !== 'admin') {
+            peopleSeatsAux.push({ index: dependents.length, person: user, seats: seats.slice(0), departurePosition: '', returnPosition: '' })
+            setPeopleSeats(peopleSeatsAux)
+          }
 
           const allowed = peopleSeats.length === 1 ? 1 : parseInt(peopleSeats.length / 2)
           setWindowAllowed(allowed)
@@ -418,8 +423,15 @@ function Reservation(props) {
 
       <div className="col-md-12">
         <h6>Passageiros</h6>
-        <span className="d-block mb-1">{`${user.name} - ${user.documentType} ${user.document}`}</span>
-        <span className="d-block mb-2">{`R$ ${user.value.toString().replace(".",",")}`}</span>
+
+        <span className={`${user.type === 'admin' ? 'd-none' : 'd-block'} mb-1`}>
+          {`${user.name} - ${user.documentType} ${user.document}`}
+        </span>
+
+        <span className={`${user.type === 'admin' ? 'd-none' : 'd-block'} mb-2`}>
+          {`R$ ${user.value.toString().replace(".",",")}`}
+        </span>
+
         <button type="button" 
                 className="btn btn-primary"
                 onClick={handleAddPerson}>
@@ -456,7 +468,7 @@ function Reservation(props) {
                 </div>
               </div>
 
-              <div className="col-lg-3">
+              <div className="col-lg-2">
                 <input  type="date" 
                         className={`form-control form-control-sm ${dependent.error.birth ? 'is-invalid' : ''}`}
                         maxLength='255' 
@@ -479,7 +491,7 @@ function Reservation(props) {
 
               { dependent.optionLapChild ? lapChild(dependent, i) : '' }
 
-              <div className="col-lg-1">
+              <div className="col-lg-2">
                 <select type="text" 
                         className={`form-select form-select-sm ${dependent.error.documentType ? 'is-invalid' : ''}`}
                         value={dependents[i].documentType || ''}
@@ -491,6 +503,7 @@ function Reservation(props) {
                 >
                   <option value="RG">RG</option>
                   <option value="CNH">CNH</option>
+                  <option value="CN">C. Nascimento</option>
                 </select>
 
                 <div id="validationDocumentType" 
@@ -503,7 +516,7 @@ function Reservation(props) {
               <div className="col-lg-2">
                 <input  type="text" 
                         className={`form-control form-control-sm ${dependent.error.document ? 'is-invalid' : ''}`} 
-                        maxLength='14' 
+                        maxLength='32' 
                         placeholder="Documento"
                         value={dependents[i].document || ''}
                         onChange={e => {

@@ -1,5 +1,8 @@
 import React from 'react'
 import logo from '../../assets/logo.png'
+import WhatsAppWidget from 'react-whatsapp-widget'
+import 'react-whatsapp-widget/dist/index.css'
+import { getUserType } from '../../config/security'
 
 function Hamburger() {
   return (
@@ -10,13 +13,24 @@ function Hamburger() {
 }
 
 function Nav({ hamburger }) {
+  
+  const wpp = <WhatsAppWidget phoneNumber={localStorage.getItem('companyPhone')} 
+                              textReplyTime="Responderemos assim que possível" 
+                              message="Olá! O que podemos fazer por você?"	 
+                              companyName={localStorage.getItem('companyName')}
+                              sendButton="Enviar"/>
+
   return (
-    <header className="navbar navbar-light sticky-top bg-white p-0 shadow">
-      <div className="container text-center">
-        <img className="my-3 img-menu" src={ logo } alt="Logo" />
-        { hamburger !== 'none' ? <Hamburger /> : '' }
-      </div>
-    </header>
+    <React.Fragment>
+      <header className="navbar navbar-light sticky-top bg-white p-0 shadow">
+        <div className="container text-center">
+          <img className="my-3 img-menu" src={ logo } alt="Logo" />
+          { hamburger !== 'none' ? <Hamburger /> : '' }
+        </div>
+      </header>
+
+      {getUserType() !== 'admin' ? wpp : ''}
+    </React.Fragment>
   )
 }
 

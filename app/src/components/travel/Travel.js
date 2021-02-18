@@ -330,8 +330,6 @@ function Travel(props) {
               </table>
             </div>
           </div>
-
-          
         </form>
 
         <div className="text-center d-grid gap-2">
@@ -349,7 +347,7 @@ function Travel(props) {
 
           <button type="button" 
                   className="btn btn-primary"
-                  onClick={handleSave}>
+                  onClick={() => history.push(`/reserva/${travel_id}`)}>
             Fazer Reserva
           </button>
 

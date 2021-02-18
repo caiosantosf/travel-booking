@@ -34,7 +34,7 @@ function UserHome() {
   return (
     <React.Fragment>
       <NavHeader />
-      
+            
       <div className="container-fluid">
         <div className="row">
                     
@@ -139,6 +139,7 @@ function UserHome() {
           </div>
         </div>
       </div>
+    
     </React.Fragment>
   )
 }

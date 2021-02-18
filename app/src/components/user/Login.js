@@ -53,8 +53,8 @@ function Login(props) {
       setLoading(true)
       setError({})
       const res = await api.post(`/users/login/${admin ? 'admin' : ''}`, auth)
-      const { type, token } = res.data
-      finishLogin(type, token)
+      const { token, companyName, companyPhone } = res.data
+      finishLogin(token, companyName, companyPhone)
     } catch (err) {
       if ((err.hasOwnProperty('response')) && (err.response)) {
         setError(err.response.data)
@@ -65,8 +65,10 @@ function Login(props) {
     }
   }
 
-  const finishLogin = (type, token) => {
+  const finishLogin = (token, companyName, companyPhone) => {
     localStorage.setItem('token', token)
+    localStorage.setItem('companyName', companyName)
+    localStorage.setItem('companyPhone', companyPhone)
     setLoading(false)
   }
 

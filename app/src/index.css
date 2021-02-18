@@ -186,3 +186,10 @@ a:link {
 .windowLeft {
   margin: .25rem .25rem .25rem 0px !important;
 }
+
+/* whatsapp button */
+
+._1bpcM {
+  color:white !important;
+  background-color: rgb(79, 206, 93) !important;
+}
