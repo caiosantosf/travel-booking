@@ -95,6 +95,15 @@ module.exports = {
     return res.status(404).json({ message: 'Usuário não encontrado'})
   },
 
+  async getAdminData (req, res) {
+    const admin = await db('adminData').select('*')
+
+    if (admin.length) {
+      return res.status(200).json(admin[0])
+    }
+    return res.status(404).json({ message: 'Dados não encontrados'})
+  },
+
   async post (req, res) {
     const data = req.body
     data.type = 'regular'

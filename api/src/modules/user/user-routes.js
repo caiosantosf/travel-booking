@@ -1,5 +1,5 @@
 const express = require('express')
-const { auth, getMany, post, destroy, getOne, put, emailResetPassword, putAdminData } = require('./user-controller')
+const { auth, getMany, post, destroy, getOne, put, emailResetPassword, putAdminData, getAdminData } = require('./user-controller')
 const { routeSecurity : security } = require('../../config/security')
 const validation = require('./user-validation')
 
@@ -51,9 +51,14 @@ routes.put('/users/:id',
   put
 )
 
-routes.put('/users/admin-data/:id', 
-  security(['regular', 'admin']),
+routes.put('/admin-data/:id', 
+  security(['admin']),
   putAdminData
+)
+
+routes.get('/admin-data/', 
+  security(['regular', 'admin']),
+  getAdminData
 )
 
 routes.delete('/users/:id', 

@@ -26,18 +26,48 @@ function Reservation(props) {
   const [windowAllowed, setWindowAllowed] = useState(0)
   const [windowAmount, setWindowAmount] = useState({ departureSelected: 0, returnSelected: 0 })
   const [seatsSelected, setSeatsSelected] = useState({ departure: [], return: [] })
+  const [adminData, setAdminData] = useState({})
+  const [reservation, setReservation] = useState([])
 
-  const { travel_id } = props.match.params
+  const { travel_id, random } = props.match.params
 
   let history = useHistory()
 
+  const resetState = () => {
+    setMessage('')
+    setLoadingSave(false)
+    setValues([])
+    setDeparturePlaces([])
+    setHasOnlyDeparture(false)
+    setHasOnlyReturn(false)
+    setUser({name: '', document: '', documentType: '', value: '0.00'})
+    setDependents([])
+    setTravelType('normal')
+    setDeparturePlace()
+    setTotal('0.00')
+    setSeats([])
+    setControlsSeats(false)
+    setPeopleSeats([{ person: {}, seats: [], departurePosition: '', returnPosition: '' }])
+    setWindowAllowed(0)
+    setWindowAmount({ departureSelected: 0, returnSelected: 0 })
+    setSeatsSelected({ departure: [], return: [] })
+    setAdminData({})
+    setReservation([])
+  }
+
   useEffect(() => {
+    setStatus(1)
+  }, [random])
+
+  useEffect(() => {
+    resetState()
     const fetchData = async () => {
+      const config = { headers :{
+        'x-access-token' : localStorage.getItem('token')
+      }}
+
       try {
-        const res = await api.get(`/travels/${travel_id}`, 
-          { headers :{
-            'x-access-token' : localStorage.getItem('token')
-          }})
+        const res = await api.get(`/travels/${travel_id}`, config)
 
         const { data } = res
         setControlsSeats(data.controlsSeats)
@@ -60,6 +90,15 @@ function Reservation(props) {
             }
           }
         })
+      } catch (error) {
+        //setMessage(error.response.data.message)
+      }
+
+      try {
+        const res = await api.get(`/admin-data/`, config)
+
+        const { data } = res
+        setAdminData(data)
       } catch (error) {
         //setMessage(error.response.data.message)
       }
@@ -124,16 +163,10 @@ function Reservation(props) {
         }
 
         if (!hasError) {
-
           if (user.type !== 'admin') {
             peopleSeatsAux.push({ index: dependents.length, person: user, seats: seats.slice(0), departurePosition: '', returnPosition: '' })
             setPeopleSeats(peopleSeatsAux)
           }
-
-          const allowed = peopleSeats.length === 1 ? 1 : parseInt(peopleSeats.length / 2)
-          setWindowAllowed(allowed)
-          setWindowAmount({ departureSelected: 0, returnSelected: 0 })
-          setSeatsSelected({ departure: [], return: [] })
 
           setStatus(2)
         }
@@ -142,15 +175,32 @@ function Reservation(props) {
       }
     } 
     if (status === 2) {
-      setStatus(3)
-    }
-    if (status === 3) {
-      save()
+      setMessage('')
+      let nextStep = true
+
+      for (const ps of peopleSeats) {
+        if (!ps.person.lapChild) {
+          if (!ps.departureSeat && (travelType === 'normal' || travelType === 'departure')) {
+            setMessage('Selecione todas as suas poltronas!')
+            nextStep = false
+            break
+          }
+          if (!ps.returnSeat && (travelType === 'normal' || travelType === 'return')) {
+            setMessage('Selecione todas as suas poltronas!')
+            nextStep = false
+            break
+          }
+        }
+      }
+
+      if (nextStep) {
+        setStatus(3)
+      }
     }
   }
 
   const handleBack = () => {
-    if (status === 1) {
+    if (status === 1 || status === 4) {
       history.push('/')
     }
     if (status === 2) {
@@ -175,19 +225,32 @@ function Reservation(props) {
 
     const datetime = dateTimeDefault(new Date())
 
+    let returnSeat = 0
+    let departureSeat = 0
+
+    for (const ps of peopleSeats) {
+      if (ps.person.type) {
+        returnSeat = ps.returnSeat
+        departureSeat = ps.departureSeat
+        break
+      }
+    }
+
     try {
-      await api.post('/reservations', {
+      const res = await api.post('/reservations', {
         travel_id: Number(travel_id), 
         user_id: user.id, 
-        departureSeat: 0, 
+        departureSeat, 
         datetime,
-        returnSeat: 0, 
+        returnSeat, 
         value: Number(user.value), 
         status: "1", 
         travelType, 
         departurePlace_id: departurePlace,
         lapChild: false
       }, config)
+
+      setReservation({ id: res.data.id})
     } catch (error) {
       let msg = ''
       Object.entries(error.response.data).forEach(([key, value]) => {
@@ -204,7 +267,10 @@ function Reservation(props) {
 
       try {
         const { name, documentType, birth, document, value, lapChild } = dependent
-        const res = await api.post('/dependents', { name, documentType, document, birth }, config)          
+        const res = await api.post('/dependents', { name, documentType, document, birth }, config)    
+        
+        returnSeat = lapChild ? 0 : peopleSeats[i].returnSeat
+        departureSeat = lapChild ? 0 : peopleSeats[i].departureSeat
 
         if (res.status === 201) {
           try {
@@ -213,8 +279,8 @@ function Reservation(props) {
               user_id: user.id, 
               dependent_id: res.data.id, 
               datetime,
-              departureSeat: 0, 
-              returnSeat: 0, 
+              departureSeat, 
+              returnSeat, 
               value: Number(value), 
               status: "1", 
               travelType, 
@@ -238,6 +304,21 @@ function Reservation(props) {
       }  
     }
     setLoadingSave(false) 
+  }
+
+  const handleCompanyPayment = () => {
+    save()
+    const cpLink = adminData.companyPaymentLink.replace('email@email.com', user.email)
+                                               .replace('@numeroreserva', reservation.id || 0)
+                                               .replace('@nome', user.name)
+                                               .replace('@cpf', user.cpf)
+                                               .replace('@documento', user.document)
+                                               .replace('@valor', total.toString().replace(".",","))
+    
+    window.open(cpLink, "_blank")
+
+    setStatus(4)
+    resetState()
   }
 
   const handleAddPerson = async () => {
@@ -306,6 +387,9 @@ function Reservation(props) {
     let returnSelected = 0
     let departure = []
     let return_ = []
+
+    const allowed = peopleSeats.length === 1 ? 1 : Math.ceil(peopleSeats.length / 2)
+    setWindowAllowed(allowed)
 
     for (const ps of peopleSeats) {
       if (ps.departurePosition.indexOf('window') !== -1) {
@@ -639,9 +723,35 @@ function Reservation(props) {
 
   const formPayment =
     <form id="payment" className="row g-3 mt-1 mb-4">
-    <h6>Pagamento</h6>
+      <h6>Pagamento</h6>
+      <div className={`col-md-12 ${!adminData.companyPayment ? 'd-none' : ''}`}>
+        <button type="button" 
+                className="btn btn-primary mb-2"
+                onClick={handleCompanyPayment}
+                disabled={loadingSave}>
+          <span className="spinner-border spinner-border-sm mx-1" 
+                role="status" 
+                aria-hidden="true" 
+                style={loadingSave ? { display: 'inline-block'} : { display : 'none' }}>
+          </span>
+          Pagamento Direto com a Empresa
+        </button>
+        <br />
+        <span>Ao escolher esta opção a sua reserva será salva e será aberta uma tela externa ao aplivativo para seguir com o pagamento com a empresa</span>
+      </div>
 
-  </form>
+      <div className={`col-md-12 ${!adminData.infinitePay ? 'd-none' : ''}`}>
+        InfinitePay
+      </div>
+    </form>
+
+  const formSuccess =
+    <form id="payment" className="row g-3 mt-1 mb-4">
+      <div className="col-md-12">
+        <h5>A sua reserva foi salva e você poderá sempre revisar todas as informações sobre ela pelo menu "Minhas Reservas"</h5>
+        <h6>Caso queira falar conosco utilize o botão WhatsApp abaixo</h6>
+      </div>
+    </form>
 
   return (
     <React.Fragment>
@@ -655,8 +765,9 @@ function Reservation(props) {
           {status === 1 ? formReservationDetails : ''}
           {status === 2 ? formSeatsChoice : ''}
           {status === 3 ? formPayment : ''}
+          {status === 4 ? formSuccess : ''}
 
-          <span className="d-block fs-5 mb-3">{`Total R$ ${total.toString().replace(".",",")}`}</span>
+          <span className={`${status === 4 ? 'd-none' : 'd-block'} fs-5 mb-3`}>{`Total R$ ${total.toString().replace(".",",")}`}</span>
 
           <div className='alert text-center alert-dismissible alert-danger fade show' role="alert"
               style={message ? { display: 'block'} : { display : 'none' }}>
@@ -665,7 +776,7 @@ function Reservation(props) {
 
           <div className="text-center d-grid gap-2">
             <button type="button" 
-                    className="btn btn-primary"
+                    className={`btn btn-primary ${status === 3 || status === 4 ? 'd-none' : ''}`}
                     onClick={handleContinue}
                     disabled={loadingSave}>
               <span className="spinner-border spinner-border-sm mx-1" 

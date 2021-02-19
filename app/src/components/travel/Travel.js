@@ -347,7 +347,7 @@ function Travel(props) {
 
           <button type="button" 
                   className="btn btn-primary"
-                  onClick={() => history.push(`/reserva/${travel_id}`)}>
+                  onClick={() => history.push(`/reserva/${travel_id}/${Math.ceil(Math.random() * 1000000)}`)}>
             Fazer Reserva
           </button>
 

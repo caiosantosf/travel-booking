@@ -48,10 +48,11 @@ function UserHome() {
               {travels.map(travel => {
                 const { id, description, destination, departurePlaces, values, imageName } = travel
                 const onlyOneValue = values.length === 1 ? true : false
+                const random = Math.ceil(Math.random() * 1000000)
 
                 return (
                   <div key={id} className="col">
-                    <Link className="card-link" to={`/reserva/${id}`}>
+                    <Link className="card-link" to={`/reserva/${id}/${random}`}>
                       <div className="card shadow-sm bg-light">
                         <img src={`${apiUrl}uploads/${imageName}`} className="card-img-top center-cropped" alt={destination} />
                         <div className="card-body">

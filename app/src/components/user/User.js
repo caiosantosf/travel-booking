@@ -77,7 +77,7 @@ function User(props) {
 
         if (adminData) {
           setAdmin({ ...admin, user_id: id })
-          await api.put(`/users/admin-data/${id}`, admin, config)
+          await api.put(`/admin-data/${id}`, admin, config)
         }
 
         finish(type, token)

@@ -57,14 +57,18 @@ const getSeatsWithReserves = async (id, travel_id) => {
 
     for (const reservation of reservations) {
       if (seat) {
+        let brk = false
         if (seat === reservation.departureSeat) {
           departureAvailable = false
-          break
+          brk = true
         } 
         if (seat === reservation.returnSeat) {
           returnAvailable = false
+          brk = true
+        }
+        if (brk) {
           break
-        } 
+        }
       }
     }
 

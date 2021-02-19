@@ -15,10 +15,11 @@ function Hamburger() {
 function Nav({ hamburger }) {
   
   const wpp = <WhatsAppWidget phoneNumber={localStorage.getItem('companyPhone')} 
-                              textReplyTime="Responderemos assim que possível" 
-                              message="Olá! O que podemos fazer por você?"	 
+                              textReplyTime='Responderemos assim que possível'
+                              message='Olá! O que podemos fazer por você?'
                               companyName={localStorage.getItem('companyName')}
-                              sendButton="Enviar"/>
+                              sendButton='Enviar'
+                              placeholder='Digite sua mensagem'/>
 
   return (
     <React.Fragment>
