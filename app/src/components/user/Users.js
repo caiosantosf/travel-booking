@@ -52,79 +52,76 @@ function Users() {
 
   return (
     <React.Fragment>
-      <div className="container-fluid">
-        <div className="row">
-          <NavHeader />
-          
-          <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <Sidebar />
+      <NavHeader />
+      <div className="container-fluid">      
+        <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-2">
+          <Sidebar />
 
-            <h5>Visualização de Usuários</h5>
-          
-            <div className="table-responsive-sm">
-              <table className="table table-responsive-sm table-sm table-striped table-hover">
-                <thead>
-                  <tr key="0">
-                    <th scope="col">Nome</th>
-                    <th scope="col">CPF</th>
-                    <th scope="col">Telefone</th>
-                    <th scope="col">Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map(user => {
-                    const phoneLen = user.phone.length
-                    return (
-                      <tr key={user.id}>
-                        <td>{user.name}</td>
-                        <td>{user.cpf}</td>
-                        <td>
-                          {`(${user.phone.substr(0, 2)}) ${user.phone.substr(2, phoneLen === 10 ? 4: 5)}-${user.phone.substr(phoneLen === 10 ? 6: 7, 4)}`}
-                          <a className='ms-2' href={`https://api.whatsapp.com/send?phone=55${user.phone}`} target="_blank" rel="noreferrer">
-                            <Whatsapp style={{color:'green'}} />
-                          </a>
-                        </td>
-                        <td><Link to={`/usuarios/${user.id}`}><PencilSquare /> </Link></td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            <nav aria-label="Page navigation example">
-              <ul className="pagination">
-                <li className="page-item">
-                  <button type="button" className="btn btn-outline-primary m-1" 
-                    disabled={currentPage === 1 ? true : false}
-                    onClick={handleFirst}><ChevronDoubleLeft />
-                  </button>
-                </li>
-
-                <li className="page-item">
-                  <button type="button" className="btn btn-outline-primary m-1" 
-                    disabled={currentPage === 1 ? true : false}
-                    onClick={handlePrevious}><ChevronLeft />
-                  </button>
-                </li>
-
-                <li className="page-item">
-                  <button type="button" className="btn btn-outline-primary m-1" 
-                    disabled={currentPage === lastPage ? true : false}
-                    onClick={handleNext}><ChevronRight />
-                  </button>
-                </li>
-
-                <li className="page-item">
-                  <button type="button" className="btn btn-outline-primary m-1" 
-                    disabled={currentPage === lastPage ? true : false}
-                    onClick={handleLast}><ChevronDoubleRight />
-                  </button>
-                </li>
-
-              </ul>
-            </nav>
+          <h5>Visualização de Usuários</h5>
+        
+          <div className="table-responsive-sm">
+            <table className="table table-responsive-sm table-sm table-striped table-hover">
+              <thead>
+                <tr key="0">
+                  <th scope="col">Nome</th>
+                  <th scope="col">CPF</th>
+                  <th scope="col">Telefone</th>
+                  <th scope="col">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map(user => {
+                  const phoneLen = user.phone.length
+                  return (
+                    <tr key={user.id}>
+                      <td>{user.name}</td>
+                      <td>{user.cpf}</td>
+                      <td>
+                        {`(${user.phone.substr(0, 2)}) ${user.phone.substr(2, phoneLen === 10 ? 4: 5)}-${user.phone.substr(phoneLen === 10 ? 6: 7, 4)}`}
+                        <a className='ms-2' href={`https://api.whatsapp.com/send?phone=55${user.phone}`} target="_blank" rel="noreferrer">
+                          <Whatsapp style={{color:'green'}} />
+                        </a>
+                      </td>
+                      <td><Link to={`/usuarios/${user.id}`}><PencilSquare /> </Link></td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
           </div>
+
+          <nav aria-label="Page navigation example">
+            <ul className="pagination">
+              <li className="page-item">
+                <button type="button" className="btn btn-outline-primary m-1" 
+                  disabled={currentPage === 1 ? true : false}
+                  onClick={handleFirst}><ChevronDoubleLeft />
+                </button>
+              </li>
+
+              <li className="page-item">
+                <button type="button" className="btn btn-outline-primary m-1" 
+                  disabled={currentPage === 1 ? true : false}
+                  onClick={handlePrevious}><ChevronLeft />
+                </button>
+              </li>
+
+              <li className="page-item">
+                <button type="button" className="btn btn-outline-primary m-1" 
+                  disabled={currentPage === lastPage ? true : false}
+                  onClick={handleNext}><ChevronRight />
+                </button>
+              </li>
+
+              <li className="page-item">
+                <button type="button" className="btn btn-outline-primary m-1" 
+                  disabled={currentPage === lastPage ? true : false}
+                  onClick={handleLast}><ChevronDoubleRight />
+                </button>
+              </li>
+
+            </ul>
+          </nav>
         </div>
       </div>
     </React.Fragment>

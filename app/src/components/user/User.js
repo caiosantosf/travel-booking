@@ -130,7 +130,7 @@ function User(props) {
     <React.Fragment>
       <NavHeader />
       <div className="container-fluid">
-        <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-2">
           <Sidebar />
 
           <h5>{id ? "Dados do usuário" : "Informe seus dados para o cadastro"}</h5>

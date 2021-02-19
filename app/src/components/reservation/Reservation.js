@@ -28,6 +28,7 @@ function Reservation(props) {
   const [seatsSelected, setSeatsSelected] = useState({ departure: [], return: [] })
   const [adminData, setAdminData] = useState({})
   const [reservation, setReservation] = useState([])
+  const [notes, setNotes] = useState()
 
   const { travel_id, random } = props.match.params
 
@@ -73,6 +74,7 @@ function Reservation(props) {
         setControlsSeats(data.controlsSeats)
         setValues(data.values)
         setDeparturePlaces(data.departurePlaces)
+        setNotes(data.notes)
 
         if (data.controlsSeats) {
           setSeats(data.seats)
@@ -457,6 +459,11 @@ function Reservation(props) {
   const formReservationDetails = 
     <form id="reservationDetails" className="row g-3 mt-1 mb-3">
       <div className="col-md-12">
+        <h6>Detalhes</h6>
+        <div>{notes}</div>
+      </div>
+
+      <div className="col-md-12">
         <h6>Tipo de viagem</h6>
 
         <div className="form-check">
@@ -757,7 +764,7 @@ function Reservation(props) {
     <React.Fragment>
       <NavHeader />
       <div className="container-fluid mb-2">
-        <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-2">
           <Sidebar />
 
           <h5>Reserva</h5>

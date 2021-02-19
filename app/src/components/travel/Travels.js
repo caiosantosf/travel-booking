@@ -59,84 +59,84 @@ function Travels() {
     <React.Fragment>
       <NavHeader />
       <div className="container-fluid">
-        <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-4">
-        <Sidebar />
+        <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-2">
+          <Sidebar />
 
-        <h5>Cadastro de viagens</h5>
-      
-        <div className="table-responsive-sm">
-          <table className="table table-sm table-striped table-hover">
-            <thead>
-              <tr key="0">
-                <th scope="col">Descrição</th>
-                <th scope="col">Destino</th>
-                <th scope="col">Saída</th>
-                <th scope="col">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {travels.map(travel => {
-                const { id, description, destination, departurePlaces } = travel
+          <h5>Cadastro de viagens</h5>
+        
+          <div className="table-responsive-sm">
+            <table className="table table-sm table-striped table-hover">
+              <thead>
+                <tr key="0">
+                  <th scope="col">Descrição</th>
+                  <th scope="col">Destino</th>
+                  <th scope="col">Saída</th>
+                  <th scope="col">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {travels.map(travel => {
+                  const { id, description, destination, departurePlaces } = travel
 
-                const departureFormatted = departurePlaces.length
-                  ? dateTimeBrazil(departurePlaces[0].departureDate)
-                  : ''
-                
-                return (
-                  <tr key={id}>
-                    <td>{description}</td>
-                    <td>{destination}</td>
-                    <td>{departureFormatted}</td>
-                    <td><Link className="me-2" to={`/viagens/${id}`}><PencilSquare /></Link></td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+                  const departureFormatted = departurePlaces.length
+                    ? dateTimeBrazil(departurePlaces[0].departureDate)
+                    : ''
+                  
+                  return (
+                    <tr key={id}>
+                      <td>{description}</td>
+                      <td>{destination}</td>
+                      <td>{departureFormatted}</td>
+                      <td><Link className="me-2" to={`/viagens/${id}`}><PencilSquare /></Link></td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <nav aria-label="Page navigation example">
+            <ul className="pagination">
+              <li className="page-item">
+                <button type="button" className="btn btn-outline-primary m-1" 
+                  disabled={currentPage === 1 ? true : false}
+                  onClick={handleFirst}><ChevronDoubleLeft />
+                </button>
+              </li>
+
+              <li className="page-item">
+                <button type="button" className="btn btn-outline-primary m-1" 
+                  disabled={currentPage === 1 ? true : false}
+                  onClick={handlePrevious}><ChevronLeft />
+                </button>
+              </li>
+
+              <li className="page-item">
+                <button type="button" className="btn btn-outline-primary m-1" 
+                  disabled={currentPage === lastPage ? true : false}
+                  onClick={handleNext}><ChevronRight />
+                </button>
+              </li>
+
+              <li className="page-item">
+                <button type="button" className="btn btn-outline-primary m-1" 
+                  disabled={currentPage === lastPage ? true : false}
+                  onClick={handleLast}><ChevronDoubleRight />
+                </button>
+              </li>
+
+            </ul>
+          </nav>
+
+          <div className="text-center d-grid gap-2">
+            <button type="button" 
+                    className="btn btn-primary"
+                    onClick={handleNew}>
+              Novo
+            </button>
+
+          </div>
         </div>
-
-        <nav aria-label="Page navigation example">
-          <ul className="pagination">
-            <li className="page-item">
-              <button type="button" className="btn btn-outline-primary m-1" 
-                disabled={currentPage === 1 ? true : false}
-                onClick={handleFirst}><ChevronDoubleLeft />
-              </button>
-            </li>
-
-            <li className="page-item">
-              <button type="button" className="btn btn-outline-primary m-1" 
-                disabled={currentPage === 1 ? true : false}
-                onClick={handlePrevious}><ChevronLeft />
-              </button>
-            </li>
-
-            <li className="page-item">
-              <button type="button" className="btn btn-outline-primary m-1" 
-                disabled={currentPage === lastPage ? true : false}
-                onClick={handleNext}><ChevronRight />
-              </button>
-            </li>
-
-            <li className="page-item">
-              <button type="button" className="btn btn-outline-primary m-1" 
-                disabled={currentPage === lastPage ? true : false}
-                onClick={handleLast}><ChevronDoubleRight />
-              </button>
-            </li>
-
-          </ul>
-        </nav>
-
-        <div className="text-center d-grid gap-2">
-          <button type="button" 
-                  className="btn btn-primary"
-                  onClick={handleNew}>
-            Novo
-          </button>
-
-        </div>
-      </div>
       </div>
     </React.Fragment>
   )

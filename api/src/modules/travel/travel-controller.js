@@ -77,6 +77,17 @@ const getSeatsWithReserves = async (id, travel_id) => {
   return seatsWithReserves
 }
 
+const getAvailableSeatsAmount = async (id, travel_id) => {
+  const bus = await db('buses').where({ id })
+  const { seats } = bus[0].layout
+  const seatsAmount = seats.reduce((total, seat) => total + (seat ? 1 : 0), 0)
+
+  const reservations = await db('reservations').where({ travel_id })
+  const reservationsAmount = reservations.reduce((total, r) => total + (r.departureSeat ? 1 : 0), 0)
+
+  return seatsAmount - reservationsAmount
+}
+
 module.exports = {
 
   async getMany (req, res) {
@@ -94,6 +105,7 @@ module.exports = {
         for (const [i, travel] of travels.data.entries()) {
           travels.data[i].values = await getValues(travel.id)
           travels.data[i].departurePlaces = await getDeparturePlaces(travel.id)
+          travels.data[i].seatsAvailable = await getAvailableSeatsAmount(travel.bus_id, travel.id)
         }
         
         if (openTravels) {
@@ -107,6 +119,7 @@ module.exports = {
         for (const [i, travel] of travels.entries()) {
           travels[i].values = await getValues(travel.id)
           travels[i].departurePlaces = await getDeparturePlaces(travel.id)
+          travels[i].seatsAvailable = await getAvailableSeatsAmount(travel.bus_id, travel.id)
         }
 
         if (openTravels) {
