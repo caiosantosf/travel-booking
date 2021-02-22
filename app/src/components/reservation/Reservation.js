@@ -143,6 +143,7 @@ function Reservation(props) {
         let peopleSeatsAux = []
         let dependentsAux = dependents.slice(0)
         let hasError = false
+        let count = 0
         
         setDependents(dependentsAux)
 
@@ -162,15 +163,24 @@ function Reservation(props) {
           if (!hasError) {
             peopleSeatsAux.push({ index, person, seats: seats.slice(0), departurePosition: '', returnPosition: '' })  
           }
+          count++
         }
 
         if (!hasError) {
           if (user.type !== 'admin') {
             peopleSeatsAux.push({ index: dependents.length, person: user, seats: seats.slice(0), departurePosition: '', returnPosition: '' })
-            setPeopleSeats(peopleSeatsAux)
           }
 
-          setStatus(2)
+          setPeopleSeats(peopleSeatsAux)
+          count++
+        
+          setMessage('')
+
+          if (count) {
+            setStatus(2)
+          } else {
+            setMessage('Insira ao menos um passageiro')
+          }
         }
       } else {
         setStatus(3)
@@ -183,12 +193,12 @@ function Reservation(props) {
       for (const ps of peopleSeats) {
         if (!ps.person.lapChild) {
           if (!ps.departureSeat && (travelType === 'normal' || travelType === 'departure')) {
-            setMessage('Selecione todas as suas poltronas!')
+            setMessage('Selecione todas as suas poltronas')
             nextStep = false
             break
           }
           if (!ps.returnSeat && (travelType === 'normal' || travelType === 'return')) {
-            setMessage('Selecione todas as suas poltronas!')
+            setMessage('Selecione todas as suas poltronas')
             nextStep = false
             break
           }
@@ -196,6 +206,10 @@ function Reservation(props) {
       }
 
       if (nextStep) {
+        if (user.type === 'admin') {
+          save()
+          history.push('/')
+        }
         setStatus(3)
       }
     }

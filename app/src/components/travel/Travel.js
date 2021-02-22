@@ -353,7 +353,7 @@ function Travel(props) {
 
             <button type="button" 
                     className="btn btn-primary"
-                    onClick={handleSave}>
+                    onClick={() => history.push(`/viagens/${travel_id}/reservas`)}>
               Lista de Passageiros
             </button>
 

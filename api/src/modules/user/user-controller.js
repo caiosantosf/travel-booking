@@ -4,7 +4,7 @@ const sendMail = require('../../config/email')
 
 const dbErrors = error => {
   let message = { message : 'Ocorreu um erro não identificado', error}
-  console.log(error)
+  
   if (error.hasOwnProperty('constraint')) {
     if (error.constraint === 'users_cpf_unique') {
       message = { cpf : 'CPF já cadastrado!' }
