@@ -4,6 +4,7 @@ import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
 import { api, apiCep } from '../../config/api'
 import { dateTimeDefault } from '../../config/util'
+import { errorApi } from '../../config/handleErrors'
 
 function DeparturePlace(props) {
   const [loadingSave, setLoadingSave] = useState(false)
@@ -35,7 +36,14 @@ function DeparturePlace(props) {
 
         setDeparturePlace(data)
       } catch (error) {
-        setMessage(error.response.data.message)
+        const errorHandled = errorApi(error)
+        if (errorHandled.forbidden) {
+          history.push('/')
+        } else {
+          if (errorHandled.general) {
+            setMessage(errorHandled.error)
+          }
+        }
       }
     }
 
@@ -58,7 +66,13 @@ function DeparturePlace(props) {
       history.push(`/viagens/${travel_id}`)
     } catch (error) {
       setLoadingSave(false)
-      setError(error.response.data)
+
+      const errorHandled = errorApi(error)
+      if (errorHandled.general) {
+        setMessage(errorHandled.error)
+      } else {
+        setError(errorHandled.error)
+      }
     }
   }
 
@@ -69,7 +83,12 @@ function DeparturePlace(props) {
       await api.delete(`/travels/${travel_id}/departureplaces/${id}`, config)
       history.push(`/viagens/${travel_id}`)
     } catch (error) {
-      setError(error.response.data)
+      const errorHandled = errorApi(error)
+      if (errorHandled.general) {
+        setMessage(errorHandled.error)
+      } else {
+        setError(errorHandled.error)
+      }
     }
 
     setLoadingSave(false)

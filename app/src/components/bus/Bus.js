@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom"
 import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
 import { api } from '../../config/api'
+import { errorApi } from '../../config/handleErrors'
 
 function Bus(props) {
   const [loadingSave, setLoadingSave] = useState(false)
@@ -30,13 +31,20 @@ function Bus(props) {
         setBus(res.data)
         setSeats(res.data.layout.seats.length)
       } catch (error) {
-        setMessage(error.response.data.message)
+        const errorHandled = errorApi(error)
+        if (errorHandled.forbidden) {
+          history.push('/')
+        } else {
+          if (errorHandled.general) {
+            setMessage(errorHandled.error)
+          }
+        }
       }
     }
     if (id !== 'novo') {
       fetchData()
     }
-  }, [id])
+  }, [id, history])
 
   const handleAddSeat = async () => {
     setSeats(seats + 1)
@@ -61,7 +69,13 @@ function Bus(props) {
       history.push('/onibus')
     } catch (error) {
       setLoadingSave(false)
-      setError(error.response.data)
+
+      const errorHandled = errorApi(error)
+      if (errorHandled.general) {
+        setMessage(errorHandled.error)
+      } else {
+        setError(errorHandled.error)
+      }
     }    
   }
 
@@ -72,7 +86,12 @@ function Bus(props) {
       await api.delete(`/buses/${id}`, config)
       history.push('/onibus')
     } catch (error) {
-      setError(error.response.data)
+      const errorHandled = errorApi(error)
+      if (errorHandled.general) {
+        setMessage(errorHandled.error)
+      } else {
+        setError(errorHandled.error)
+      }
     }
 
     setLoadingSave(false)
@@ -88,8 +107,8 @@ function Bus(props) {
           <h5>Cadastro de ônibus</h5>
 
           <form className="row g-3 mt-1 mb-4">
-            <div className='alert text-center alert-primary' role="alert"
-                  style={message ? { display: 'block'} : { display : 'none' }}>
+            <div className='alert text-center alert-danger' role="alert"
+                 style={message ? { display: 'block'} : { display : 'none' }}>
               {message}
             </div>
 

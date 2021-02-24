@@ -3,11 +3,13 @@ import { Link, useHistory } from "react-router-dom"
 import { api } from '../../config/api'
 import logo from '../../assets/logo.png'
 import { getUserType } from '../../config/security'
+import { errorApi } from '../../config/handleErrors'
 
 function Login(props) {
   const [auth, setAuth] = useState({})
   const [error, setError] = useState({})
   const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
 
   const admin = props.match.url === '/admin' ? true : false
   const exit = props.match.url === '/sair' ? true : false
@@ -24,28 +26,22 @@ function Login(props) {
   }, [exit, history])
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (token) {
+    if (token) {
+      if (returnTo) {
+        localStorage.setItem('to', '')
+        history.push(returnTo)
+      } else {
+        const type = getUserType()
 
-          if (returnTo) {
-            localStorage.setItem('to', '')
-            history.push(returnTo)
-          } else {
-            const type = getUserType()
-
-            if (type === 'admin') {
-              history.push('/admin-inicial')
-            } else {
-              if (type === 'regular') {
-                history.push('/')
-              }
-            } 
+        if (type === 'admin') {
+          history.push('/admin-inicial')
+        } else {
+          if (type === 'regular') {
+            history.push('/')
           }
         }
-      } catch (error) {}
+      }
     }
-    fetchData()
   }, [token, history, returnTo])
 
   const handleLogin = async () => {
@@ -55,12 +51,14 @@ function Login(props) {
       const res = await api.post(`/users/login/${admin ? 'admin' : ''}`, auth)
       const { token, companyName, companyPhone } = res.data
       finishLogin(token, companyName, companyPhone)
-    } catch (err) {
-      if ((err.hasOwnProperty('response')) && (err.response)) {
-        setError(err.response.data)
+    } catch (error) {
+      const errorHandled = errorApi(error)
+      if (errorHandled.general) {
+        setMessage(errorHandled.error)
       } else {
-        alert('Você está sem internet ou o nosso servidor está fora do ar')
+        setError(errorHandled.error)
       }
+
       setLoading(false)
     }
   }
@@ -81,6 +79,12 @@ function Login(props) {
         </div>
 
         <div className="mb-2">
+
+          <div className='alert text-center alert-danger' role="alert"
+               style={message ? { display: 'block'} : { display : 'none' }}>
+            {message}
+          </div>
+
           <label htmlFor="cpf" className="form-label">CPF</label>
 
           <input type="text" 

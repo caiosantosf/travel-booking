@@ -5,9 +5,11 @@ import { CalendarCheck } from 'react-bootstrap-icons'
 import { Link } from "react-router-dom"
 import { api, apiUrl } from '../../config/api'
 import { dateTimeBrazil } from '../../config/util'
+import { errorApi } from '../../config/handleErrors'
 
 function UserHome() {
   const [travels, setTravels] = useState([])
+  const [message, setMessage] = useState('')
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,7 +25,10 @@ function UserHome() {
           setTravels(false)
         }
       } catch (error) {  
-        //fala que houve um erro
+        const errorHandled = errorApi(error)
+        if (errorHandled.general) {
+          setMessage(errorHandled.error)
+        }
       }
     }
     fetchData()
@@ -37,6 +42,11 @@ function UserHome() {
       <div className="container-fluid mb-4">
         <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-2">
           <Sidebar />
+
+          <div className='alert text-center alert-danger' role="alert"
+               style={message ? { display: 'block'} : { display : 'none' }}>
+            {message}
+          </div>
           
           {!travels ? noTravels : ''}
 

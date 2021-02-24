@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom"
 import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
 import { api } from '../../config/api'
+import { errorApi } from '../../config/handleErrors'
 
 function Value(props) {
   const [loadingSave, setLoadingSave] = useState(false)
@@ -31,14 +32,21 @@ function Value(props) {
 
         setValue(data)
       } catch (error) {
-        setMessage(error.response.data.message)
+        const errorHandled = errorApi(error)
+        if (errorHandled.forbidden) {
+          history.push('/')
+        } else {
+          if (errorHandled.general) {
+            setMessage(errorHandled.error)
+          }
+        }
       }
     }
 
     if (id !== 'novo') {
       fetchData()
     }
-  }, [travel_id, id])
+  }, [travel_id, id, history])
 
   const handleSave = async () => {
     setLoadingSave(true)
@@ -54,7 +62,13 @@ function Value(props) {
       history.push(`/viagens/${travel_id}`)
     } catch (error) {
       setLoadingSave(false)
-      setError(error.response.data)
+      
+      const errorHandled = errorApi(error)
+      if (errorHandled.general) {
+        setMessage(errorHandled.error)
+      } else {
+        setError(errorHandled.error)
+      }
     }
   }
 
@@ -65,7 +79,12 @@ function Value(props) {
       await api.delete(`/travels/${travel_id}/values/${id}`, config)
       history.push(`/viagens/${travel_id}`)
     } catch (error) {
-      setError(error.response.data)
+      const errorHandled = errorApi(error)
+      if (errorHandled.general) {
+        setMessage(errorHandled.error)
+      } else {
+        setError(errorHandled.error)
+      }
     }
 
     setLoadingSave(false)

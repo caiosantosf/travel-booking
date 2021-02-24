@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useHistory } from "react-router-dom"
 import { api } from '../../config/api'
+import { errorApi } from '../../config/handleErrors'
 
 function EmailResetPassword() {
   const [email, setEmail] = useState({})
@@ -19,11 +20,13 @@ function EmailResetPassword() {
         error : false
       })
       setLoading(false)
-    } catch (err) {
-      setMessage({
-        email : err.response.data.email,
-        error : true
-      })
+    } catch (error) {
+      const errorHandled = errorApi(error)
+      if (errorHandled.forbidden) {
+        history.push('/')
+      } else {
+        setMessage({ ...errorHandled.error, error: true })
+      }
       setLoading(false)
     }
   }

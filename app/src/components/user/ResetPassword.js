@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useHistory } from "react-router-dom"
 import { api } from '../../config/api'
+import { errorApi } from '../../config/handleErrors'
 
 function ResetPassword(props) {
   const [password, setPassword] = useState({})
@@ -28,8 +29,13 @@ function ResetPassword(props) {
         })
       }
       setPassword({})
-    } catch (err) {
-      setMessage({ ...err.response.data, error : true })
+    } catch (error) {
+      const errorHandled = errorApi(error)
+      if (errorHandled.forbidden) {
+        history.push('/')
+      } else {
+        setMessage({ ...errorHandled.error, error: true })
+      }
       setLoading(false)
     }
   }

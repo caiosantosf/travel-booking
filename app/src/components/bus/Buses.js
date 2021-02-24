@@ -4,11 +4,13 @@ import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
 import { PencilSquare, ChevronDoubleLeft, ChevronDoubleRight, ChevronRight, ChevronLeft } from 'react-bootstrap-icons'
 import { api } from '../../config/api'
+import { errorApi } from '../../config/handleErrors'
 
 function Buses() {
   const [buses, setBuses] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [lastPage, setLastPage] = useState(0)
+  const [message, setMessage] = useState('')
 
   let history = useHistory()
 
@@ -27,7 +29,14 @@ function Buses() {
           setLastPage(1)
         }
       } catch (error) {
-        history.push('/')
+        const errorHandled = errorApi(error)
+        if (errorHandled.forbidden) {
+          history.push('/')
+        } else {
+          if (errorHandled.general) {
+            setMessage(errorHandled.error)
+          }
+        }
       }
     }
     fetchData()
@@ -66,6 +75,11 @@ function Buses() {
           <Sidebar />
 
           <h5>Cadastro de ônibus</h5>
+
+          <div className='alert text-center alert-danger' role="alert"
+               style={message ? { display: 'block'} : { display : 'none' }}>
+            {message}
+          </div>
         
           <div className="table-responsive-sm">
             <table className="table table-sm table-striped table-hover">

@@ -5,6 +5,7 @@ import Sidebar from '../nav/Sidebar'
 import { api } from '../../config/api'
 import { PencilSquare } from 'react-bootstrap-icons'
 import { dateTimeBrazil } from '../../config/util'
+import { errorApi } from '../../config/handleErrors'
 
 function Travel(props) {
   const [loadingSave, setLoadingSave] = useState(false)
@@ -40,7 +41,14 @@ function Travel(props) {
 
         setTravel(data)
       } catch (error) {
-        setMessage(error.response.data.message)
+        const errorHandled = errorApi(error)
+        if (errorHandled.forbidden) {
+          history.push('/')
+        } else {
+          if (errorHandled.general) {
+            setMessage(errorHandled.error)
+          }
+        }
       }
     }
 
@@ -60,7 +68,14 @@ function Travel(props) {
           }
         }
       } catch (error) {
-        //setMessage(error.response.data.message)
+        const errorHandled = errorApi(error)
+        if (errorHandled.forbidden) {
+          history.push('/')
+        } else {
+          if (errorHandled.general) {
+            setMessage(errorHandled.error)
+          }
+        }
       }
     }
 
@@ -102,7 +117,13 @@ function Travel(props) {
       }
     } catch (error) {
       setLoadingSave(false)
-      setError(error.response.data)
+
+      const errorHandled = errorApi(error)
+      if (errorHandled.general) {
+        setMessage(errorHandled.error)
+      } else {
+        setError(errorHandled.error)
+      }
     }
   }
 
@@ -113,7 +134,12 @@ function Travel(props) {
       await api.delete(`/travels/${travel_id}`, config)
       history.push('/viagens')
     } catch (error) {
-      setError(error.response.data)
+      const errorHandled = errorApi(error)
+      if (errorHandled.general) {
+        setMessage(errorHandled.error)
+      } else {
+        setError(errorHandled.error)
+      }
     }
 
     setLoadingSave(false)

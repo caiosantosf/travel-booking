@@ -6,11 +6,13 @@ import { PencilSquare, ChevronDoubleLeft, ChevronDoubleRight, ChevronRight, Chev
 import { api } from '../../config/api'
 import PassengersListPDF  from './PassengersListPDF'
 import { PDFDownloadLink } from '@react-pdf/renderer'
+import { errorApi } from '../../config/handleErrors'
 
 function PassengersList(props) {
   const [passengers, setPassengers] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [lastPage, setLastPage] = useState(0)
+  const [message, setMessage] = useState('')
 
   let { travel_id } = props.match.params
 
@@ -32,12 +34,19 @@ function PassengersList(props) {
           setLastPage(1)
         }
       } catch (error) {
-        //history.push('/')
+        const errorHandled = errorApi(error)
+        if (errorHandled.forbidden) {
+          history.push('/')
+        } else {
+          if (errorHandled.general) {
+            setMessage(errorHandled.error)
+          }
+        }
       }
     }
     fetchData()
 
-  }, [currentPage, travel_id])
+  }, [currentPage, travel_id, history])
 
   const handleFirst = async () => {
     setCurrentPage(1)
@@ -63,6 +72,11 @@ function PassengersList(props) {
           <Sidebar />
 
           <h5>Lista de Passageiros</h5>
+
+          <div className='alert text-center alert-danger' role="alert"
+               style={message ? { display: 'block'} : { display : 'none' }}>
+            {message}
+          </div>
         
           <div className="table-responsive-sm">
             <table className="table table-responsive-lgcd ap table-sm table-striped table-hover">

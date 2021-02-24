@@ -5,9 +5,11 @@ import { CalendarCheck, PersonFill } from 'react-bootstrap-icons'
 import { api, apiUrl } from '../../config/api'
 import { dateTimeBrazil } from '../../config/util'
 import { getUserId } from '../../config/security'
+import { errorApi } from '../../config/handleErrors'
 
 function UserReservations() {
   const [reservations, setReservations] = useState([])
+  const [message, setMessage] = useState('')
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,7 +24,10 @@ function UserReservations() {
           setReservations(res.data.data)
         }
       } catch (error) {  
-        //fala que houve um erro
+        const errorHandled = errorApi(error)
+        if (errorHandled.general) {
+          setMessage(errorHandled.error)
+        }
       }
     }
     fetchData()
@@ -36,6 +41,11 @@ function UserReservations() {
           <Sidebar />
           
           {!reservations ? <h1>Você não fez nenhuma reserva!</h1> : <h5>Minhas Reservas</h5>}
+
+          <div className='alert text-center alert-primary' role="alert"
+               style={message ? { display: 'block'} : { display : 'none' }}>
+            {message}
+          </div>
 
           <div className="mt-1 row row-cols-1 row-cols-md-2 row-cols-xl-3 row-cols-xxl-4 g-3">
 

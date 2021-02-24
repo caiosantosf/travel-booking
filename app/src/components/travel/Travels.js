@@ -5,11 +5,13 @@ import Sidebar from '../nav/Sidebar'
 import { PencilSquare, ChevronDoubleLeft, ChevronDoubleRight, ChevronRight, ChevronLeft } from 'react-bootstrap-icons'
 import { api } from '../../config/api'
 import { dateTimeBrazil } from '../../config/util'
+import { errorApi } from '../../config/handleErrors'
 
 function Travels() {
   const [travels, setTravels] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [lastPage, setLastPage] = useState(0)
+  const [message, setMessage] = useState('')
 
   let history = useHistory()
 
@@ -28,7 +30,14 @@ function Travels() {
           setLastPage(1)
         }
       } catch (error) {  
-        history.push('/')
+        const errorHandled = errorApi(error)
+        if (errorHandled.forbidden) {
+          history.push('/')
+        } else {
+          if (errorHandled.general) {
+            setMessage(errorHandled.error)
+          }
+        }
       }
     }
     fetchData()
@@ -63,6 +72,11 @@ function Travels() {
           <Sidebar />
 
           <h5>Cadastro de viagens</h5>
+
+          <div className='alert text-center alert-danger' role="alert"
+               style={message ? { display: 'block'} : { display : 'none' }}>
+            {message}
+          </div>
         
           <div className="table-responsive-sm">
             <table className="table table-sm table-striped table-hover">

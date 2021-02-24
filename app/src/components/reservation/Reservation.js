@@ -6,6 +6,7 @@ import { api } from '../../config/api'
 import { dateTimeBrazil, dateTimeDefault, calculateAge, calculateValue } from '../../config/util'
 import { getUserId } from '../../config/security'
 import { PersonXFill } from 'react-bootstrap-icons'
+import { errorApi } from '../../config/handleErrors'
 
 function Reservation(props) {
   const [message, setMessage] = useState('')
@@ -95,7 +96,10 @@ function Reservation(props) {
           }
         })
       } catch (error) {
-        //setMessage(error.response.data.message)
+        const errorHandled = errorApi(error)
+        if (errorHandled.general) {
+          setMessage(errorHandled.error)
+        }
       }
 
       try {
@@ -104,7 +108,10 @@ function Reservation(props) {
         const { data } = res
         setAdminData(data)
       } catch (error) {
-        //setMessage(error.response.data.message)
+        const errorHandled = errorApi(error)
+        if (errorHandled.general) {
+          setMessage(errorHandled.error)
+        }
       }
     }
 
@@ -127,7 +134,10 @@ function Reservation(props) {
 
         setUser(data)
       } catch (error) {
-        //setMessage(error.response.data.message)
+        const errorHandled = errorApi(error)
+        if (errorHandled.general) {
+          setMessage(errorHandled.error)
+        }
       }
     }
 
@@ -272,12 +282,17 @@ function Reservation(props) {
       id = res.data.id
       setReservation({ id: res.data.id})
     } catch (error) {
-      let msg = ''
-      Object.entries(error.response.data).forEach(([key, value]) => {
-        msg += `${value} | `
-      })
-      msg = msg.substr(0, msg.length - 3)
-      setMessage(msg)
+      const errorHandled = errorApi(error)
+      if (errorHandled.general) {
+        setMessage(errorHandled.error)
+      } else {
+        let msg = ''
+        Object.entries(error.response.data).forEach(([key, value]) => {
+          msg += `${value} | `
+        })
+        msg = msg.substr(0, msg.length - 3)
+        setMessage(msg)
+      }
     }
     
     for (const [i, dependent] of dependents.entries()) {
@@ -308,19 +323,30 @@ function Reservation(props) {
               lapChild: lapChild ? true : false
             }, config)
           } catch (error) {
-            let msg = ''
-            Object.entries(error.response.data).forEach(([key, value]) => {
-              msg += `${value} | `
-            })
-            msg = msg.substr(0, msg.length - 3)
-            setMessage(msg)
+            const errorHandled = errorApi(error)
+            if (errorHandled.general) {
+              setMessage(errorHandled.error)
+            } else {
+              let msg = ''
+              Object.entries(error.response.data).forEach(([key, value]) => {
+                msg += `${value} | `
+              })
+              msg = msg.substr(0, msg.length - 3)
+              setMessage(msg)
+            }
           }
         }
       } catch (error) {
-        setMessage('Corrija as informações inválidas')
-        let dependentsAux = dependents.slice(0)
-        dependentsAux[i].error = error
-        setDependents(dependentsAux)
+        const errorHandled = errorApi(error)
+        if (errorHandled.general) {
+          setMessage(errorHandled.error)
+        } else {
+          setMessage('Corrija as informações inválidas')
+
+          let dependentsAux = dependents.slice(0)
+          dependentsAux[i].error = errorHandled.error
+          setDependents(dependentsAux)
+        }
       }  
     }
 
@@ -333,7 +359,10 @@ function Reservation(props) {
           'datetime': datetime
         }})
       } catch (error) {
-        
+        const errorHandled = errorApi(error)
+        if (errorHandled.general) {
+          setMessage(errorHandled.error)
+        }
       }
     }
 
@@ -381,9 +410,9 @@ function Reservation(props) {
       dependentsAux[i].value = value
 
       setDependents(dependentsAux)
-    } catch (err) {
+    } catch (error) {
       let dependentsAux = dependents.slice(0)
-      const birth = err.message
+      const birth = error.message
       dependentsAux[i].error = { birth }
       setDependents(dependentsAux)
     }

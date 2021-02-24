@@ -4,6 +4,7 @@ import { api, apiCep } from '../../config/api'
 import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
 import { getUserType, getUserId } from '../../config/security'
+import { errorApi } from '../../config/handleErrors'
 
 function User(props) {
   const [user, setUser] = useState({documentType: 'RG', state: 'AC'})
@@ -45,13 +46,20 @@ function User(props) {
         delete data.password
         setUser(data)
       } catch (error) {
-        setMessage(error.response.data.message)
+        const errorHandled = errorApi(error)
+        if (errorHandled.forbidden) {
+          history.push('/')
+        } else {
+          if (errorHandled.general) {
+            setMessage(errorHandled.error)
+          }
+        }
       }
     }
     if (id) {
       fetchData()
     }
-  }, [id])
+  }, [id, history])
 
   const handleSave = async () => {
     try {
@@ -82,9 +90,14 @@ function User(props) {
 
         finish(type, token)
       }
-    } catch (err) {
-      setMessage(err.response.data.message)
-      setError(err.response.data)
+    } catch (error) {
+      const errorHandled = errorApi(error)
+      if (errorHandled.general) {
+        setMessage(errorHandled.error)
+      } else {
+        setError(errorHandled.error)
+      }
+
       setLoading(false)
     }
   }

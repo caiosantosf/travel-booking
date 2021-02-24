@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
 })
 
 function PassengersListPDF({ passengers, travel_id }) {
-  const [travel, setTravel] = useState({})
+  const [travel, setTravel] = useState({destination: ''})
   const [departurePlaces, setDeparturePlaces] = useState([{departureDate: ''}])
 
   const fetchData = async () => {
@@ -62,7 +62,7 @@ function PassengersListPDF({ passengers, travel_id }) {
       setTravel(data)
       setDeparturePlaces(data.departurePlaces)
     } catch (error) {
-      //setMessage(error.response.data.message)
+      
     }
   }
   
