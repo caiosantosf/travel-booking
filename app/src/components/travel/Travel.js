@@ -130,7 +130,7 @@ function Travel(props) {
   return (
     <React.Fragment>
       <NavHeader />
-      <div className="container-fluid">
+      <div className="container-fluid mb-4">
         <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-2">
           <Sidebar />
 
@@ -371,7 +371,7 @@ function Travel(props) {
             </button>
 
             <button type="button" 
-                    className="btn btn-warning text-white mb-4"
+                    className="btn btn-warning text-white"
                     onClick={() => {
                       history.push('/viagens')
                     }}>

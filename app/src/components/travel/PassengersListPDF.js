@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer'
 import { api } from '../../config/api'
 import { dateTimeBrazil } from '../../config/util'

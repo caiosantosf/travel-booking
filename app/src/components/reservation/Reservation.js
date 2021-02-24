@@ -29,6 +29,8 @@ function Reservation(props) {
   const [adminData, setAdminData] = useState({})
   const [reservation, setReservation] = useState([])
   const [notes, setNotes] = useState()
+  const [errorCC, setErrorCC] = useState({})
+  const [CC, setCC] = useState({})
 
   const { travel_id, random } = props.match.params
 
@@ -252,6 +254,7 @@ function Reservation(props) {
       }
     }
 
+    let id = 0
     try {
       const res = await api.post('/reservations', {
         travel_id: Number(travel_id), 
@@ -266,6 +269,7 @@ function Reservation(props) {
         lapChild: false
       }, config)
 
+      id = res.data.id
       setReservation({ id: res.data.id})
     } catch (error) {
       let msg = ''
@@ -319,13 +323,29 @@ function Reservation(props) {
         setDependents(dependentsAux)
       }  
     }
+
+    if (user.type !== 'admin' && reservation) {
+      try {
+        await api.post('/reservations-email', {}, { headers :{
+          'x-access-token': localStorage.getItem('token'),
+          'email': true,
+          'user_id': user.id,
+          'datetime': datetime
+        }})
+      } catch (error) {
+        
+      }
+    }
+
     setLoadingSave(false) 
+
+    return id
   }
 
-  const handleCompanyPayment = () => {
-    save()
+  const handleCompanyPayment = async () => {
+    const id = await save()
     const cpLink = adminData.companyPaymentLink.replace('email@email.com', user.email)
-                                               .replace('@numeroreserva', reservation.id || 0)
+                                               .replace('@numeroreserva', id || 0)
                                                .replace('@nome', user.name)
                                                .replace('@cpf', user.cpf)
                                                .replace('@documento', user.document)
@@ -745,6 +765,7 @@ function Reservation(props) {
   const formPayment =
     <form id="payment" className="row g-3 mt-1 mb-4">
       <h6>Pagamento</h6>
+      
       <div className={`col-md-12 ${!adminData.companyPayment ? 'd-none' : ''}`}>
         <button type="button" 
                 className="btn btn-primary mb-2"
@@ -761,8 +782,131 @@ function Reservation(props) {
         <span>Ao escolher esta opção a sua reserva será salva e será aberta uma tela externa ao aplivativo para seguir com o pagamento com a empresa</span>
       </div>
 
-      <div className={`col-md-12 ${!adminData.infinitePay ? 'd-none' : ''}`}>
-        InfinitePay
+      <div className={`col-md-6 ${!adminData.infinitePay ? 'd-none' : ''}`}>
+        <label htmlFor="cc-name" className="form-label">Nome no cartão</label>
+        <input type="text" className={`form-control ${errorCC.name ? 'is-invalid' : ''}`} id="cc-name" maxLength="255"
+          value={CC.name || ''}
+          onChange={e => {
+            setUser({ ...CC,
+              name: e.target.value
+            })
+          }}/>
+
+        <div id="validationCCName" 
+          className="invalid-feedback" 
+          style={errorCC.name ? { display: 'inline' } : { display: 'none' }}>
+          {errorCC.name}
+        </div>
+      </div>
+
+      <div className={`col-md-6 ${!adminData.infinitePay ? 'd-none' : ''}`}>
+        <label htmlFor="cc-number" className="form-label">Número</label>
+        <input type="text" className={`form-control ${errorCC.number ? 'is-invalid' : ''}`} id="cc-number" maxLength="16"
+          value={CC.number || ''}
+          onChange={e => {
+            const re = /^[0-9\b]+$/
+            const key = e.target.value
+
+            if (key === '' || re.test(key)) {
+              setCC({ ...CC, number: key })
+            }
+            }}/>
+
+        <div id="validationCCNumber" 
+          className="invalid-feedback" 
+          style={errorCC.number ? { display: 'inline' } : { display: 'none' }}>
+          {errorCC.number}
+        </div>
+      </div>
+
+      <div className={`col-md-3 ${!adminData.infinitePay ? 'd-none' : ''}`}>
+        <label htmlFor="cc-month" className="form-label">Mês Validade</label>
+        <input type="text" className={`form-control ${errorCC.month ? 'is-invalid' : ''}`} id="cc-month" maxLength="2"
+          value={CC.month || ''}
+          onChange={e => {
+            const re = /^[0-9\b]+$/
+            const key = e.target.value
+
+            if (key === '' || re.test(key)) {
+              setCC({ ...CC, month: key })
+            }
+            }}/>
+
+        <div id="validationCCMonth" 
+          className="invalid-feedback" 
+          style={errorCC.month ? { display: 'inline' } : { display: 'none' }}>
+          {errorCC.month}
+        </div>
+      </div>
+
+      <div className={`col-md-3 ${!adminData.infinitePay ? 'd-none' : ''}`}>
+        <label htmlFor="cc-year" className="form-label">Ano Validade</label>
+        <input type="text" className={`form-control ${errorCC.year ? 'is-invalid' : ''}`} id="cc-month" maxLength="4"
+          value={CC.year || ''}
+          onChange={e => {
+            const re = /^[0-9\b]+$/
+            const key = e.target.value
+
+            if (key === '' || re.test(key)) {
+              setCC({ ...CC, year: key })
+            }
+            }}/>
+
+        <div id="validationCCYear" 
+          className="invalid-feedback" 
+          style={errorCC.year ? { display: 'inline' } : { display: 'none' }}>
+          {errorCC.year}
+        </div>
+      </div>
+
+      <div className={`col-md-3 ${!adminData.infinitePay ? 'd-none' : ''}`}>
+        <label htmlFor="cc-number" className="form-label">CVV</label>
+        <input type="text" className={`form-control ${errorCC.cvv ? 'is-invalid' : ''}`} id="cc-cvv" maxLength="3"
+          value={CC.cvv || ''}
+          onChange={e => {
+            const re = /^[0-9\b]+$/
+            const key = e.target.value
+
+            if (key === '' || re.test(key)) {
+              setCC({ ...CC, cvv: key })
+            }
+            }}/>
+
+        <div id="validationCCCVV" 
+          className="invalid-feedback" 
+          style={errorCC.cvv ? { display: 'inline' } : { display: 'none' }}>
+          {errorCC.cvv}
+        </div>
+      </div>
+
+      <div className={`col-md-3 ${!adminData.infinitePay ? 'd-none' : ''}`}>
+        <label htmlFor="cc-installments" className="form-label">Parcelas</label>
+        <select className={`form-select ${errorCC.installments ? 'is-invalid' : ''}`} id="cc-installments"
+                value={CC.installments || ''}
+                onChange={e => {
+                  setUser({ ...user,
+                    installments: e.target.value
+                  })
+                }}>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+          <option value="11">11</option>
+          <option value="12">12</option>
+        </select>
+
+        <div id="validationCCCVV" 
+          className="invalid-feedback" 
+          style={errorCC.cvv ? { display: 'inline' } : { display: 'none' }}>
+          {errorCC.cvv}
+        </div>
       </div>
     </form>
 
@@ -777,7 +921,7 @@ function Reservation(props) {
   return (
     <React.Fragment>
       <NavHeader />
-      <div className="container-fluid mb-2">
+      <div className="container-fluid mb-4">
         <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-2">
           <Sidebar />
 
@@ -797,7 +941,7 @@ function Reservation(props) {
 
           <div className="text-center d-grid gap-2">
             <button type="button" 
-                    className={`btn btn-primary ${status === 3 || status === 4 ? 'd-none' : ''}`}
+                    className={`btn btn-primary ${(status === 3 && !adminData.infinitePay) || status === 4 ? 'd-none' : ''}`}
                     onClick={handleContinue}
                     disabled={loadingSave}>
               <span className="spinner-border spinner-border-sm mx-1" 

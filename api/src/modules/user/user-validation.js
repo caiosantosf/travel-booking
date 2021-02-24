@@ -181,6 +181,17 @@ const validation = (fields) => {
         if (new Date(birth) === 'Invalid Date') {
           messages.birth = 'A Data de nascimento não é valida'
         }
+        
+        const date = new Date(birth)
+        const diffMs = Date.now() - date.getTime()
+        if (diffMs < 0) {
+          messages.birth = 'A Data de nascimento não é valida'
+        }
+        const ageDt = new Date(diffMs)
+        if (Math.abs(ageDt.getUTCFullYear() - 1970) < 17) {
+          messages.birth = 'Somente podem se cadastrar maiores de 16 anos'
+        }
+
       } else {
         messages.birth = 'A Data de nascimento é obrigatória'
       }

@@ -129,13 +129,13 @@ function User(props) {
   return (
     <React.Fragment>
       <NavHeader />
-      <div className="container-fluid">
+      <div className="container-fluid mb-4">
         <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-2">
           <Sidebar />
 
           <h5>{id ? "Dados do usuário" : "Informe seus dados para o cadastro"}</h5>
 
-          <form className="row g-3 mt-1 mb-4">
+          <form className="row g-3 mt-1">
             <div className='alert text-center alert-primary' role="alert"
                 style={message ? { display: 'block'} : { display : 'none' }}>
               {message}
@@ -158,6 +158,7 @@ function User(props) {
                 {error.userName}
               </div>
             </div>
+            
             <div className="col-lg-3">
               <label htmlFor="cpf" className="form-label">{`CPF ${adminData ? 'do Responsável' : ''}`}</label>
               <input type="text" className={`form-control ${error.cpf ? 'is-invalid' : ''}`} id="cpf" maxLength="11" 
@@ -555,7 +556,7 @@ function User(props) {
                 Confirmar
               </button>
               <button type="button" 
-                      className="btn btn-warning text-white mb-4"
+                      className="btn btn-warning text-white"
                       onClick={() => {
                         props.history.goBack()
                       }}>

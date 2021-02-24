@@ -10,6 +10,11 @@ routes.get('/reservations',
   getMany
 )
 
+routes.post('/reservations-email', 
+  security(['admin', 'regular']),
+  getMany
+)
+
 routes.post('/reservations', 
   security(['admin', 'regular']),
   validation(['travel_id', 'user_id']),

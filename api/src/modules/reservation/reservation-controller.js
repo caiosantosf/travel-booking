@@ -1,4 +1,5 @@
 const db = require('../../database/connection')
+const sendMail = require('../../config/email')
 
 const dbErrors = error => {
   let message = { message : 'Ocorreu um erro não identificado', error}
@@ -55,9 +56,19 @@ const getPerson = async reservation => {
   return person
 }
 
+const dateTimeBrazil = dtstr => {
+  const dt = new Date(dtstr)
+  const day = dt.getDate().toString().padStart(2, '0')
+  const month = (dt.getMonth() + 1).toString().padStart(2, '0')
+  const year = dt.getFullYear()
+  const hour = dt.getHours().toString().padStart(2, '0')
+  const minute = dt.getMinutes().toString().padStart(2, '0')
+
+  return `${day}/${month}/${year} ${hour}:${minute}`
+}
+
 module.exports = {
   async getMany (req, res) {
-
     const completeReservation = async (reservations) => {
       let res = reservations
       if (res.length) {
@@ -75,8 +86,40 @@ module.exports = {
       }
       return res
     }
+
+    const emailReservation = async (reservations) => {
+      const { email } = reservations.data[0].reservations[0].person
+      const { reservations: passengers } = reservations.data[0]
+      const { departurePlace, destination } = reservations.data[0].travel
+      const { homeAddress, addressNumber, neighborhood, city, state, departureDate, returnDate } = departurePlace[0]
+  
+      const passengersHtml = passengers.map(passenger => {
+        const { departureSeat, returnSeat, lapChild, value } = passenger
+        const { name } = passenger.person
+        return `<p>Nome: ${name}, Poltronas: Ida: ${departureSeat} Volta: ${returnSeat}${lapChild ? ' (Colo)' : ''}, R$: ${value.replace('.', ',')}</p>`
+      }).join('')
+
+      const total = (passengers.reduce((tot, person) => tot + Number(person.value), 0)).toFixed(2).replace('.', ',')
+
+      const admin = await db('users').where({ type: 'admin' })
+      const { name, phone } = admin[0]
+      const phoneLen = phone.length
+      const phoneFomartted = `(${phone.substr(0, 2)}) ${phone.substr(2, phoneLen === 10 ? 4: 5)}-${phone.substr(phoneLen === 10 ? 6: 7, 4)}`
+  
+      const emailContent = `<h2>Olá, obrigado por viajar conosco!</h2><h3>Confira os dados da sua reserva</h3>
+        <p>Destino: ${destination}</p>
+        <p>Local de Saída: ${homeAddress}, ${addressNumber}, ${neighborhood}, ${city}-${state}</p>
+        <p>Data de Saída: ${dateTimeBrazil(departureDate)}</p>
+        <p>Data de Retorno: ${dateTimeBrazil(returnDate)}</p>
+        <h4>Passageiros</h4>
+        ${passengersHtml}
+        <h4>Total R$ ${total}</h4>
+        <br /><p>${name} - ${phoneFomartted}</p>`
+      
+      await sendMail(email, 'Confirmação de Reserva', emailContent) 
+    }
     
-    const { currentpage: currentPage, user_id, travel_id } = req.headers
+    const { currentpage: currentPage, user_id, travel_id, datetime, email } = req.headers
     let reservations = {}
     let reservationsGrouped = {}
 
@@ -100,6 +143,7 @@ module.exports = {
       reservationsGrouped = await db('reservations')
                             .select('user_id', 'datetime', 'travel_id')
                             .where({ user_id })
+                            .where({ datetime })
                             .groupBy('user_id', 'datetime', 'travel_id')
                             .paginate({ perPage: 10, currentPage, isLengthAware: true })
       
@@ -115,6 +159,9 @@ module.exports = {
             reservationsGrouped.data[i].travel = await getTravel(reservation.travel_id, reservationsGrouped.data[i].reservations[0].departurePlace_id)
           }
 
+          if (email) {
+            emailReservation(reservationsGrouped)
+          }
           return res.status(200).json(reservationsGrouped)
         }
       }

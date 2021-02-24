@@ -58,7 +58,7 @@ function Travels() {
   return (
     <React.Fragment>
       <NavHeader />
-      <div className="container-fluid">
+      <div className="container-fluid mb-4">
         <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-2">
           <Sidebar />
 

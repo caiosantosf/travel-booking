@@ -48,8 +48,8 @@ const validation = (fields) => {
         if (isNaN(initialAge)) {
           messages.initialAge = 'A idade inicial não é valida'
         }
-        if (initialAge > 99) {
-          messages.initialAge = 'Idade máxima é 99'
+        if (initialAge > 999) {
+          messages.initialAge = 'Idade máxima é 999'
         }
       } else {
         messages.initialAge = 'A idade inicial é obrigatória'
@@ -61,8 +61,8 @@ const validation = (fields) => {
         if (isNaN(finalAge)) {
           messages.finalAge = 'A idade final não é valida'
         }
-        if (finalAge > 99) {
-          messages.finalAge = 'Idade máxima é 99'
+        if (finalAge > 999) {
+          messages.finalAge = 'Idade máxima é 999'
         }
       } else {
         messages.finalAge = 'A idade final é obrigatória'

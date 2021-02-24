@@ -35,7 +35,7 @@ const validation = (fields) => {
 
     if (fields.includes('document')) {
       if ( (typeof document !== 'undefined') && (document.trim() !== '') ) {
-        if (document.length > 14) {
+        if (document.length > 32) {
           messages.document = 'O Documento não pode ter mais do que 32 caracteres'
         }
       } else {
