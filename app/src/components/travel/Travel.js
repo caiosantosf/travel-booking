@@ -84,7 +84,7 @@ function Travel(props) {
     }
 
     fetchBuses()
-  }, [travel_id])
+  }, [travel_id, history])
 
   const handleSave = async () => {
     setLoadingSave(true)
@@ -105,7 +105,7 @@ function Travel(props) {
         data.append("name", travel.description)
         data.append("file", file)
     
-        await api.patch(`/travels/image/${travel_id_created}`, data, config)
+        await api.patch(`/travels/image/${travel_id_created ? travel_id_created : travel_id}`, data, config)
       }
 
       setLoadingSave(false)
@@ -379,8 +379,14 @@ function Travel(props) {
 
             <button type="button" 
                     className="btn btn-primary"
-                    onClick={() => history.push(`/viagens/${travel_id}/reservas`)}>
+                    onClick={() => history.push(`/viagens/${travel_id}/reservas`, {travel, departurePlaces})}>
               Lista de Passageiros
+            </button>
+
+            <button type="button" 
+                    className="btn btn-primary"
+                    onClick={() => history.push(`/viagens/${travel_id}/pagamentos`)}>
+              Pagamentos
             </button>
 
             <button type="button" 

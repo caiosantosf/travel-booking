@@ -1,5 +1,6 @@
 const db = require('../../database/connection')
 const sendMail = require('../../config/email')
+const mercadopago = require ('mercadopago')
 
 const dbErrors = error => {
   let message = { message : 'Ocorreu um erro não identificado', error}
@@ -36,6 +37,11 @@ const getDependent = async (id, user_id) => {
 const getUser = async id => {
   const user = await db('users').where({ id })
   return user[0]
+}
+
+const getAdminData = async () => {
+  const adminData = await db('adminData')
+  return adminData[0]
 }
 
 const getPerson = async reservation => {
@@ -124,13 +130,15 @@ module.exports = {
     let reservationsGrouped = {}
 
     if (!user_id) {
+      const adminData = await getAdminData()
+
       reservations = await db('reservations')
                                   .modify(q => {
                                     if (travel_id) q.where({ travel_id })
                                   })
                                   .orderBy('id', 'desc')
-                                  .paginate({ perPage: 10, currentPage, isLengthAware: true })
-      
+                                  .paginate({ perPage: 100, currentPage, isLengthAware: true })
+  
       if (reservations.hasOwnProperty('data')) {
         reservations.data = await completeReservation(reservations.data)
         reservations.data.sort((a, b) => (a.departureSeat > b.departureSeat) ? 1 : (a.departureSeat === b.departureSeat) ? ((a.dependent_id > b.dependent_id) ? 1 : -1) : -1 )
@@ -224,5 +232,55 @@ module.exports = {
       return res.status(200).json({ message: 'Reserva excluída com sucesso' })
     }
     return res.status(404).json({ message: 'Reserva não encontrada' })
+  },
+
+  async mercadoPagoPayment (req, res) {
+    mercadopago.configure({
+      access_token: 'TEST-2584090948115274-030110-50304b5950625c1d29196a2da39e319c-194573136'
+    })
+
+    const { user_id, reservation_id } = req.params
+
+    const user = getUser(user_id)
+
+    let preference = {
+      items: [{
+        title: req.body.description,
+        unit_price: Number(req.body.total),
+        quantity: 1,
+      }],
+      payer: {
+        name: user.name.split(' ').slice(0, -1).join(' '),
+        surname: user.name.split(' ').slice(-1).join(' '),
+        email: user.email,
+        phone: {
+          area_code: user.phone.substr(0, 2),
+          number: user.phone.substr(2)
+        },
+        identification: {
+          type: "CPF",
+          number: user.cpf
+        },
+        address: {
+          street_name: user.homeAddress,
+          street_number: user.addressNumber,
+          zip_code: user.cep
+        },
+    },
+    external_reference: reservation_id
+      /*back_urls: {
+        "success": "http://localhost:8080/feedback",
+        "failure": "http://localhost:8080/feedback",
+        "pending": "http://localhost:8080/feedback"
+      },
+      auto_return: 'approved',*/
+    }
+
+    try {
+      const response = await mercadopago.preferences.create(preference)  
+      res.json({id: response.body.id})
+    } catch (error) {
+      console.log(error)
+    }
   }
 }

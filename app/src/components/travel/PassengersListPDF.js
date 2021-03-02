@@ -1,6 +1,5 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer'
-import { api } from '../../config/api'
 import { dateTimeBrazil } from '../../config/util'
 
 const styles = StyleSheet.create({
@@ -46,27 +45,7 @@ const styles = StyleSheet.create({
   }
 })
 
-function PassengersListPDF({ passengers, travel_id }) {
-  const [travel, setTravel] = useState({destination: ''})
-  const [departurePlaces, setDeparturePlaces] = useState([{departureDate: ''}])
-
-  const fetchData = async () => {
-    try {
-      const res = await api.get(`/travels/${travel_id}`, 
-        { headers :{
-          'x-access-token' : localStorage.getItem('token')
-        }})
-
-      const { data } = res
-
-      setTravel(data)
-      setDeparturePlaces(data.departurePlaces)
-    } catch (error) {
-      
-    }
-  }
-  
-  fetchData()
+function PassengersListPDF({ passengers, travel, departurePlaces }) {
 
   return (
     <Document>

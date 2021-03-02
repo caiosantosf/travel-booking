@@ -195,7 +195,7 @@ module.exports = {
       if (result) {
         return res.status(200).json({ message : 'Imagem salva com sucesso'})
       }
-      return res.status(404).json({ message: 'Imagem não encontrada'})
+      return res.status(404).json({ message: 'Viagem não encontrada'})
     } catch (error) {
       const message = dbErrors(error)
       return res.status(400).json(message)

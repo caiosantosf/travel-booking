@@ -1,9 +1,14 @@
 const express = require('express')
-const { getMany, post, destroy, getOne, put } = require('./reservation-controller')
+const { getMany, post, destroy, getOne, put, mercadoPagoPayment } = require('./reservation-controller')
 const { routeSecurity : security } = require('../../config/security')
 const validation = require('./reservation-validation')
 
 const routes = express.Router()
+
+routes.post('/reservations/payment/mercadopago/:user_id/:reservation_id',
+  security(['admin', 'regular']),
+  mercadoPagoPayment
+)
 
 routes.get('/reservations',
   security(['admin', 'regular']),

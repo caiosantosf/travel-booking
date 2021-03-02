@@ -519,6 +519,23 @@ function User(props) {
             </div>
 
             <div className="col-lg-3" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}>
+              <label htmlFor="infinitePayUser" className="form-label">Usuário InfinitePay</label>
+              <input type="text" className={`form-control ${error.infinitePayUser ? 'is-invalid' : ''}`} id="infinitePayUser" maxLength="255"
+                value={admin.infinitePayUser || ''}
+                onChange={e => {
+                  setAdmin({ ...admin,
+                    infinitePayUser: e.target.value
+                  })
+                }}/>
+
+              <div id="validationInfinitePayUser" 
+                className="invalid-feedback" 
+                style={error.infinitePayUser ? { display: 'inline' } : { display: 'none' }}>
+                {error.infinitePayUser}
+              </div>
+            </div>
+
+            <div className="col-lg-3" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}>
               <label htmlFor="companyPayment" className="form-label">Pagamento Direto</label>
               <select className={`form-select ${error.companyPayment ? 'is-invalid' : ''}`} id="companyPayment"
                 value={admin.companyPayment.toString() || 'false'}
@@ -538,7 +555,7 @@ function User(props) {
               </div>
             </div>
 
-            <div className="col-lg-9" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}>
+            <div className="col-lg-6" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}>
               <label htmlFor="companyPaymentLink" className="form-label">Pagamento Direto Link</label>
               <input type="text" className={`form-control ${error.companyPaymentLink ? 'is-invalid' : ''}`} id="companyPaymentLink" maxLength="255"
                 value={admin.companyPaymentLink || ''}

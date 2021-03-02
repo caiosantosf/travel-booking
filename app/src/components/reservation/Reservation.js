@@ -30,8 +30,8 @@ function Reservation(props) {
   const [adminData, setAdminData] = useState({})
   const [reservation, setReservation] = useState([])
   const [notes, setNotes] = useState()
-  const [errorCC, setErrorCC] = useState({})
-  const [CC, setCC] = useState({})
+  const [description, setDescription] = useState()
+  const [config, setConfig] = useState({headers:{'x-access-token' : localStorage.getItem('token')}})
 
   const { travel_id, random } = props.match.params
 
@@ -57,6 +57,7 @@ function Reservation(props) {
     setSeatsSelected({ departure: [], return: [] })
     setAdminData({})
     setReservation([])
+    setConfig({headers:{'x-access-token' : localStorage.getItem('token')}})
   }
 
   useEffect(() => {
@@ -66,9 +67,6 @@ function Reservation(props) {
   useEffect(() => {
     resetState()
     const fetchData = async () => {
-      const config = { headers :{
-        'x-access-token' : localStorage.getItem('token')
-      }}
 
       try {
         const res = await api.get(`/travels/${travel_id}`, config)
@@ -78,6 +76,7 @@ function Reservation(props) {
         setValues(data.values)
         setDeparturePlaces(data.departurePlaces)
         setNotes(data.notes)
+        setDescription(data.description)
 
         if (data.controlsSeats) {
           setSeats(data.seats)
@@ -116,7 +115,7 @@ function Reservation(props) {
     }
 
     fetchData()
-  }, [travel_id])
+  }, [travel_id, config])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -221,7 +220,11 @@ function Reservation(props) {
         if (user.type === 'admin') {
           save()
           history.push('/')
-        }
+         } else {
+          if (adminData.mercadoPago) {
+            handleMercadoPagoPayment()
+          }
+         }
         setStatus(3)
       }
     }
@@ -246,10 +249,6 @@ function Reservation(props) {
   const save = async () => {
     setLoadingSave(true)
     setMessage('')
-
-    const config = { headers :{
-      'x-access-token' : localStorage.getItem('token')
-    }}
 
     const datetime = dateTimeDefault(new Date())
 
@@ -373,14 +372,51 @@ function Reservation(props) {
 
   const handleCompanyPayment = async () => {
     const id = await save()
-    const cpLink = adminData.companyPaymentLink.replace('email@email.com', user.email)
-                                               .replace('@numeroreserva', id || 0)
-                                               .replace('@nome', user.name)
-                                               .replace('@cpf', user.cpf)
-                                               .replace('@documento', user.document)
-                                               .replace('@valor', total.toString().replace(".",","))
+    const link = adminData.companyPaymentLink.replace('email@email.com', user.email)
+                                             .replace('@numeroreserva', id || 0)
+                                             .replace('@nome', user.name)
+                                             .replace('@cpf', user.cpf)
+                                             .replace('@documento', user.document)
+                                             .replace('@valor', total.toString().replace(".",","))
     
-    window.open(cpLink, "_blank")
+    window.open(link, "_blank")
+
+    setStatus(4)
+    resetState()
+  }
+
+  const handleInfinitePayPayment = async () => {
+    await save()
+    
+    const link = `https://pay.infinitepay.io/${adminData.infinitePayUser}/${total.replace(".",",")}`
+
+    window.open(link, "_blank")
+
+    setStatus(4)
+    resetState()
+  }
+
+  const handleMercadoPagoPayment = async () => {
+    const fetchData = async () => {
+      const id = await save()
+
+      try {
+        const res = await api.post(`/reservations/payment/mercadopago/${user.id}/${id}`, {
+          description,
+          total
+        }, config)
+
+        const script = document.createElement('script')
+
+        script.src = 'https://www.mercadopago.com.br/integrations/v1/web-payment-checkout.js'
+        script.dataset.preferenceId = res.data.id      
+
+        document.querySelector("#mercadoPago").appendChild(script)
+      } catch(error) {
+        console.log(error)
+      }
+    }
+    await fetchData()
 
     setStatus(4)
     resetState()
@@ -792,152 +828,35 @@ function Reservation(props) {
     </form>
 
   const formPayment =
-    <form id="payment" className="row g-3 mt-1 mb-4">
+    <div id="payment" className="row g-3 mt-1 mb-4">
       <h6>Pagamento</h6>
       
       <div className={`col-md-12 ${!adminData.companyPayment ? 'd-none' : ''}`}>
         <button type="button" 
                 className="btn btn-primary mb-2"
-                onClick={handleCompanyPayment}
-                disabled={loadingSave}>
-          <span className="spinner-border spinner-border-sm mx-1" 
-                role="status" 
-                aria-hidden="true" 
-                style={loadingSave ? { display: 'inline-block'} : { display : 'none' }}>
-          </span>
+                onClick={handleCompanyPayment}>
           Pagamento Direto com a Empresa
         </button>
         <br />
         <span>Ao escolher esta opção a sua reserva será salva e será aberta uma tela externa ao aplivativo para seguir com o pagamento com a empresa</span>
       </div>
 
-      <div className={`col-md-6 ${!adminData.infinitePay ? 'd-none' : ''}`}>
-        <label htmlFor="cc-name" className="form-label">Nome no cartão</label>
-        <input type="text" className={`form-control ${errorCC.name ? 'is-invalid' : ''}`} id="cc-name" maxLength="255"
-          value={CC.name || ''}
-          onChange={e => {
-            setUser({ ...CC,
-              name: e.target.value
-            })
-          }}/>
-
-        <div id="validationCCName" 
-          className="invalid-feedback" 
-          style={errorCC.name ? { display: 'inline' } : { display: 'none' }}>
-          {errorCC.name}
-        </div>
+      <div className={`col-md-12 ${!adminData.infinitePay ? 'd-none' : ''}`}>
+        <button type="button" 
+                className="btn btn-primary mb-2"
+                onClick={handleInfinitePayPayment}>
+          Pagamento pelo InfinitePay
+        </button>
+        <br />
+        <span>Ao escolher esta opção a sua reserva será salva e será aberta uma tela externa ao aplivativo para seguir com o pagamento pelo App InfinitePay</span>
       </div>
 
-      <div className={`col-md-6 ${!adminData.infinitePay ? 'd-none' : ''}`}>
-        <label htmlFor="cc-number" className="form-label">Número</label>
-        <input type="text" className={`form-control ${errorCC.number ? 'is-invalid' : ''}`} id="cc-number" maxLength="16"
-          value={CC.number || ''}
-          onChange={e => {
-            const re = /^[0-9\b]+$/
-            const key = e.target.value
-
-            if (key === '' || re.test(key)) {
-              setCC({ ...CC, number: key })
-            }
-            }}/>
-
-        <div id="validationCCNumber" 
-          className="invalid-feedback" 
-          style={errorCC.number ? { display: 'inline' } : { display: 'none' }}>
-          {errorCC.number}
-        </div>
+      <div className={`col-md-12 ${!adminData.mercadoPago ? 'd-none' : ''}`}>
+        <div id="mercadoPago"></div>
+        <br />
+        <span>Ao escolher clicar no botão acima a sua reserva será salva e será aberta uma tela externa ao aplivativo para seguir com o pagamento pelo MercadoPago</span>
       </div>
-
-      <div className={`col-md-3 ${!adminData.infinitePay ? 'd-none' : ''}`}>
-        <label htmlFor="cc-month" className="form-label">Mês Validade</label>
-        <input type="text" className={`form-control ${errorCC.month ? 'is-invalid' : ''}`} id="cc-month" maxLength="2"
-          value={CC.month || ''}
-          onChange={e => {
-            const re = /^[0-9\b]+$/
-            const key = e.target.value
-
-            if (key === '' || re.test(key)) {
-              setCC({ ...CC, month: key })
-            }
-            }}/>
-
-        <div id="validationCCMonth" 
-          className="invalid-feedback" 
-          style={errorCC.month ? { display: 'inline' } : { display: 'none' }}>
-          {errorCC.month}
-        </div>
-      </div>
-
-      <div className={`col-md-3 ${!adminData.infinitePay ? 'd-none' : ''}`}>
-        <label htmlFor="cc-year" className="form-label">Ano Validade</label>
-        <input type="text" className={`form-control ${errorCC.year ? 'is-invalid' : ''}`} id="cc-month" maxLength="4"
-          value={CC.year || ''}
-          onChange={e => {
-            const re = /^[0-9\b]+$/
-            const key = e.target.value
-
-            if (key === '' || re.test(key)) {
-              setCC({ ...CC, year: key })
-            }
-            }}/>
-
-        <div id="validationCCYear" 
-          className="invalid-feedback" 
-          style={errorCC.year ? { display: 'inline' } : { display: 'none' }}>
-          {errorCC.year}
-        </div>
-      </div>
-
-      <div className={`col-md-3 ${!adminData.infinitePay ? 'd-none' : ''}`}>
-        <label htmlFor="cc-number" className="form-label">CVV</label>
-        <input type="text" className={`form-control ${errorCC.cvv ? 'is-invalid' : ''}`} id="cc-cvv" maxLength="3"
-          value={CC.cvv || ''}
-          onChange={e => {
-            const re = /^[0-9\b]+$/
-            const key = e.target.value
-
-            if (key === '' || re.test(key)) {
-              setCC({ ...CC, cvv: key })
-            }
-            }}/>
-
-        <div id="validationCCCVV" 
-          className="invalid-feedback" 
-          style={errorCC.cvv ? { display: 'inline' } : { display: 'none' }}>
-          {errorCC.cvv}
-        </div>
-      </div>
-
-      <div className={`col-md-3 ${!adminData.infinitePay ? 'd-none' : ''}`}>
-        <label htmlFor="cc-installments" className="form-label">Parcelas</label>
-        <select className={`form-select ${errorCC.installments ? 'is-invalid' : ''}`} id="cc-installments"
-                value={CC.installments || ''}
-                onChange={e => {
-                  setUser({ ...user,
-                    installments: e.target.value
-                  })
-                }}>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-          <option value="7">7</option>
-          <option value="8">8</option>
-          <option value="9">9</option>
-          <option value="10">10</option>
-          <option value="11">11</option>
-          <option value="12">12</option>
-        </select>
-
-        <div id="validationCCCVV" 
-          className="invalid-feedback" 
-          style={errorCC.cvv ? { display: 'inline' } : { display: 'none' }}>
-          {errorCC.cvv}
-        </div>
-      </div>
-    </form>
+    </div>
 
   const formSuccess =
     <form id="payment" className="row g-3 mt-1 mb-4">
