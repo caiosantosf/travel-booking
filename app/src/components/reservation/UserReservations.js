@@ -3,7 +3,7 @@ import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
 import { CalendarCheck, PersonFill } from 'react-bootstrap-icons'
 import { api, apiUrl } from '../../config/api'
-import { dateTimeBrazil } from '../../config/util'
+import { dateTimeBrazil, translatePaymentStatus } from '../../config/util'
 import { getUserId } from '../../config/security'
 import { errorApi } from '../../config/handleErrors'
 
@@ -53,7 +53,11 @@ function UserReservations() {
               const { travel, reservations } = reservation
               const { imageName, destination, departurePlace } = travel
 
-              const total = (reservation.reservations.reduce((tot, person) => tot + Number(person.value), 0)).toFixed(2)
+              const status = reservations.filter(res => (!res.dependent_id))[0].status
+
+              const statusToShow = translatePaymentStatus(status)
+
+              const total = (reservations.reduce((tot, person) => tot + Number(person.value), 0)).toFixed(2)
               
               return (
                 <div key={i} className="col">
@@ -88,9 +92,13 @@ function UserReservations() {
                           )
                         })}
                       <hr />
-                        <div>
-                          <span>{`Valor Total: ${total.toString().replace(".",",")}`}</span>
-                        </div>
+                      <div>
+                        <span>{`Valor Total: ${total.toString().replace(".",",")}`}</span>
+                      </div>
+                      <hr />
+                      <div>
+                        <span>Pagamento: <strong className={statusToShow.color}>{statusToShow.translated}</strong></span>
+                      </div>
                     </div>
                   </div>
                 </div>

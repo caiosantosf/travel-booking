@@ -50,7 +50,7 @@ function DeparturePlace(props) {
     if (id !== 'novo') {
       fetchData()
     }
-  }, [travel_id, id])
+  }, [travel_id, id, history])
 
   const handleSave = async () => {
     setLoadingSave(true)

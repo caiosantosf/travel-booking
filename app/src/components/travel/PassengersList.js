@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { Link, useHistory } from "react-router-dom"
+import { useHistory } from "react-router-dom"
 import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
-import { PencilSquare, ChevronDoubleLeft, ChevronDoubleRight, ChevronRight, ChevronLeft, Whatsapp } from 'react-bootstrap-icons'
+import { ChevronDoubleLeft, ChevronDoubleRight, ChevronRight, ChevronLeft, Whatsapp, Trash } from 'react-bootstrap-icons'
 import { api } from '../../config/api'
 import PassengersListPDF  from './PassengersListPDF'
 import { PDFDownloadLink } from '@react-pdf/renderer'
@@ -15,6 +15,7 @@ function PassengersList(props) {
   const [message, setMessage] = useState('')
   const [travel, setTravel] = useState({})
   const [departurePlaces, setDeparturePlaces] = useState([{}])
+  const [adminData, setAdminData] = useState({})
 
   const { travel_id } = props.match.params
   const { travel: trv, departurePlaces: dp } = props.location.state  
@@ -52,10 +53,42 @@ function PassengersList(props) {
           }
         }
       }
+
+      try {
+        const res = await api.get(`/admin-data/`, {headers:{'x-access-token' : localStorage.getItem('token')}})
+
+        const { data } = res
+        setAdminData(data)
+      } catch (error) {
+        const errorHandled = errorApi(error)
+        if (errorHandled.general) {
+          setMessage(errorHandled.error)
+        }
+      }
     }
     fetchData()
-
   }, [currentPage, travel_id, history])
+
+  const handleDestroy = async (id) => {
+    try {
+      await api.delete(`/reservations/${id}`, { headers :{
+        'x-access-token' : localStorage.getItem('token')
+      }})
+
+      var filtered = passengers.filter(function(value, index, arr){ 
+        return value.id !== id
+      })
+
+      setPassengers(filtered)
+    } catch (error) {
+      const errorHandled = errorApi(error)
+      if (errorHandled.general) {
+        setMessage(errorHandled.error)
+      } else {
+        //setError(errorHandled.error)
+      }
+    }
+  }
 
   const handleFirst = async () => {
     setCurrentPage(1)
@@ -97,12 +130,12 @@ function PassengersList(props) {
                   <th scope="col">Colo</th>
                   <th scope="col">Responsável</th>
                   <th scope="col">Telefone</th>
-                  <th scope="col">Ações</th>
+                  <th scope="col"></th>
                 </tr>
               </thead>
               <tbody>
                 {passengers.map(passenger => {
-                  const { id, person, departureSeat, returnSeat, lapChild } = passenger
+                  const { id, person, departureSeat, returnSeat, lapChild, user_id } = passenger
                   const { name, phone, responsible } = person
 
                   const phoneLen = phone ? phone.length : 0
@@ -123,7 +156,7 @@ function PassengersList(props) {
                           {phone ? `(${passenger.person.phone.substr(0, 2)}) ${phone.substr(2, phoneLen === 10 ? 4: 5)}-${phone.substr(phoneLen === 10 ? 6: 7, 4)}` : ''}
                           {phone ? wpp : ''}
                         </td>
-                        <td><Link to={`/viagens/${travel_id}/reservas/${id}`}><PencilSquare /> </Link></td>
+                        <td>{user_id === adminData.user_id ? <button className="btn btn-link p-0" onClick={() => {handleDestroy(id)}}><Trash /> </button> : ''}</td>
                       </tr>
                     )
                   } else {

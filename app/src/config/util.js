@@ -52,4 +52,24 @@ const calculateValue = (values, age, travelType, lapChild) => {
   return { value, optionLapChild}
 }
 
-export { dateTimeBrazil, dateTimeDefault, calculateAge, calculateValue }
+const translatePaymentStatus = status => {
+  let statusToShow = {}
+
+  if (status === 'pending') statusToShow = {status, translated: 'Pendente', color: 'text-warning'}
+  if (status === 'approved') statusToShow = {status, translated: 'Aprovado', color: 'text-success'}
+  if (status === 'authorized') statusToShow = {status, translated: 'Pendente', color: 'text-warning'}
+  if (status === 'in_process') statusToShow = {status, translated: 'Em Processamento', color: 'text-warning'}
+  if (status === 'in_mediation') statusToShow = {status, translated: 'Em Disputa', color: 'text-warning'}
+  if (status === 'rejected') statusToShow = {status, translated: 'Rejeitado', color: 'text-danger'}
+  if (status === 'cancelled') statusToShow = {status, translated: 'Cancelado', color: 'text-danger'}
+  if (status === 'refunded') statusToShow = {status, translated: 'Devolvido', color: 'text-danger'}
+  if (status === 'charged_back') statusToShow = {status, translated: 'Estornado', color: 'text-danger'}
+  if (status === 'created') statusToShow = {status, translated: 'Criado', color: 'text-warning'}
+
+  if (status === '1') statusToShow = {status, translated: 'Esperando', color: 'text-warning'}
+  if (status === '2') statusToShow = {status, translated: 'Recebido', color: 'text-success'}
+
+  return statusToShow
+}
+
+export { dateTimeBrazil, dateTimeDefault, calculateAge, calculateValue, translatePaymentStatus }

@@ -31,8 +31,7 @@ function Reservation(props) {
   const [reservation, setReservation] = useState([])
   const [notes, setNotes] = useState()
   const [description, setDescription] = useState()
-  const [config, setConfig] = useState({headers:{'x-access-token' : localStorage.getItem('token')}})
-
+  
   const { travel_id, random } = props.match.params
 
   let history = useHistory()
@@ -57,7 +56,6 @@ function Reservation(props) {
     setSeatsSelected({ departure: [], return: [] })
     setAdminData({})
     setReservation([])
-    setConfig({headers:{'x-access-token' : localStorage.getItem('token')}})
   }
 
   useEffect(() => {
@@ -69,7 +67,10 @@ function Reservation(props) {
     const fetchData = async () => {
 
       try {
-        const res = await api.get(`/travels/${travel_id}`, config)
+        const res = await api.get(`/travels/${travel_id}`,
+        { headers :{
+          'x-access-token' : localStorage.getItem('token')
+        }})
 
         const { data } = res
         setControlsSeats(data.controlsSeats)
@@ -102,7 +103,10 @@ function Reservation(props) {
       }
 
       try {
-        const res = await api.get(`/admin-data/`, config)
+        const res = await api.get(`/admin-data/`, 
+        { headers :{
+          'x-access-token' : localStorage.getItem('token')
+        }})
 
         const { data } = res
         setAdminData(data)
@@ -115,7 +119,7 @@ function Reservation(props) {
     }
 
     fetchData()
-  }, [travel_id, config])
+  }, [travel_id])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -263,6 +267,10 @@ function Reservation(props) {
       }
     }
 
+    const config = { headers :{
+      'x-access-token' : localStorage.getItem('token')
+    }}
+
     let id = 0
     try {
       const res = await api.post('/reservations', {
@@ -272,7 +280,7 @@ function Reservation(props) {
         datetime,
         returnSeat, 
         value: Number(user.value), 
-        status: "1", 
+        status: "created", 
         travelType, 
         departurePlace_id: departurePlace,
         lapChild: false
@@ -316,7 +324,7 @@ function Reservation(props) {
               departureSeat, 
               returnSeat, 
               value: Number(value), 
-              status: "1", 
+              status: "created", 
               travelType, 
               departurePlace_id: departurePlace, 
               lapChild: lapChild ? true : false
@@ -397,29 +405,28 @@ function Reservation(props) {
   }
 
   const handleMercadoPagoPayment = async () => {
-    const fetchData = async () => {
-      const id = await save()
+    const id = await save()
 
-      try {
-        const res = await api.post(`/reservations/payment/mercadopago/${user.id}/${id}`, {
-          description,
-          total
-        }, config)
+    try {
+      const res = await api.post(`/reservations/payment/mercadopago/${user.id}/${id}`, {
+        description,
+        total
+      }, { headers :{
+        'x-access-token' : localStorage.getItem('token')
+      }})
 
-        const script = document.createElement('script')
+      const script = document.createElement('script')
 
-        script.src = 'https://www.mercadopago.com.br/integrations/v1/web-payment-checkout.js'
-        script.dataset.preferenceId = res.data.id      
+      script.src = 'https://www.mercadopago.com.br/integrations/v1/web-payment-checkout.js'
+      script.dataset.preferenceId = res.data.id      
 
-        document.querySelector("#mercadoPago").appendChild(script)
-      } catch(error) {
-        console.log(error)
+      document.querySelector("#mercadoPago").appendChild(script)
+    } catch(error) {
+      const errorHandled = errorApi(error)
+      if (errorHandled.general) {
+        setMessage(errorHandled.error)
       }
     }
-    await fetchData()
-
-    setStatus(4)
-    resetState()
   }
 
   const handleAddPerson = async () => {

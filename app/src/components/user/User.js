@@ -8,7 +8,7 @@ import { errorApi } from '../../config/handleErrors'
 
 function User(props) {
   const [user, setUser] = useState({documentType: 'RG', state: 'AC'})
-  const [admin, setAdmin] = useState({infinitePay: true, companyPayment: false})
+  const [admin, setAdmin] = useState({infinitePay: false, companyPayment: false, mercadoPago: false})
   const [error, setError] = useState({})
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
@@ -45,6 +45,15 @@ function User(props) {
         data.birth = data.birth.substr(0, 10)
         delete data.password
         setUser(data)
+
+        if (adminData) {
+          const res = await api.get('/admin-data/', 
+            { headers :{
+              'x-access-token' : localStorage.getItem('token')
+            }})
+          const { data } = res
+          setAdmin(data)
+        }
       } catch (error) {
         const errorHandled = errorApi(error)
         if (errorHandled.forbidden) {
@@ -59,7 +68,7 @@ function User(props) {
     if (id) {
       fetchData()
     }
-  }, [id, history])
+  }, [id, history, adminData])
 
   const handleSave = async () => {
     try {
@@ -84,7 +93,6 @@ function User(props) {
         const { type, token } = res.data
 
         if (adminData) {
-          setAdmin({ ...admin, user_id: id })
           await api.put(`/admin-data/${id}`, admin, config)
         }
 
@@ -192,6 +200,7 @@ function User(props) {
                 {error.cpf}
               </div>
             </div>
+            
             <div className="col-lg-3" style={adminData ? { display: 'none'} : { display : 'inline-block'}}>
               <label htmlFor="birth" className="form-label">Nascimento</label>
               <input type="date" className={`form-control ${error.birth ? 'is-invalid' : ''}`} id="birth" 
@@ -209,6 +218,7 @@ function User(props) {
                 {error.birth}
               </div>
             </div>
+            
             <div className="col-lg-2" style={adminData ? { display: 'none'} : { display : 'inline-block'}}>
             <label htmlFor="documentType" className="form-label">Tipo de Documento</label>
               <select className={`form-select ${error.documentType ? 'is-invalid' : ''}`} id="documentType" 
@@ -228,6 +238,7 @@ function User(props) {
                 {error.documentType}
               </div>
             </div>
+            
             <div className="col-lg-3">
               <label htmlFor="document" className="form-label">{`${adminData ? 'CNPJ' : 'Documento'}`}</label>
               <input type="text" className={`form-control ${error.document ? 'is-invalid' : ''}`} id="document" maxLength="14"
@@ -245,6 +256,7 @@ function User(props) {
                 {error.document}
               </div>
             </div>
+            
             <div className="col-lg-3">
               <label htmlFor="phone" className="form-label">Celular (WhatsApp)</label>
               <input type="text" className={`form-control ${error.phone ? 'is-invalid' : ''}`} id="phone" maxLength="11"
@@ -265,6 +277,7 @@ function User(props) {
                 {error.phone}
               </div>
             </div>
+            
             <div className="col-lg-4">
               <label htmlFor="email" className="form-label">Email</label>
               <input type="email" className={`form-control ${error.email ? 'is-invalid' : ''}`} id="email" maxLength="255" 
@@ -569,6 +582,46 @@ function User(props) {
                 className="invalid-feedback" 
                 style={error.companyPaymentLink ? { display: 'inline' } : { display: 'none' }}>
                 {error.companyPaymentLink}
+              </div>
+            </div>
+            
+
+
+
+            <div className="col-lg-3" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}>
+              <label htmlFor="companyPayment" className="form-label">Mercado Pago</label>
+              <select className={`form-select ${error.mercadoPago ? 'is-invalid' : ''}`} id="mercadoPago"
+                value={admin.mercadoPago.toString() || 'false'}
+                onChange={e => {
+                  setAdmin({ ...admin,
+                    mercadoPago: e.target.value === 'true' ? true : false
+                  })
+                }}>
+                <option value={true}>Sim</option>
+                <option value={false}>Não</option>
+              </select>
+
+              <div id="validationMercadoPago" 
+                className="invalid-feedback" 
+                style={error.mercadoPago ? { display: 'inline' } : { display: 'none' }}>
+                {error.mercadoPago}
+              </div>
+            </div>
+
+            <div className="col-lg-6" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}>
+              <label htmlFor="mercadoPagoToken" className="form-label">Mercado Pago Token</label>
+              <input type="text" className={`form-control ${error.mercadoPagoToken ? 'is-invalid' : ''}`} id="mercadoPagoToken" maxLength="255"
+                value={admin.mercadoPagoToken || ''}
+                onChange={e => {
+                  setAdmin({ ...admin,
+                    mercadoPagoToken: e.target.value
+                  })
+                }}/>
+
+              <div id="validationMercadoPagoToken" 
+                className="invalid-feedback" 
+                style={error.mercadoPagoToken ? { display: 'inline' } : { display: 'none' }}>
+                {error.mercadoPagoToken}
               </div>
             </div>
 

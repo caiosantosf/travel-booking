@@ -19,7 +19,6 @@ const sendMail = async (to, subject, html) => {
 
     return true
   } catch (error) {
-    console.log(error)
     return false
   }
 

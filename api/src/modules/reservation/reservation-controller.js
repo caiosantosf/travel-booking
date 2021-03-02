@@ -73,6 +73,21 @@ const dateTimeBrazil = dtstr => {
   return `${day}/${month}/${year} ${hour}:${minute}`
 }
 
+const getStatusMercadoPago = reservation_id => {
+  const adminData = await getAdminData()
+
+  mercadopago.configure({
+    access_token: adminData.mercadoPagoToken
+  })
+
+  try {
+    const resMP = await mercadopago.payment.search({ qs: { external_reference: reservation_id }})
+    return resMP.results[0].status
+  } catch(error) {
+    return false
+  }
+}
+
 module.exports = {
   async getMany (req, res) {
     const completeReservation = async (reservations) => {
@@ -87,6 +102,17 @@ module.exports = {
 
           if (res[i].person.responsibleReturnSeat) {
             res[i].returnSeat = res[i].person.responsibleReturnSeat
+          }
+
+          const statusUpdated = getStatusMercadoPago(res[i].id)
+
+          if (res[i].status !== statusUpdated){
+            res[i].status = statusUpdated
+
+            try {
+              await db('reservations').where({ id: res[i].id }).update({ status: statusUpdated })
+            } catch (error) {}
+            
           }
         }
       }
@@ -125,19 +151,17 @@ module.exports = {
       await sendMail(email, 'Confirmação de Reserva', emailContent) 
     }
     
-    const { currentpage: currentPage, user_id, travel_id, datetime, email } = req.headers
+    const { currentpage: currentPage, user_id, travel_id, email } = req.headers
     let reservations = {}
     let reservationsGrouped = {}
 
     if (!user_id) {
-      const adminData = await getAdminData()
-
       reservations = await db('reservations')
-                                  .modify(q => {
-                                    if (travel_id) q.where({ travel_id })
-                                  })
-                                  .orderBy('id', 'desc')
-                                  .paginate({ perPage: 100, currentPage, isLengthAware: true })
+                            .modify(q => {
+                              if (travel_id) q.where({ travel_id })
+                            })
+                            .orderBy('id', 'desc')
+                            .paginate({ perPage: 100, currentPage, isLengthAware: true })
   
       if (reservations.hasOwnProperty('data')) {
         reservations.data = await completeReservation(reservations.data)
@@ -151,9 +175,9 @@ module.exports = {
       reservationsGrouped = await db('reservations')
                             .select('user_id', 'datetime', 'travel_id')
                             .where({ user_id })
-                            .where({ datetime })
+
                             .groupBy('user_id', 'datetime', 'travel_id')
-                            .paginate({ perPage: 10, currentPage, isLengthAware: true })
+                            .paginate({ perPage: 100, currentPage, isLengthAware: true })
       
       if (reservationsGrouped.hasOwnProperty('data')) {
         if (reservationsGrouped.data.length) {
@@ -178,8 +202,8 @@ module.exports = {
   },
 
   async getOne (req, res) {
-    const { travel_id } = req.params
-    let reservation = await db('reservations').where({ travel_id })
+    const { id } = req.params
+    let reservation = await db('reservations').where({ id })
     reservation = reservation[0]
 
     if (reservation) {
@@ -234,53 +258,75 @@ module.exports = {
     return res.status(404).json({ message: 'Reserva não encontrada' })
   },
 
-  async mercadoPagoPayment (req, res) {
+  async mercadoPagoPaymentStatus (req, res) {
+    const adminData = await getAdminData()
+
     mercadopago.configure({
-      access_token: 'TEST-2584090948115274-030110-50304b5950625c1d29196a2da39e319c-194573136'
+      access_token: adminData.mercadoPagoToken
+    })
+
+    const { reservation_id } = req.params
+
+    try {
+      const response = await mercadopago.payment.search({ qs: { external_reference: reservation_id }})
+      res.json(response.body)
+    } catch (error) {
+      res.status(500).json({ message: "Erro desconhecido ao acessar o Mercado Pago. Tente novamente mais tarde!", error})
+    }
+  },
+
+  async mercadoPagoPayment (req, res) {
+    const adminData = await getAdminData()
+
+    mercadopago.configure({
+      access_token: adminData.mercadoPagoToken
     })
 
     const { user_id, reservation_id } = req.params
+    const { description, total } = req.body
 
-    const user = getUser(user_id)
+    const user = await getUser(user_id)
+
+    const { name, email, phone, cpf, homeAddress, addressNumber, cep } = user
 
     let preference = {
       items: [{
-        title: req.body.description,
-        unit_price: Number(req.body.total),
+        title: description,
+        unit_price: Number(total),
         quantity: 1,
       }],
       payer: {
-        name: user.name.split(' ').slice(0, -1).join(' '),
-        surname: user.name.split(' ').slice(-1).join(' '),
-        email: user.email,
+        name: name.split(' ').slice(0, -1).join(' '),
+        surname: name.split(' ').slice(-1).join(' '),
+        email: email,
         phone: {
-          area_code: user.phone.substr(0, 2),
-          number: user.phone.substr(2)
+          area_code: phone.substr(0, 2),
+          number: Number(phone.substr(2))
         },
         identification: {
           type: "CPF",
-          number: user.cpf
+          number: cpf
         },
         address: {
-          street_name: user.homeAddress,
-          street_number: user.addressNumber,
-          zip_code: user.cep
+          street_name: homeAddress,
+          street_number: addressNumber,
+          zip_code: cep
         },
-    },
-    external_reference: reservation_id
-      /*back_urls: {
-        "success": "http://localhost:8080/feedback",
-        "failure": "http://localhost:8080/feedback",
-        "pending": "http://localhost:8080/feedback"
       },
-      auto_return: 'approved',*/
+      external_reference: reservation_id,
+      back_urls: {
+        "success": `${proccess.env.APP_LOCATION}pagamento/success`,
+        "failure": `${proccess.env.APP_LOCATION}pagamento/failure`,
+        "pending": `${proccess.env.APP_LOCATION}pagamento/pending`
+      },
+      auto_return: 'all',
     }
 
     try {
       const response = await mercadopago.preferences.create(preference)  
-      res.json({id: response.body.id})
+      res.json({ id: response.body.id })
     } catch (error) {
-      console.log(error)
+      res.status(500).json({ message: "Erro desconhecido ao acessar o Mercado Pago. Tente novamente mais tarde!", error})
     }
   }
 }
