@@ -17,6 +17,10 @@ app.use(express.json())
 
 app.use(express.static(`${process.cwd()}\\public`))
 
+app.get('/', function(req, res) {
+  res.status(200).json({ message: 'Travel Booking is flying!' });
+})
+
 app.use(userRoutes)
 app.use(busRoutes)
 app.use(travelRoutes)
