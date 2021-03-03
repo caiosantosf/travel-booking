@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-const sendMail = async (to, subject, html) => {
+const sendMail = async (to, subject, html, bcc) => {
   let transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -13,6 +13,7 @@ const sendMail = async (to, subject, html) => {
     await transporter.sendMail({
       from: `Sistema de Reserva de Passagens <${ process.env.EMAIL }>`, 
       to,
+      bcc,
       subject,
       html
     })

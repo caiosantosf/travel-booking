@@ -73,7 +73,7 @@ const dateTimeBrazil = dtstr => {
   return `${day}/${month}/${year} ${hour}:${minute}`
 }
 
-const getStatusMercadoPago = reservation_id => {
+const getStatusMercadoPago = async reservation_id => {
   const adminData = await getAdminData()
 
   mercadopago.configure({
@@ -82,7 +82,7 @@ const getStatusMercadoPago = reservation_id => {
 
   try {
     const resMP = await mercadopago.payment.search({ qs: { external_reference: reservation_id }})
-    return resMP.results[0].status
+    return resMP.body.results[0].status
   } catch(error) {
     return false
   }
@@ -104,15 +104,20 @@ module.exports = {
             res[i].returnSeat = res[i].person.responsibleReturnSeat
           }
 
-          const statusUpdated = getStatusMercadoPago(res[i].id)
+          if (res[i].status !== '1' && res[i].status !== '2' && !res[i].dependent_id) {
+            const statusUpdated = await getStatusMercadoPago(res[i].id)
 
-          if (res[i].status !== statusUpdated){
-            res[i].status = statusUpdated
+            if (res[i].status !== statusUpdated && statusUpdated){
+              res[i].status = statusUpdated
 
-            try {
-              await db('reservations').where({ id: res[i].id }).update({ status: statusUpdated })
-            } catch (error) {}
-            
+              try {
+                await db('reservations')
+                        .where({ id: res[i].id })
+                        .update({ status: statusUpdated, departureSeat: 0, returnSeat: 0 })
+              } catch (error) {
+                return []
+              }
+            }
           }
         }
       }
@@ -148,7 +153,10 @@ module.exports = {
         <h4>Total R$ ${total}</h4>
         <br /><p>${name} - ${phoneFomartted}</p>`
       
-      await sendMail(email, 'Confirmação de Reserva', emailContent) 
+      const { adminUser_id } = await getAdminData()
+      const { emailAdmin } = await getUser(adminUser_id)
+      
+      await sendMail(email, 'Confirmação de Reserva', emailContent, emailAdmin) 
     }
     
     const { currentpage: currentPage, user_id, travel_id, email } = req.headers
@@ -315,9 +323,9 @@ module.exports = {
       },
       external_reference: reservation_id,
       back_urls: {
-        "success": `${proccess.env.APP_LOCATION}pagamento/success`,
-        "failure": `${proccess.env.APP_LOCATION}pagamento/failure`,
-        "pending": `${proccess.env.APP_LOCATION}pagamento/pending`
+        "success": `${process.env.APP_LOCATION}pagamento/success`,
+        "failure": `${process.env.APP_LOCATION}pagamento/failure`,
+        "pending": `${process.env.APP_LOCATION}pagamento/pending`
       },
       auto_return: 'all',
     }

@@ -7,12 +7,12 @@ module.exports = {
 
       const token = req.headers['x-access-token'] || req.query.token
       if (!token) {
-        return res.status(401).json({ auth: false, message: 'Requisição sem Token de autenticação' })
+        return res.status(401).json({ auth: false, message: 'Você não está logado, por favor faça login novamente' })
       }
 
       jwt.verify(token, process.env.SECRET, function(err, decoded) {
         if (err) {
-          return res.status(500).json({ auth: false, message: 'Não foi possível validar o Token de autenticação' })
+          return res.status(500).json({ auth: false, message: 'Sua sessão expirou, por favor faça login novamente' })
         } 
 
         if ((req.params.id) && (req.url.search('users') > -1)) {

@@ -324,7 +324,7 @@ function Reservation(props) {
               departureSeat, 
               returnSeat, 
               value: Number(value), 
-              status: "created", 
+              status: "dependent", 
               travelType, 
               departurePlace_id: departurePlace, 
               lapChild: lapChild ? true : false

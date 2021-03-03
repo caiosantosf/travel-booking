@@ -182,7 +182,7 @@ module.exports = {
       const link = `${domain}redefine-senha/${id}?token=${token(id)}`
       const emailContent = `Acesse o link a seguir para cadastrar uma nova senha: <a href="${link}">Clique Aqui</a>`
 
-      if (await sendMail(email, 'Recuperação de Senha', emailContent)) {
+      if (await sendMail(email, 'Recuperação de Senha', emailContent, '')) {
         return res.status(200).json({ email: 'Enviamos um link de recuperação de senha para o seu email. Verifique se não foi para o Spam ou lixo eletrônico'})
       }
       return res.status(400).json({ email: 'Houve um problema ao enviar o email de recuperação de senha. Contate a empresa.'})
