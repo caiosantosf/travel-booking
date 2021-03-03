@@ -7,7 +7,10 @@
     "start": "knex migrate:latest && nodemon src/server.js",
     "staging": "knex migrate:latest && node src/server.js"
   },
-  "author": "",
+  "engines": {
+    "node": "12.x"
+  },
+  "author": "Caio Santos",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.21.1",
