@@ -146,9 +146,7 @@ module.exports = {
       travel[0].values = await getValues(travel[0].id)
       travel[0].departurePlaces = await getDeparturePlaces(travel[0].id)
       travel[0].seats = await getSeatsWithReserves(travel[0].bus_id, id)
-      
-      delete travel[0].bus_id
-      
+            
       return res.status(200).json(travel[0])
     }
     return res.status(404).json({ message: 'Viagem não encontrada'})
@@ -179,6 +177,7 @@ module.exports = {
     data.imageName = ''
 
     try {
+      console.log(data)
       const result = await db('travels').where({ id }).update({ id, ...data })
 
       if (result) {
