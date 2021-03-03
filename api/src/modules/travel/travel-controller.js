@@ -123,7 +123,13 @@ module.exports = {
         }
 
         if (openTravels) {
-          travels = travels.filter((travel) => (travel.departurePlaces[0].departureDate >= new Date()))
+          travels = travels.filter((travel) => {
+            if (travel.departurePlaces.length) {
+              return travel.departurePlaces[0].departureDate >= new Date()
+            } else {
+              return false
+            }
+          })
         }
 
         return res.status(200).json(travels)
