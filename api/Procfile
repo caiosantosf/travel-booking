@@ -1,1 +1,1 @@
-web: npm staging
+web: npm run staging
