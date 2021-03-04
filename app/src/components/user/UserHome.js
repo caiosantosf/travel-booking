@@ -32,7 +32,7 @@ function UserHome() {
     fetchData()
   }, [])
 
-  const noTravels = <h1>No momento não temos viagens em aberto!</h1>
+  const noTravels = ''//<h1>No momento não temos viagens em aberto!</h1>
 
   return (
     <React.Fragment>
@@ -46,7 +46,7 @@ function UserHome() {
             {message}
           </div>
           
-          {!travels ? noTravels : ''}
+          {!travels.length ? noTravels : ''}
 
           <div className="row row-cols-1 row-cols-md-2 row-cols-xl-3 row-cols-xxl-4 g-3">
 
