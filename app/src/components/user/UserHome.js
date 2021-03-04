@@ -21,8 +21,6 @@ function UserHome() {
           }})
         if (res.status === 200) {
           setTravels(res.data)
-        } else {
-          setTravels(false)
         }
       } catch (error) {  
         const errorHandled = errorApi(error)
