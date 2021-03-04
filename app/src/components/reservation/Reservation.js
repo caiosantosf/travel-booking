@@ -148,7 +148,9 @@ function Reservation(props) {
   }, [travelType, values])
 
   useEffect(() => {
-    setTotal((dependents.reduce((tot, dependent) => tot + Number(dependent.value), 0) + user.type === 'regular' ? Number(user.value) : 0).toFixed(2))
+    let auxTotal = dependents.reduce((tot, dependent) => tot + Number(dependent.value), 0)
+    auxTotal += user.type === 'regular' ? Number(user.value) : 0
+    setTotal((auxTotal).toFixed(2))
   }, [dependents, user])
 
   const handleContinue = async () => {
