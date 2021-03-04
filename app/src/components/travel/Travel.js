@@ -94,7 +94,13 @@ function Travel(props) {
       let travel_id_created = 0
 
       if (travel_id !== 'novo') {
-        await api.put(`/travels/${travel_id}`, travel, config)
+
+        let travelAux = { ...travel }
+        delete travelAux.values
+        delete travelAux.departurePlaces
+        delete travelAux.seats
+
+        await api.put(`/travels/${travel_id}`, travelAux, config)
       } else {
         const res = await api.post('/travels', travel, config)
         travel_id_created = res.data.id

@@ -25,9 +25,9 @@ yarn-error.log*
 .env
 
 # exclude everything
-uploads
+api/public/uploads/*
 
 # exception to the rule
-!uploads/.gitkeep 
+!api/public/uploads/.gitkeep 
 
 Attention.txt

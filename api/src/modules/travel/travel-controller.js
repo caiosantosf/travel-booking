@@ -177,7 +177,6 @@ module.exports = {
     data.imageName = ''
 
     try {
-      console.log(data)
       const result = await db('travels').where({ id }).update({ id, ...data })
 
       if (result) {

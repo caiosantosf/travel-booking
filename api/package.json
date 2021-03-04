@@ -4,8 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "knex migrate:latest && nodemon src/server.js",
-    "staging": "knex migrate:latest && node src/server.js"
+    "start": "knex migrate:latest && cross-env nodemon src/server.js",
+    "staging": "cross-env NODE_ENV=staging knex migrate:latest && cross-env NODE_ENV=staging node src/server.js"
   },
   "engines": {
     "node": "12.x"

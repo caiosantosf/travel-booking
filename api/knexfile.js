@@ -45,7 +45,8 @@ module.exports = {
       host: process.env.DB_HOST_STAGING,
       database: process.env.DB_NAME_STAGING,
       user: process.env.DB_USER_STAGING,
-      password: process.env.DB_PASSWORD_STAGING
+      password: process.env.DB_PASSWORD_STAGING,
+      ssl: { rejectUnauthorized: false }
     },
     pool: {
       min: 2,

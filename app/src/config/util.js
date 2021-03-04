@@ -20,13 +20,14 @@ const dateTimeDefault = dt => {
 }
 
 const calculateAge = dt => { 
-  const date = new Date(dt)
-  const diffMs = Date.now() - date.getTime()
-  if (diffMs < 0) {
-    throw new Error("A Data de nascimento não é valida")
+  const today = new Date()
+  const birthDate = new Date(dt)
+  let age = today.getFullYear() - birthDate.getFullYear()
+  const m = today.getMonth() - birthDate.getMonth()
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age = age - 1
   }
-  const ageDt = new Date(diffMs)
-  return Math.abs(ageDt.getUTCFullYear() - 1970)
+  return age
 }
 
 const calculateValue = (values, age, travelType, lapChild) => {
