@@ -863,7 +863,7 @@ function Reservation(props) {
       <div className={`col-md-12 ${!adminData.mercadoPago ? 'd-none' : ''}`}>
         <div id="mercadoPago"></div>
         <br />
-        <span>Ao escolher clicar no botão acima a sua reserva será salva e será aberta uma tela externa ao aplivativo para seguir com o pagamento pelo MercadoPago</span>
+        <span>Espere até que apareça um botão acima, ao clicar nele a sua reserva será salva e será aberta uma tela externa ao aplivativo para seguir com o pagamento pelo MercadoPago</span>
       </div>
     </div>
 

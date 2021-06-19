@@ -111,9 +111,17 @@ module.exports = {
               res[i].status = statusUpdated
 
               try {
-                await db('reservations')
-                        .where({ id: res[i].id })
-                        .update({ status: statusUpdated, departureSeat: 0, returnSeat: 0 })
+                const arrCancelStatus = ['rejected', 'cancelled', 'refunded', 'charged_back']
+                
+                if (arrCancelStatus.includes(statusUpdated)) {
+                  await db('reservations')
+                          .where({ id: res[i].id })
+                          .update({ status: statusUpdated, departureSeat: 0, returnSeat: 0 })
+                } else {
+                  await db('reservations')
+                          .where({ id: res[i].id })
+                          .update({ status: statusUpdated })
+                }
               } catch (error) {
                 return []
               }
