@@ -5,6 +5,7 @@ import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
 import { getUserType, getUserId } from '../../config/security'
 import { errorApi } from '../../config/handleErrors'
+import InputMask from 'react-input-mask';
 
 function User(props) {
   const [user, setUser] = useState({documentType: 'RG', state: 'AC'})
@@ -83,6 +84,11 @@ function User(props) {
       } else {
         const { passwordConfirmation, id, ...userData} = user
 
+        if (userData.birth) {
+          const dateParts = userData.birth.split('/')
+          userData.birth = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`
+        }
+console.log(userData.birth)
         const config = { headers :{
           'x-access-token' : localStorage.getItem('token'),
         }}
@@ -105,6 +111,8 @@ function User(props) {
       } else {
         setError(errorHandled.error)
       }
+
+      window.scrollTo({top: 0, behavior: 'smooth'});
 
       setLoading(false)
     }
@@ -203,14 +211,20 @@ function User(props) {
             
             <div className="col-lg-3" style={adminData ? { display: 'none'} : { display : 'inline-block'}}>
               <label htmlFor="birth" className="form-label">Nascimento</label>
-              <input type="date" className={`form-control ${error.birth ? 'is-invalid' : ''}`} id="birth" 
-                disabled={adminViewUser}
-                value={user.birth || ''}
+
+              <InputMask 
+                mask="99/99/9999" 
+                className={`form-control ${error.birth ? 'is-invalid' : ''}`} 
+                id="birth" 
+                disabled={adminViewUser} value={user.birth || ''} 
                 onChange={e => {
                   setUser({ ...user,
                     birth: e.target.value
                   })
-                }}/>
+                }}
+              >
+                {inputProps => <input {...inputProps} type="tel" />}
+              </InputMask>
 
               <div id="validationBirth" 
                 className="invalid-feedback" 

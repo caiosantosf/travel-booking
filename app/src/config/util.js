@@ -27,7 +27,6 @@ const calculateAge = dt => {
   if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
       age = age - 1
   }
-  console.log(`${today.getFullYear()} ${birthDate.getFullYear()} ${age}`)
   return age
 }
 

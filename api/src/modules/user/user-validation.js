@@ -183,9 +183,10 @@ const validation = (fields) => {
         }
         
         const today = new Date()
-        const birthDate = new Date(birth)
+        const birthDate = new Date(birth + 'T00:00')
         let age = today.getFullYear() - birthDate.getFullYear()
         const m = today.getMonth() - birthDate.getMonth()
+
         if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
             age = age - 1
         }
