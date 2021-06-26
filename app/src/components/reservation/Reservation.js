@@ -164,6 +164,12 @@ function Reservation(props) {
         
         setDependents(dependentsAux)
 
+        if (user.type !== 'admin') {
+          peopleSeatsAux.push({ index: dependents.length, person: user, seats: seats.slice(0), departurePosition: '', returnPosition: '' })
+        }
+
+        count++
+
         for (const [index, person] of dependents.entries()) {
           if (!person.name) {
             dependentsAux[index].error = { name: 'O Nome é obrigatório' }
@@ -183,14 +189,9 @@ function Reservation(props) {
           count++
         }
 
-        if (!hasError) {
-          if (user.type !== 'admin') {
-            peopleSeatsAux.push({ index: dependents.length, person: user, seats: seats.slice(0), departurePosition: '', returnPosition: '' })
-          }
-
+        if (!hasError) {        
           setPeopleSeats(peopleSeatsAux)
-          count++
-        
+
           setMessage('')
 
           if (count) {
@@ -808,6 +809,7 @@ function Reservation(props) {
           })}
 
         </div>
+        <hr />
       </div>
     )
   }
@@ -816,23 +818,21 @@ function Reservation(props) {
     <form id="seatsChoice" className="row g-3 mt-1 mb-4">
       <h6>Escolha de Poltronas</h6>
 
-      <div className="row mt-0 g-3 row-cols-1 row-cols-md-1 row-cols-lg-2 row-cols-xl-3 row-cols-xxl-4">
-
-        {travelType === 'normal' || travelType === 'departure' ? 
-          peopleSeats.map(p => {
-            if (!p.person.lapChild) {
-              return seatRow(p, 'departure')
+      <div className="row mt-0 g-3 row-cols-1 row-cols-md-1 row-cols-lg-2">
+        {peopleSeats.map(p => {
+          if (!p.person.lapChild) {
+            if (travelType === 'normal') {
+              return ['departure', 'return'].map(type => {
+                return seatRow(p, type)
+              })
+            } else {
+              return [travelType].map(type => {
+                return seatRow(p, type)
+              })
             }
-            return ''
-          }) : ''}
-
-        {travelType === 'normal' || travelType === 'return' ? 
-          peopleSeats.map(p => {
-            if (!p.person.lapChild) {
-              return seatRow(p, 'return')
-            }
-            return ''
-        }) : ''}
+          } 
+          return ''
+        })}
       </div>
     </form>
 

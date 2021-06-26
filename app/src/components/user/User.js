@@ -88,7 +88,7 @@ function User(props) {
           const dateParts = userData.birth.split('/')
           userData.birth = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`
         }
-console.log(userData.birth)
+
         const config = { headers :{
           'x-access-token' : localStorage.getItem('token'),
         }}
