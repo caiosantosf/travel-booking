@@ -64,7 +64,7 @@ function Travel(props) {
           setBuses(data)
         
           if (travel_id === 'novo') {
-            setTravel({controlsSeats: true, bus_id: data[0].id})
+            setTravel({controlsSeats: true, departurePayment: true, bus_id: data[0].id})
           }
         }
       } catch (error) {
@@ -231,7 +231,7 @@ function Travel(props) {
               </div>
             </div>
 
-            <div className="col-md-4">
+            <div className="col-md-3">
               <label className="form-label" htmlFor="controlsSeat">Controla Poltronas?</label>
               <select className={`form-select ${error.controlsSeats ? 'is-invalid' : ''}`} id="controlsSeat"
                 value={travel.controlsSeats || ''}
@@ -251,7 +251,27 @@ function Travel(props) {
               </div>
             </div>
 
-            <div className="col-md-8">
+            <div className="col-md-3">
+              <label className="form-label" htmlFor="departurePayment">Pagamento no Embarque?</label>
+              <select className={`form-select ${error.departurePayment ? 'is-invalid' : ''}`} id="departurePayment"
+                value={travel.departurePayment || ''}
+                onChange={e => {
+                  setTravel({ ...travel,
+                    departurePayment: e.target.value
+                  })
+                }}>
+                <option value={true}>Sim</option>
+                <option value={false}>Não</option>
+              </select>
+
+              <div id="validationDeparturePayment" 
+                  className="invalid-feedback" 
+                  style={error.departurePayment ? { display: 'inline' } : { display: 'none' }}>
+                  {error.departurePayment}
+              </div>
+            </div>
+
+            <div className="col-md-6">
               <label htmlFor="file" className="form-label">Imagem</label>
               <input name="file" type="file"
                     className="form-control file-upload"
