@@ -1,6 +1,6 @@
 const validation = (fields) => {
   return (req, res, next) => {
-    const { id, description, destination, bus_id, installments, controlsSeats } = req.body
+    const { id, description, destination, bus_id, installments, controlsSeats, departurePayment } = req.body
     const messages = {}
     
     if (fields.includes('id')) {
@@ -56,6 +56,12 @@ const validation = (fields) => {
     if (fields.includes('controlsSeats')) {
       if ( (typeof controlsSeats === 'undefined') || (controlsSeats === '') ) {
         messages.controlsSeats = 'É obrigatório informar se irá controlar poltronas'
+      }
+    }
+
+    if (fields.includes('departurePayment')) {
+      if ( (typeof departurePayment === 'undefined') || (departurePayment === '') ) {
+        messages.departurePayment = 'É obrigatório informar se será permitido pagar no embarque'
       }
     }
     
