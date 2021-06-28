@@ -7,6 +7,7 @@ import { dateTimeBrazil, dateTimeDefault, calculateAge, calculateValue } from '.
 import { getUserId } from '../../config/security'
 import { PersonXFill } from 'react-bootstrap-icons'
 import { errorApi } from '../../config/handleErrors'
+import InputMask from 'react-input-mask';
 
 function Reservation(props) {
   const [message, setMessage] = useState('')
@@ -311,7 +312,11 @@ function Reservation(props) {
       setDependents(dependentsAux)
 
       try {
-        const { name, documentType, birth, document, value, lapChild } = dependent
+        let { name, documentType, birth, document, value, lapChild } = dependent
+
+        const dateParts = birth.split('/')
+        birth = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`
+
         const res = await api.post('/dependents', { name, documentType, document, birth }, config)    
         
         returnSeat = lapChild ? 0 : peopleSeats[i].returnSeat
@@ -669,19 +674,21 @@ function Reservation(props) {
               </div>
 
               <div className="col-lg-2">
-                <input  type="date" 
-                        className={`form-control form-control-sm ${dependent.error.birth ? 'is-invalid' : ''}`}
-                        maxLength='255' 
-                        placeholder="Nascimento"
-                        value={dependents[i].birth || ''}
-                        onBlur={() => handleAgeCalculations(i)}
-                        onChange={e => {
-                          let dependentsAux = dependents.slice(0)
-                          dependentsAux[i].birth = e.target.value
-                          setDependents(dependentsAux)
-                        }}
-                />
-        
+                <InputMask 
+                  mask="99/99/9999" 
+                  className={`form-control form-control-sm ${dependent.error.birth ? 'is-invalid' : ''}`}
+                  placeholder="Nascimento"
+                  value={dependents[i].birth || ''}
+                  onBlur={() => handleAgeCalculations(i)}
+                  onChange={e => {
+                    let dependentsAux = dependents.slice(0)
+                    dependentsAux[i].birth = e.target.value
+                    setDependents(dependentsAux)
+                  }}
+                >
+                  {inputProps => <input {...inputProps} type="tel" />}
+                </InputMask>
+
                 <div id="validationBirth" 
                   className="invalid-feedback" 
                   style={dependent.error.birth ? { display: 'inline' } : { display: 'none' }}>

@@ -6,6 +6,7 @@ import Sidebar from '../nav/Sidebar'
 import { getUserType, getUserId } from '../../config/security'
 import { errorApi } from '../../config/handleErrors'
 import InputMask from 'react-input-mask';
+import { dateTimeBrazil } from '../../config/util'
 
 function User(props) {
   const [user, setUser] = useState({documentType: 'RG', state: 'AC'})
@@ -43,7 +44,7 @@ function User(props) {
             'x-access-token' : localStorage.getItem('token')
           }})
         const { data } = res
-        data.birth = data.birth.substr(0, 10)
+        data.birth = dateTimeBrazil(data.birth).substr(0, 10)
         delete data.password
         setUser(data)
 
