@@ -166,7 +166,7 @@ function Reservation(props) {
         setDependents(dependentsAux)
 
         if (user.type !== 'admin') {
-          peopleSeatsAux.push({ index: dependents.length, person: user, seats: seats.slice(0), departurePosition: '', returnPosition: '' })
+          peopleSeatsAux.push({ index: 0, person: user, seats: seats.slice(0), departurePosition: '', returnPosition: '' })
         }
 
         count++
@@ -185,7 +185,7 @@ function Reservation(props) {
             hasError = true
           }
           if (!hasError) {
-            peopleSeatsAux.push({ index, person, seats: seats.slice(0), departurePosition: '', returnPosition: '' })  
+            peopleSeatsAux.push({ index: index + 1, person, seats: seats.slice(0), departurePosition: '', returnPosition: '' })  
           }
           count++
         }
@@ -760,7 +760,7 @@ function Reservation(props) {
 
           {personSeats.seats.map((s, i) => {
             const { seat, position, departureAvailable, returnAvailable } = s
-            
+
             let disabled = false
             let classBtn = 'btn-primary'
 
