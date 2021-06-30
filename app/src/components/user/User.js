@@ -10,7 +10,7 @@ import { dateTimeBrazil } from '../../config/util'
 
 function User(props) {
   const [user, setUser] = useState({documentType: 'RG', state: 'AC'})
-  const [admin, setAdmin] = useState({infinitePay: false, companyPayment: false, mercadoPago: false})
+  const [admin, setAdmin] = useState({infinitePay: false, companyPayment: false, mercadoPago: false, pix: false})
   const [error, setError] = useState({})
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
@@ -526,6 +526,8 @@ function User(props) {
               </div>
             </div>
 
+            <div className="clearfix" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}></div>
+
             <div className="col-lg-3" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}>
               <label htmlFor="infinitePay" className="form-label">InfinitePay</label>
               <select className={`form-select ${error.infinitePay ? 'is-invalid' : ''}`} id="infinitePay"
@@ -546,7 +548,7 @@ function User(props) {
               </div>
             </div>
 
-            <div className="col-lg-3" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}>
+            <div className="col-lg-9" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}>
               <label htmlFor="infinitePayUser" className="form-label">Usuário InfinitePay</label>
               <input type="text" className={`form-control ${error.infinitePayUser ? 'is-invalid' : ''}`} id="infinitePayUser" maxLength="255"
                 value={admin.infinitePayUser || ''}
@@ -583,7 +585,7 @@ function User(props) {
               </div>
             </div>
 
-            <div className="col-lg-6" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}>
+            <div className="col-lg-9" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}>
               <label htmlFor="companyPaymentLink" className="form-label">Pagamento Direto Link</label>
               <input type="text" className={`form-control ${error.companyPaymentLink ? 'is-invalid' : ''}`} id="companyPaymentLink" maxLength="255"
                 value={admin.companyPaymentLink || ''}
@@ -599,9 +601,6 @@ function User(props) {
                 {error.companyPaymentLink}
               </div>
             </div>
-            
-
-
 
             <div className="col-lg-3" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}>
               <label htmlFor="companyPayment" className="form-label">Mercado Pago</label>
@@ -623,7 +622,7 @@ function User(props) {
               </div>
             </div>
 
-            <div className="col-lg-6" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}>
+            <div className="col-lg-9" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}>
               <label htmlFor="mercadoPagoToken" className="form-label">Mercado Pago Token</label>
               <input type="text" className={`form-control ${error.mercadoPagoToken ? 'is-invalid' : ''}`} id="mercadoPagoToken" maxLength="255"
                 value={admin.mercadoPagoToken || ''}
@@ -637,6 +636,64 @@ function User(props) {
                 className="invalid-feedback" 
                 style={error.mercadoPagoToken ? { display: 'inline' } : { display: 'none' }}>
                 {error.mercadoPagoToken}
+              </div>
+            </div>
+
+            <div className="col-lg-3" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}>
+              <label htmlFor="pix" className="form-label">Pix</label>
+              <select className={`form-select ${error.pix ? 'is-invalid' : ''}`} id="pix"
+                value={admin.pix.toString() || 'false'}
+                onChange={e => {
+                  setAdmin({ ...admin,
+                    pix: e.target.value === 'true' ? true : false
+                  })
+                }}>
+                <option value={true}>Sim</option>
+                <option value={false}>Não</option>
+              </select>
+
+              <div id="validationPix" 
+                className="invalid-feedback" 
+                style={error.pix ? { display: 'inline' } : { display: 'none' }}>
+                {error.pix}
+              </div>
+            </div>
+
+            <div className="col-lg-3" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}>
+              <label htmlFor="pixKeyType" className="form-label">Tipo Chave Pix</label>
+              <select className={`form-select ${error.pixKeyType ? 'is-invalid' : ''}`} id="pixKeyType"
+                value={admin.pixKeyType || 'email'}
+                onChange={e => {
+                  setAdmin({ ...admin,
+                    pixKeyType: e.target.value === 'true' ? true : false
+                  })
+                }}>
+                <option value={'email'}>Email</option>
+                <option value={'phone'}>Telefone</option>
+                <option value={'cpf'}>CPF</option>
+              </select>
+
+              <div id="validationPixKeyType" 
+                className="invalid-feedback" 
+                style={error.pixKeyType ? { display: 'inline' } : { display: 'none' }}>
+                {error.pixKeyType}
+              </div>
+            </div>
+
+            <div className="col-lg-6" style={!adminData ? { display: 'none'} : { display : 'inline-block'}}>
+              <label htmlFor="pixKey" className="form-label">Chave Pix</label>
+              <input type="text" className={`form-control ${error.pixKey ? 'is-invalid' : ''}`} id="pixKey" maxLength="255"
+                value={admin.pixKey || ''}
+                onChange={e => {
+                  setAdmin({ ...admin,
+                    pixKey: e.target.value
+                  })
+                }}/>
+
+              <div id="validationPixKey" 
+                className="invalid-feedback" 
+                style={error.pixKey ? { display: 'inline' } : { display: 'none' }}>
+                {error.pixKey}
               </div>
             </div>
 
