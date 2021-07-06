@@ -234,7 +234,7 @@ function Travel(props) {
             <div className="col-md-3">
               <label className="form-label" htmlFor="controlsSeat">Controla Poltronas?</label>
               <select className={`form-select ${error.controlsSeats ? 'is-invalid' : ''}`} id="controlsSeat"
-                value={travel.controlsSeats || ''}
+                value={travel.controlsSeats || 'false'}
                 onChange={e => {
                   setTravel({ ...travel,
                     controlsSeats: e.target.value
@@ -254,7 +254,7 @@ function Travel(props) {
             <div className="col-md-3">
               <label className="form-label" htmlFor="departurePayment">Pagamento no Embarque?</label>
               <select className={`form-select ${error.departurePayment ? 'is-invalid' : ''}`} id="departurePayment"
-                value={travel.departurePayment || ''}
+                value={travel.departurePayment || 'false'}
                 onChange={e => {
                   setTravel({ ...travel,
                     departurePayment: e.target.value
@@ -398,18 +398,21 @@ function Travel(props) {
             </button>
 
             <button type="button" 
+                    style={travel_id !== 'novo' ? { display: 'inline-block'} : { display : 'none' }}
                     className="btn btn-primary"
                     onClick={() => history.push(`/reserva/${travel_id}/${Math.ceil(Math.random() * 1000000)}`)}>
               Fazer Reserva
             </button>
 
             <button type="button" 
+                    style={travel_id !== 'novo' ? { display: 'inline-block'} : { display : 'none' }}
                     className="btn btn-primary"
                     onClick={() => history.push(`/viagens/${travel_id}/reservas`, {travel, departurePlaces})}>
               Lista de Passageiros
             </button>
 
-            <button type="button" 
+            <button type="button"
+                    style={travel_id !== 'novo' ? { display: 'inline-block'} : { display : 'none' }}
                     className="btn btn-primary"
                     onClick={() => history.push(`/viagens/${travel_id}/pagamentos`)}>
               Pagamentos

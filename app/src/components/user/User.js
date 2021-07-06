@@ -10,7 +10,7 @@ import { dateTimeBrazil } from '../../config/util'
 
 function User(props) {
   const [user, setUser] = useState({documentType: 'RG', state: 'AC'})
-  const [admin, setAdmin] = useState({infinitePay: false, companyPayment: false, mercadoPago: false, pix: false})
+  const [admin, setAdmin] = useState({infinitePay: false, companyPayment: false, mercadoPago: false, pix: false, pixKeyType: 'email'})
   const [error, setError] = useState({})
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
@@ -53,7 +53,10 @@ function User(props) {
             { headers :{
               'x-access-token' : localStorage.getItem('token')
             }})
-          const { data } = res
+          let { data } = res
+          if (!data.pixKeyType) {
+            data.pixKeyType = 'email'
+          }
           setAdmin(data)
         }
       } catch (error) {
@@ -665,7 +668,7 @@ function User(props) {
                 value={admin.pixKeyType || 'email'}
                 onChange={e => {
                   setAdmin({ ...admin,
-                    pixKeyType: e.target.value === 'true' ? true : false
+                    pixKeyType: e.target.value
                   })
                 }}>
                 <option value={'email'}>Email</option>

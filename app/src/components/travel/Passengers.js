@@ -4,11 +4,11 @@ import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
 import { ChevronDoubleLeft, ChevronDoubleRight, ChevronRight, ChevronLeft, Whatsapp, Trash } from 'react-bootstrap-icons'
 import { api } from '../../config/api'
-import PassengersListPDF  from './PassengersListPDF'
+import PassengersListPDF  from './PassengersPDF'
 import { PDFDownloadLink } from '@react-pdf/renderer'
 import { errorApi } from '../../config/handleErrors'
 
-function PassengersList(props) {
+function Passengers(props) {
   const [passengers, setPassengers] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [lastPage, setLastPage] = useState(0)
@@ -33,6 +33,7 @@ function PassengersList(props) {
         const res = await api.get('/reservations', 
           { headers :{
             'travel_id': travel_id,
+            'active': true,
             'currentPage': currentPage, 
             'x-access-token' : localStorage.getItem('token'),
             'list': 'passengers'
@@ -226,4 +227,4 @@ function PassengersList(props) {
   )
 }
 
-export default PassengersList
+export default Passengers

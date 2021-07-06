@@ -26,7 +26,7 @@ const getSeatsWithReserves = async (id, travel_id) => {
   const bus = await db('buses').where({ id })
   const { seats } = bus[0].layout
 
-  const reservations = await db('reservations').where({ travel_id })
+  const reservations = await db('reservations').where({ travel_id, active: true })
   const seatsWithReserves = []
 
   const corridorLeft = Array.from({length: 20}, (j, i) => i * 4 + 1)
@@ -82,7 +82,7 @@ const getAvailableSeatsAmount = async (id, travel_id) => {
   const { seats } = bus[0].layout
   const seatsAmount = seats.reduce((total, seat) => total + (seat ? 1 : 0), 0)
 
-  const reservations = await db('reservations').where({ travel_id })
+  const reservations = await db('reservations').where({ travel_id, active: true })
   const reservationsAmount = reservations.reduce((total, r) => total + (r.departureSeat ? 1 : 0), 0)
 
   return seatsAmount - reservationsAmount
@@ -155,7 +155,7 @@ module.exports = {
   async post (req, res) {
     const data = req.body
     
-    data.imageName = ''
+    delete data.imageName
     data.installments = 1
 
     try {
@@ -174,7 +174,7 @@ module.exports = {
     const { id } = req.params
     const data = req.body
 
-    data.imageName = ''
+    delete data.imageName
 
     try {
       const result = await db('travels').where({ id }).update({ id, ...data })

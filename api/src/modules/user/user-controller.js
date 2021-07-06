@@ -38,7 +38,7 @@ module.exports = {
       return res.status(400).json({ password: 'Senha inválida' })
     }
 
-    if (req.originalUrl.search('admin')) {
+    if (req.originalUrl.search('admin') != '-1') {
       const user = await db('users').where({ type : 'admin' })
 
       if (!user.length) {
@@ -54,9 +54,6 @@ module.exports = {
 
           await db('adminData').insert({
             user_id : id[0],
-            infinitePay: true,
-            companyPayment: false,
-            companyPaymentLink: ''
           })
     
           return res.status(201).json({ id: id[0], type, token: token(id, type) })

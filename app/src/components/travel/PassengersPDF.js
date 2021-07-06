@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   }
 })
 
-function PassengersListPDF({ passengers, travel, departurePlaces }) {
+function PassengersPDF({ passengers, travel, departurePlaces }) {
 
   return (
     <Document>
@@ -98,4 +98,4 @@ function PassengersListPDF({ passengers, travel, departurePlaces }) {
     </Document>
 )}
 
-export default PassengersListPDF
+export default PassengersPDF

@@ -88,6 +88,53 @@ const getStatusMercadoPago = async reservation_id => {
   }
 }
 
+const emailReservation = async (reservations) => {
+  const { email } = reservations.data[0].reservations[0].person
+  const { reservations: passengers } = reservations.data[0]
+  const { departurePlace, destination } = reservations.data[0].travel
+  const { homeAddress, addressNumber, neighborhood, city, state, departureDate, returnDate } = departurePlace[0]
+
+  const passengersHtml = passengers.map(passenger => {
+    const { departureSeat, returnSeat, lapChild, value } = passenger
+    const { name } = passenger.person
+    return `<p>Nome: ${name}, Poltronas: Ida: ${departureSeat} Volta: ${returnSeat}${lapChild ? ' (Colo)' : ''}, R$: ${value.replace('.', ',')}</p>`
+  }).join('')
+
+  const total = (passengers.reduce((tot, person) => tot + Number(person.value), 0)).toFixed(2).replace('.', ',')
+
+  const { user_id: adminUser_id } = await getAdminData()
+  const { email: emailAdmin, name: nameAdmin, phone: phoneAdmin } = await getUser(adminUser_id)
+
+  const phoneLen = phoneAdmin.length
+  const phoneFomartted = `(${phoneAdmin.substr(0, 2)}) ${phoneAdmin.substr(2, phoneLen === 10 ? 4: 5)}-${phoneAdmin.substr(phoneLen === 10 ? 6: 7, 4)}`
+
+  const emailContent = `<h2>Olá, obrigado por viajar conosco!</h2><h3>Confira os dados da sua reserva</h3>
+    <p>Destino: ${destination}</p>
+    <p>Local de Saída: ${homeAddress}, ${addressNumber}, ${neighborhood}, ${city}-${state}</p>
+    <p>Data de Saída: ${dateTimeBrazil(departureDate)}</p>
+    <p>Data de Retorno: ${dateTimeBrazil(returnDate)}</p>
+    <h4>Passageiros</h4>
+    ${passengersHtml}
+    <h4>Total R$ ${total}</h4>
+    <br /><p>${nameAdmin} - ${phoneFomartted}</p>`
+  
+  await sendMail(email, 'Confirmação de Reserva', emailContent, emailAdmin) 
+}
+
+const emailConfirmation = async (user_id) => {
+  const user = await getUser(user_id)
+  const { user_id: adminUser_id } = await getAdminData()
+  const { email: emailAdmin, name: nameAdmin, phone: phoneAdmin } = await getUser(adminUser_id)
+
+  const phoneLen = phoneAdmin.length
+  const phoneFomartted = `(${phoneAdmin.substr(0, 2)}) ${phoneAdmin.substr(2, phoneLen === 10 ? 4: 5)}-${phoneAdmin.substr(phoneLen === 10 ? 6: 7, 4)}`
+
+  const emailContent = `<h2>Olá, obrigado por viajar conosco!</h2><h3>O seu pagamento foi confirmado</h3>
+                        <br /><p>${nameAdmin} - ${phoneFomartted}</p>`
+
+  await sendMail(user.email, 'Confirmação de Pagamento', emailContent, emailAdmin) 
+}
+
 module.exports = {
   async getMany (req, res) {
     const completeReservation = async (reservations) => {
@@ -131,43 +178,8 @@ module.exports = {
       }
       return res
     }
-
-    const emailReservation = async (reservations) => {
-      const { email } = reservations.data[0].reservations[0].person
-      const { reservations: passengers } = reservations.data[0]
-      const { departurePlace, destination } = reservations.data[0].travel
-      const { homeAddress, addressNumber, neighborhood, city, state, departureDate, returnDate } = departurePlace[0]
-  
-      const passengersHtml = passengers.map(passenger => {
-        const { departureSeat, returnSeat, lapChild, value } = passenger
-        const { name } = passenger.person
-        return `<p>Nome: ${name}, Poltronas: Ida: ${departureSeat} Volta: ${returnSeat}${lapChild ? ' (Colo)' : ''}, R$: ${value.replace('.', ',')}</p>`
-      }).join('')
-
-      const total = (passengers.reduce((tot, person) => tot + Number(person.value), 0)).toFixed(2).replace('.', ',')
-
-      const admin = await db('users').where({ type: 'admin' })
-      const { name, phone } = admin[0]
-      const phoneLen = phone.length
-      const phoneFomartted = `(${phone.substr(0, 2)}) ${phone.substr(2, phoneLen === 10 ? 4: 5)}-${phone.substr(phoneLen === 10 ? 6: 7, 4)}`
-  
-      const emailContent = `<h2>Olá, obrigado por viajar conosco!</h2><h3>Confira os dados da sua reserva</h3>
-        <p>Destino: ${destination}</p>
-        <p>Local de Saída: ${homeAddress}, ${addressNumber}, ${neighborhood}, ${city}-${state}</p>
-        <p>Data de Saída: ${dateTimeBrazil(departureDate)}</p>
-        <p>Data de Retorno: ${dateTimeBrazil(returnDate)}</p>
-        <h4>Passageiros</h4>
-        ${passengersHtml}
-        <h4>Total R$ ${total}</h4>
-        <br /><p>${name} - ${phoneFomartted}</p>`
-      
-      const { adminUser_id } = await getAdminData()
-      const { emailAdmin } = await getUser(adminUser_id)
-      
-      await sendMail(email, 'Confirmação de Reserva', emailContent, emailAdmin) 
-    }
     
-    const { currentpage: currentPage, user_id, travel_id, email } = req.headers
+    const { currentpage: currentPage, user_id, travel_id, datetime, email, active } = req.headers
     let reservations = {}
     let reservationsGrouped = {}
 
@@ -175,6 +187,9 @@ module.exports = {
       reservations = await db('reservations')
                             .modify(q => {
                               if (travel_id) q.where({ travel_id })
+                            })
+                            .modify(q => {
+                              if (active === 'false' || active === 'true') q.where({ active })
                             })
                             .orderBy('id', 'desc')
                             .paginate({ perPage: 100, currentPage, isLengthAware: true })
@@ -191,7 +206,9 @@ module.exports = {
       reservationsGrouped = await db('reservations')
                             .select('user_id', 'datetime', 'travel_id')
                             .where({ user_id })
-
+                            .modify(q => {
+                              if (datetime) q.where({ datetime })
+                            })
                             .groupBy('user_id', 'datetime', 'travel_id')
                             .paginate({ perPage: 100, currentPage, isLengthAware: true })
       
@@ -208,7 +225,7 @@ module.exports = {
           }
 
           if (email) {
-            emailReservation(reservationsGrouped)
+            emailReservation(reservationsGrouped, 'first')
           }
           return res.status(200).json(reservationsGrouped)
         }
@@ -250,9 +267,20 @@ module.exports = {
     const data = req.body
 
     try {
-      const result = await db('reservations').where({ id }).update({ id, ...data })
+      const result = await db('reservations').where({ id }).update({ ...data })
 
       if (result) {
+        let reservation = await db('reservations').where({ id })
+        reservation = reservation[0]
+
+        if (['2', '4', '6'].includes(data.status)) {
+          await emailConfirmation(reservation.user_id)
+        }
+
+        if (data.active === 'false' || data.active === 'true') {
+          await db('reservations').where({ user_id: reservation.user_id, datetime: reservation.datetime }).update({ active: data.active })
+        }
+
         return res.status(200).json({ message : 'Reserva salva com sucesso' })
       }
 
@@ -331,9 +359,9 @@ module.exports = {
       },
       external_reference: reservation_id,
       back_urls: {
-        "success": `${process.env.APP_LOCATION}pagamento/success`,
-        "failure": `${process.env.APP_LOCATION}pagamento/failure`,
-        "pending": `${process.env.APP_LOCATION}pagamento/pending`
+        "success": `${process.env.APP_LOCATION}pagamento/${reservation_id}/success`,
+        "failure": `${process.env.APP_LOCATION}pagamento/${reservation_id}/failure`,
+        "pending": `${process.env.APP_LOCATION}pagamento/${reservation_id}/pending`
       },
       auto_return: 'all',
     }

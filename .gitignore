@@ -31,3 +31,4 @@ api/public/uploads/*
 !api/public/uploads/.gitkeep 
 
 Attention.txt
+.eslintcache

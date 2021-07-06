@@ -3,7 +3,7 @@ import { useHistory, Link } from "react-router-dom"
 import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
 import { api } from '../../config/api'
-import { dateTimeBrazil, dateTimeDefault, calculateAge, calculateValue } from '../../config/util'
+import { dateTimeBrazil, dateTimeDefault, calculateAge, calculateValue, translatePixKeyType } from '../../config/util'
 import { getUserId } from '../../config/security'
 import { PersonXFill } from 'react-bootstrap-icons'
 import { errorApi } from '../../config/handleErrors'
@@ -32,6 +32,8 @@ function Reservation(props) {
   const [reservation, setReservation] = useState([])
   const [notes, setNotes] = useState()
   const [description, setDescription] = useState()
+  const [departurePayment, setDeparturePayment] = useState()
+  const [reservationId, setReservationId] = useState()
   
   const { travel_id, random } = props.match.params
 
@@ -57,6 +59,10 @@ function Reservation(props) {
     setSeatsSelected({ departure: [], return: [] })
     setAdminData({})
     setReservation([])
+    setNotes(null)
+    setDescription(null)
+    setDeparturePayment(null)
+    setReservationId(null)
   }
 
   useEffect(() => {
@@ -79,6 +85,7 @@ function Reservation(props) {
         setDeparturePlaces(data.departurePlaces)
         setNotes(data.notes)
         setDescription(data.description)
+        setDeparturePayment(data.departurePayment)
 
         if (data.controlsSeats) {
           setSeats(data.seats)
@@ -254,7 +261,29 @@ function Reservation(props) {
     }
   }
 
-  const save = async () => {
+  const put = async (paymentOption, id) => {
+    const config = { headers :{
+      'x-access-token' : localStorage.getItem('token')
+    }}
+
+    try {
+      await api.put(`/reservations/${id}`, { status: paymentOption, active: true }, config)
+    } catch (error) {
+      const errorHandled = errorApi(error)
+      if (errorHandled.general) {
+        setMessage(errorHandled.error)
+      } else {
+        let msg = ''
+        Object.entries(error.response.data).forEach(([key, value]) => {
+          msg += `${value} | `
+        })
+        msg = msg.substr(0, msg.length - 3)
+        setMessage(msg)
+      }
+    }
+  }
+
+  const save = async (paymentOption) => {
     setLoadingSave(true)
     setMessage('')
 
@@ -276,6 +305,7 @@ function Reservation(props) {
     }}
 
     let id = 0
+
     try {
       const res = await api.post('/reservations', {
         travel_id: Number(travel_id), 
@@ -284,10 +314,11 @@ function Reservation(props) {
         datetime,
         returnSeat, 
         value: Number(user.value), 
-        status: "created", 
+        status: paymentOption, 
         travelType, 
         departurePlace_id: departurePlace,
-        lapChild: false
+        lapChild: false,
+        active: false
       }, config)
 
       id = res.data.id
@@ -319,8 +350,9 @@ function Reservation(props) {
 
         const res = await api.post('/dependents', { name, documentType, document, birth }, config)    
         
-        returnSeat = lapChild ? 0 : peopleSeats[i].returnSeat
-        departureSeat = lapChild ? 0 : peopleSeats[i].departureSeat
+        let indexDependent = i + 1
+        returnSeat = lapChild ? 0 : peopleSeats[indexDependent].returnSeat
+        departureSeat = lapChild ? 0 : peopleSeats[indexDependent].departureSeat
 
         if (res.status === 201) {
           try {
@@ -335,7 +367,8 @@ function Reservation(props) {
               status: "dependent", 
               travelType, 
               departurePlace_id: departurePlace, 
-              lapChild: lapChild ? true : false
+              lapChild: lapChild ? true : false,
+              active: false
             }, config)
           } catch (error) {
             const errorHandled = errorApi(error)
@@ -382,14 +415,21 @@ function Reservation(props) {
     }
 
     setLoadingSave(false) 
+    setReservationId(id)
 
     return id
   }
 
   const handleCompanyPayment = async () => {
-    const id = await save()
+    let id = 0
+    if (!adminData.mercadoPago){
+      id = await save('7')
+    }
+
+    await put('7', reservationId || id)
+
     const link = adminData.companyPaymentLink.replace('email@email.com', user.email)
-                                             .replace('@numeroreserva', id || 0)
+                                             .replace('@numeroreserva', reservationId || 0)
                                              .replace('@nome', user.name)
                                              .replace('@cpf', user.cpf)
                                              .replace('@documento', user.document)
@@ -401,8 +441,34 @@ function Reservation(props) {
     resetState()
   }
 
+  const handlePixPayment = async () => {
+    let id = 0
+    if (!adminData.mercadoPago){
+      id = await save('1')
+    }
+    await put('1', reservationId || id)
+
+    setStatus(4)
+    resetState()
+  }
+
+  const handleDeparturePayment = async () => {
+    let id = 0
+    if (!adminData.mercadoPago){
+      id = await save('7')
+    }
+    await put('7', reservationId || id)
+
+    setStatus(4)
+    resetState()
+  }
+
   const handleInfinitePayPayment = async () => {
-    await save()
+    let id = 0
+    if (!adminData.mercadoPago){
+      id = await save('3')
+    }
+    await put('3', reservationId || id)
     
     const link = `https://pay.infinitepay.io/${adminData.infinitePayUser}/${total.replace(".",",")}`
 
@@ -413,7 +479,7 @@ function Reservation(props) {
   }
 
   const handleMercadoPagoPayment = async () => {
-    const id = await save()
+    const id = await save('created')
 
     try {
       const res = await api.post(`/reservations/payment/mercadopago/${user.id}/${id}`, {
@@ -846,6 +912,46 @@ function Reservation(props) {
   const formPayment =
     <div id="payment" className="row g-3 mt-1 mb-4">
       <h6>Pagamento</h6>
+
+      <span>Sua reserva foi salva!</span>
+
+      <div className={`col-md-12 ${!departurePayment ? 'd-none' : ''}`}>
+        <button type="button" 
+                className="btn btn-primary mb-2"
+                onClick={handleDeparturePayment}>
+          Pagamento no Embarque
+        </button>
+        <br />
+        <span>Ao escolher esta opção você ficará responsável por pagar o valor total na hora do embarque no ônibus</span>
+      </div>
+
+      <div className={`col-md-12 ${!adminData.pix ? 'd-none' : ''}`}>
+        <button type="button" 
+                className="btn btn-primary mb-2"
+                data-bs-toggle="modal" data-bs-target="#pixModal">
+          Pagamento por Pix
+        </button>
+        <br />
+      </div>
+
+      <div class="modal fade" id="pixModal" tabindex="-1" aria-labelledby="pixModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="pixModalLabel">Pix</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              Chave Pix: {translatePixKeyType(adminData.pixKeyType)} - {adminData.pixKey}
+              <br />
+              Valor Total: R$ {total.replace(".",",")}
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onClick={handlePixPayment}>Confirmar</button>
+            </div>
+          </div>
+        </div>
+      </div>
       
       <div className={`col-md-12 ${!adminData.companyPayment ? 'd-none' : ''}`}>
         <button type="button" 
@@ -854,7 +960,6 @@ function Reservation(props) {
           Pagamento Direto com a Empresa
         </button>
         <br />
-        <span>Ao escolher esta opção a sua reserva será salva e será aberta uma tela externa ao aplivativo para seguir com o pagamento com a empresa</span>
       </div>
 
       <div className={`col-md-12 ${!adminData.infinitePay ? 'd-none' : ''}`}>
@@ -864,20 +969,18 @@ function Reservation(props) {
           Pagamento pelo InfinitePay
         </button>
         <br />
-        <span>Ao escolher esta opção a sua reserva será salva e será aberta uma tela externa ao aplivativo para seguir com o pagamento pelo App InfinitePay</span>
       </div>
 
       <div className={`col-md-12 ${!adminData.mercadoPago ? 'd-none' : ''}`}>
         <div id="mercadoPago"></div>
-        <br />
-        <span>Espere até que apareça um botão acima, ao clicar nele a sua reserva será salva e será aberta uma tela externa ao aplivativo para seguir com o pagamento pelo MercadoPago</span>
+        <span>Espere até que apareça um botão acima, ao clicar nele será aberta uma tela externa ao aplivativo para seguir com o pagamento pelo MercadoPago</span>
       </div>
     </div>
 
   const formSuccess =
     <form id="payment" className="row g-3 mt-1 mb-4">
       <div className="col-md-12">
-        <h5>A sua reserva foi salva e você poderá sempre revisar todas as informações sobre ela pelo menu "Minhas Reservas"</h5>
+        <h5>Você receberá um email quando seu pagamento for confirmado, você tambem poderá sempre revisar todas as informações sobre a reserva pelo menu "Minhas Reservas"</h5>
         <h6>Caso queira falar conosco utilize o botão WhatsApp abaixo</h6>
       </div>
     </form>
@@ -905,7 +1008,7 @@ function Reservation(props) {
 
           <div className="text-center d-grid gap-2">
             <button type="button" 
-                    className={`btn btn-primary ${(status === 3 && !adminData.infinitePay) || status === 4 ? 'd-none' : ''}`}
+                    className={`btn btn-primary ${(status === 3 || status === 4) ? 'd-none' : ''}`}
                     onClick={handleContinue}
                     disabled={loadingSave}>
               <span className="spinner-border spinner-border-sm mx-1" 

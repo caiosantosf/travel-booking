@@ -7,9 +7,11 @@ import { errorApi } from '../../config/handleErrors'
 
 function Payment(props) {
   const [loadingSave, setLoadingSave] = useState(false)
+  const [loadingDestroy, setLoadingDestroy] = useState(false)
   const [error, setError] = useState({})
   const [message, setMessage] = useState('')
   const [payment, setPayment] = useState('')
+  const [originalStatus, setOriginalStatus] = useState('')
 
   let history = useHistory()
 
@@ -27,7 +29,20 @@ function Payment(props) {
           { headers :{
             'x-access-token' : localStorage.getItem('token')
           }})
-        setPayment(res.data)
+
+        let data = res.data
+
+        const status = data.status === '1' ? '1' :
+                       data.status === '2' ? '2' :
+                       data.status === '3' ? '1' :
+                       data.status === '4' ? '2' :
+                       data.status === '5' ? '1' :
+                       data.status === '6' ? '2' : '1'
+
+        data.status = status
+
+        setPayment(data)
+        setOriginalStatus(res.data.status)
       } catch (error) {
         const errorHandled = errorApi(error)
         if (errorHandled.forbidden) {
@@ -42,12 +57,43 @@ function Payment(props) {
       fetchData()
   }, [id, history])
 
+  const handleDestroy = async () => {
+    setLoadingDestroy(true)
+
+    try {
+      await api.put(`/reservations/${id}`, {active: false}, config)
+      props.history.goBack()
+    } catch (error) {
+      const errorHandled = errorApi(error)
+      if (errorHandled.general) {
+        setMessage(errorHandled.error)
+      } else {
+        setError(errorHandled.error)
+      }
+    }
+
+    setLoadingDestroy(false)
+  }
+
   const handleSave = async () => {
     setLoadingSave(true)
     setError({})
+
+    const status = payment.status === '1' && originalStatus === '1' ? '1' :
+                   payment.status === '1' && originalStatus === '2' ? '1' :
+                   payment.status === '1' && originalStatus === '3' ? '3' :
+                   payment.status === '1' && originalStatus === '4' ? '3' :
+                   payment.status === '1' && originalStatus === '5' ? '5' :
+                   payment.status === '1' && originalStatus === '6' ? '5' :
+                   payment.status === '2' && originalStatus === '1' ? '2' :
+                   payment.status === '2' && originalStatus === '2' ? '2' :
+                   payment.status === '2' && originalStatus === '3' ? '4' :
+                   payment.status === '2' && originalStatus === '4' ? '4' :
+                   payment.status === '2' && originalStatus === '5' ? '6' :
+                   payment.status === '2' && originalStatus === '6' ? '6' : ''
     
     try {
-      await api.put(`/reservations/${id}`, {status: payment.status}, config) 
+      await api.put(`/reservations/${id}`, {status}, config) 
       props.history.goBack()
     } catch (error) {
       setLoadingSave(false)
@@ -70,14 +116,14 @@ function Payment(props) {
 
           <h5>Alteração do Status de Pagamento</h5>
 
-          <form className="row g-3 mt-1 mb-4">
-            <div className='alert text-center alert-danger' role="alert"
-                 style={message ? { display: 'block'} : { display : 'none' }}>
-              {message}
-            </div>
+          <div className='alert text-center alert-danger' role="alert"
+                style={message ? { display: 'block'} : { display : 'none' }}>
+            {message}
+          </div>
 
-            <h6>{name}</h6>
+          <h6>{name}</h6>
 
+          <form className={`row g-3 mt-1 mb-4`} style={['1', '2', '3', '4', '5', '6'].includes(originalStatus) ? { display: 'block'} : { display : 'none' }}>
             <div className="col-lg-3">
               <label htmlFor="status" className="form-label">Status</label>
               <select className={`form-select ${error.status ? 'is-invalid' : ''}`} id="status"
@@ -99,17 +145,30 @@ function Payment(props) {
             </div>
           </form>
 
-          <div className="text-center d-grid gap-2">
+          <div className={`text-center d-grid gap-2`}>
             <button type="button" 
-                    className="btn btn-primary"
+                    className={`btn btn-primary`}
                     onClick={handleSave}
-                    disabled={loadingSave}>
+                    disabled={loadingSave}
+                    style={['1', '2', '3', '4', '5', '6'].includes(originalStatus) ? { display: 'block'} : { display : 'none' }}>
               <span className="spinner-border spinner-border-sm mx-1" 
                     role="status" 
                     aria-hidden="true" 
                     style={loadingSave ? { display: 'inline-block'} : { display : 'none' }}>
               </span>
               Salvar
+            </button>
+
+            <button type="button" 
+                    className="btn btn-primary"
+                    onClick={handleDestroy}
+                    disabled={loadingSave}>
+              <span className="spinner-border spinner-border-sm mx-1" 
+                    role="status" 
+                    aria-hidden="true" 
+                    style={loadingDestroy ? { display: 'inline-block'} : { display : 'none' }}>
+              </span>
+              Excluir
             </button>
 
             <button type="button" 

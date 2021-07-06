@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react'
 import { useHistory } from "react-router-dom"
 import NavHeader from '../nav/NavHeader'
 import Sidebar from '../nav/Sidebar'
-import { PencilSquare, ChevronDoubleLeft, ChevronDoubleRight, ChevronRight, ChevronLeft, Whatsapp } from 'react-bootstrap-icons'
+import { ChevronDoubleLeft, ChevronDoubleRight, ChevronRight, ChevronLeft, Whatsapp } from 'react-bootstrap-icons'
 import { api } from '../../config/api'
 import { errorApi } from '../../config/handleErrors'
-import { dateTimeBrazil, translatePaymentStatus } from '../../config/util'
+import { dateTimeBrazil } from '../../config/util'
 
-function PaymentList(props) {
+function InactiveReservations(props) {
   const [passengers, setPassengers] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [lastPage, setLastPage] = useState(0)
@@ -24,6 +24,7 @@ function PaymentList(props) {
         const res = await api.get('/reservations', 
           { headers :{
             'travel_id': travel_id,
+            'active': false,
             'currentPage': currentPage, 
             'x-access-token' : localStorage.getItem('token'),
             'list': 'payment'
@@ -61,10 +62,6 @@ function PaymentList(props) {
 
   }, [currentPage, travel_id, history])
 
-  const handleEditStatus = async (id, name) => {
-    history.push(`/viagens/${travel_id}/pagamentos/${id}`, {name})
-  }
-
   const handleFirst = async () => {
     setCurrentPage(1)
   }
@@ -88,7 +85,7 @@ function PaymentList(props) {
         <div className="mt-4 col-md-9 ms-sm-auto col-lg-10 px-md-2">
           <Sidebar />
 
-          <h5>Lista de Pagamentos</h5>
+          <h5>Reservas Excluídas</h5>
 
           <div className='alert text-center alert-danger' role="alert"
                style={message ? { display: 'block'} : { display : 'none' }}>
@@ -103,16 +100,12 @@ function PaymentList(props) {
                   <th scope="col">Data Reserva</th>
                   <th scope="col">Telefone</th>
                   <th scope="col">Valor</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Ações</th>
                 </tr>
               </thead>
               <tbody>
                 {passengers.map(passenger => {
-                  const { id, person, datetime, status, value } = passenger
+                  const { id, person, datetime, value } = passenger
                   const { name, phone, type } = person
-
-                  const statusToShow = translatePaymentStatus(status)
 
                   const phoneLen = phone ? phone.length : 0
                   const wpp = 
@@ -130,10 +123,6 @@ function PaymentList(props) {
                             {phone ? wpp : ''}
                           </td>
                           <td>{`R$ ${value.replace('.', ',')}`}</td>
-                          <td><strong className={statusToShow.color}>{statusToShow.translated}</strong></td>
-                          <td>{status === '1' || status === '2' ? 
-                            <button className="btn btn-link p-0" onClick={() => {handleEditStatus(id, name)}}><PencilSquare /> </button> : ''}
-                          </td>
                         </tr>
                       )
                     } else {
@@ -193,4 +182,4 @@ function PaymentList(props) {
   )
 }
 
-export default PaymentList
+export default InactiveReservations
