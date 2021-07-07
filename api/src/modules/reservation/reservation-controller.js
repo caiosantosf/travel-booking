@@ -248,11 +248,11 @@ module.exports = {
   },
 
   async post (req, res) {
-    const data = req.body
+    let data = req.body
 
     try {
       const id = await db('reservations').insert(data).returning('id')
-      
+
       if (id) {
         return res.status(201).json({ id: id[0] })
       }

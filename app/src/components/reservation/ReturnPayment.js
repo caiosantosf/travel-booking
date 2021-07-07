@@ -24,7 +24,16 @@ function ReturnPayment(props) {
     }}
 
     try {
-      await api.put(`/reservations/${id}`, { active: true }, config)
+      const res = await api.get(`/reservations/${id}`, config)
+
+      const { data } = res
+
+      await api.post('/reservations-email', {}, { headers :{
+        'x-access-token': localStorage.getItem('token'),
+        'email': true,
+        'user_id': data.user_id,
+        'datetime': data.datetime
+      }})
     } catch (error) {
       const errorHandled = errorApi(error)
       if (errorHandled.general) {

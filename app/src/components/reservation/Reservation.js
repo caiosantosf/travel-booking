@@ -7,7 +7,8 @@ import { dateTimeBrazil, dateTimeDefault, calculateAge, calculateValue, translat
 import { getUserId } from '../../config/security'
 import { PersonXFill } from 'react-bootstrap-icons'
 import { errorApi } from '../../config/handleErrors'
-import InputMask from 'react-input-mask';
+import InputMask from 'react-input-mask'
+import { v4 as uuidv4 } from 'uuid'
 
 function Reservation(props) {
   const [message, setMessage] = useState('')
@@ -29,11 +30,10 @@ function Reservation(props) {
   const [windowAmount, setWindowAmount] = useState({ departureSelected: 0, returnSelected: 0 })
   const [seatsSelected, setSeatsSelected] = useState({ departure: [], return: [] })
   const [adminData, setAdminData] = useState({})
-  const [reservation, setReservation] = useState([])
+  const [reservation, setReservation] = useState(null)
   const [notes, setNotes] = useState()
   const [description, setDescription] = useState()
   const [departurePayment, setDeparturePayment] = useState()
-  const [reservationId, setReservationId] = useState()
   
   const { travel_id, random } = props.match.params
 
@@ -58,11 +58,10 @@ function Reservation(props) {
     setWindowAmount({ departureSelected: 0, returnSelected: 0 })
     setSeatsSelected({ departure: [], return: [] })
     setAdminData({})
-    setReservation([])
+    setReservation(null)
     setNotes(null)
     setDescription(null)
     setDeparturePayment(null)
-    setReservationId(null)
   }
 
   useEffect(() => {
@@ -261,13 +260,29 @@ function Reservation(props) {
     }
   }
 
-  const put = async (paymentOption, id) => {
+  const put = async (paymentOption, id, datetime) => {
     const config = { headers :{
       'x-access-token' : localStorage.getItem('token')
     }}
 
     try {
-      await api.put(`/reservations/${id}`, { status: paymentOption, active: true }, config)
+      await api.put(`/reservations/${id}`, { status: paymentOption }, config)
+
+      if (user.type !== 'admin') {
+        try {
+          await api.post('/reservations-email', {}, { headers :{
+            'x-access-token': localStorage.getItem('token'),
+            'email': true,
+            'user_id': user.id,
+            'datetime': datetime
+          }})
+        } catch (error) {
+          const errorHandled = errorApi(error)
+          if (errorHandled.general) {
+            setMessage(errorHandled.error)
+          }
+        }
+      }
     } catch (error) {
       const errorHandled = errorApi(error)
       if (errorHandled.general) {
@@ -287,7 +302,16 @@ function Reservation(props) {
     setLoadingSave(true)
     setMessage('')
 
+    const config = { headers :{
+      'x-access-token' : localStorage.getItem('token')
+    }}
+console.log(reservation)
+    if (reservation) {
+      await api.delete(`/reservations/${reservation.id}`, config)
+    }
+
     const datetime = dateTimeDefault(new Date())
+    setReservation({ ...reservation, datetime })
 
     let returnSeat = 0
     let departureSeat = 0
@@ -299,10 +323,6 @@ function Reservation(props) {
         break
       }
     }
-
-    const config = { headers :{
-      'x-access-token' : localStorage.getItem('token')
-    }}
 
     let id = 0
 
@@ -318,11 +338,12 @@ function Reservation(props) {
         travelType, 
         departurePlace_id: departurePlace,
         lapChild: false,
-        active: false
+        active: true
       }, config)
 
       id = res.data.id
-      setReservation({ id: res.data.id})
+
+      setReservation({ ...reservation, id})
     } catch (error) {
       const errorHandled = errorApi(error)
       if (errorHandled.general) {
@@ -368,7 +389,7 @@ function Reservation(props) {
               travelType, 
               departurePlace_id: departurePlace, 
               lapChild: lapChild ? true : false,
-              active: false
+              active: true
             }, config)
           } catch (error) {
             const errorHandled = errorApi(error)
@@ -398,38 +419,21 @@ function Reservation(props) {
       }  
     }
 
-    if (user.type !== 'admin' && reservation) {
-      try {
-        await api.post('/reservations-email', {}, { headers :{
-          'x-access-token': localStorage.getItem('token'),
-          'email': true,
-          'user_id': user.id,
-          'datetime': datetime
-        }})
-      } catch (error) {
-        const errorHandled = errorApi(error)
-        if (errorHandled.general) {
-          setMessage(errorHandled.error)
-        }
-      }
-    }
+    setLoadingSave(false)
 
-    setLoadingSave(false) 
-    setReservationId(id)
-
-    return id
+    return { id, datetime }
   }
 
   const handleCompanyPayment = async () => {
-    let id = 0
+    let res = null
     if (!adminData.mercadoPago){
-      id = await save('7')
+      res = await save('5')
     }
 
-    await put('7', reservationId || id)
+    await put('5', reservation ? reservation.id : res.id, reservation ? reservation.datetime : res.datetime)
 
     const link = adminData.companyPaymentLink.replace('email@email.com', user.email)
-                                             .replace('@numeroreserva', reservationId || 0)
+                                             .replace('@numeroreserva', reservation.id || 0)
                                              .replace('@nome', user.name)
                                              .replace('@cpf', user.cpf)
                                              .replace('@documento', user.document)
@@ -442,33 +446,36 @@ function Reservation(props) {
   }
 
   const handlePixPayment = async () => {
-    let id = 0
+    let res = null
     if (!adminData.mercadoPago){
-      id = await save('1')
+      res = await save('1')
     }
-    await put('1', reservationId || id)
+
+    await put('1', reservation ? reservation.id : res.id, reservation ? reservation.datetime : res.datetime)
 
     setStatus(4)
     resetState()
   }
 
   const handleDeparturePayment = async () => {
-    let id = 0
+    let res = null
     if (!adminData.mercadoPago){
-      id = await save('7')
+      res = await save('7')
     }
-    await put('7', reservationId || id)
+
+    await put('7', reservation ? reservation.id : res.id, reservation ? reservation.datetime : res.datetime)
 
     setStatus(4)
     resetState()
   }
 
   const handleInfinitePayPayment = async () => {
-    let id = 0
+    let res = null
     if (!adminData.mercadoPago){
-      id = await save('3')
+      res = await save('3')
     }
-    await put('3', reservationId || id)
+
+    await put('3', reservation ? reservation.id : res.id, reservation ? reservation.datetime : res.datetime)
     
     const link = `https://pay.infinitepay.io/${adminData.infinitePayUser}/${total.replace(".",",")}`
 
@@ -480,6 +487,7 @@ function Reservation(props) {
 
   const handleMercadoPagoPayment = async () => {
     const id = await save('created')
+    setReservation({ ...reservation, id })
 
     try {
       const res = await api.post(`/reservations/payment/mercadopago/${user.id}/${id}`, {
