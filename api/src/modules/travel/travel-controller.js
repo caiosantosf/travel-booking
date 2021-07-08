@@ -155,7 +155,7 @@ module.exports = {
   async post (req, res) {
     const data = req.body
     
-    delete data.imageName
+    data.imageName = ''
     data.installments = 1
 
     try {

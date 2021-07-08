@@ -16,7 +16,7 @@ function ResetPassword(props) {
         setLoading(true)
         const id = props.match.params.id
         const token = props.location.search.replace('?token=', '')
-        const res = await api.patch(`/users/login/resetpassword/${id}`, { 'password' : password.password }, 
+        const res = await api.patch(`/users/login/resetpassword/${id}`, { 'password' : password.password, 'reset' : true }, 
           { headers :{
             'x-access-token' : token
           }})

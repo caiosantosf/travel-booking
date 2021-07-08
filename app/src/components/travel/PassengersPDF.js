@@ -1,6 +1,6 @@
 import React from 'react'
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer'
-import { dateTimeBrazil } from '../../config/util'
+import { dateTimeBrazil, translatePaymentStatus } from '../../config/util'
 
 const styles = StyleSheet.create({
   table: { 
@@ -19,7 +19,15 @@ const styles = StyleSheet.create({
   }, 
 
   tableColSmall: { 
-    width: "13%", 
+    width: "7%", 
+    borderStyle: "solid", 
+    borderWidth: 1, 
+    borderLeftWidth: 0, 
+    borderTopWidth: 0 
+  },
+
+  tableColMedium: { 
+    width: "19%", 
     borderStyle: "solid", 
     borderWidth: 1, 
     borderLeftWidth: 0, 
@@ -27,7 +35,7 @@ const styles = StyleSheet.create({
   },
 
   tableColBig: { 
-    width: "60%", 
+    width: "30%", 
     borderStyle: "solid", 
     borderWidth: 1, 
     borderLeftWidth: 0, 
@@ -59,6 +67,12 @@ function PassengersPDF({ passengers, travel, departurePlaces }) {
           <View style={styles.tableColSmall}> 
             <Text style={styles.tableCell}>P. Volta</Text> 
           </View>
+          <View style={styles.tableColMedium}> 
+            <Text style={styles.tableCell}>Pagamento</Text> 
+          </View>
+          <View style={styles.tableColBig}> 
+            <Text style={styles.tableCell}>Ponto</Text> 
+          </View>
           <View style={styles.tableColBig}> 
             <Text style={styles.tableCell}>Nome</Text> 
           </View> 
@@ -68,7 +82,7 @@ function PassengersPDF({ passengers, travel, departurePlaces }) {
         </View>
 
         {passengers.map(passenger => {
-          const { id, person, departureSeat, returnSeat, lapChild } = passenger
+          const { id, person, departureSeat, returnSeat, lapChild, status, departurePlace_id } = passenger
           const { name } = person
 
           if ((departureSeat || returnSeat) || lapChild) {
@@ -79,6 +93,12 @@ function PassengersPDF({ passengers, travel, departurePlaces }) {
                 </View> 
                 <View style={styles.tableColSmall}> 
                   <Text style={styles.tableCell}>{returnSeat}</Text> 
+                </View> 
+                <View style={styles.tableColMedium}> 
+                  <Text style={styles.tableCell}>{translatePaymentStatus(status).translated}</Text> 
+                </View> 
+                <View style={styles.tableColBig}> 
+                  <Text style={styles.tableCell}>{departurePlaces.filter(dp => dp.id === departurePlace_id)[0].homeAddress}</Text> 
                 </View> 
                 <View style={styles.tableColBig}> 
                   <Text style={styles.tableCell}>{name}</Text>

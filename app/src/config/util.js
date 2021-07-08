@@ -66,16 +66,14 @@ const translatePaymentStatus = status => {
   if (status === 'refunded') statusToShow = {status, translated: 'Devolvido (MP)', color: 'text-danger'}
   if (status === 'charged_back') statusToShow = {status, translated: 'Estornado (MP)', color: 'text-danger'}
   if (status === 'created') statusToShow = {status, translated: 'Criado (MP)', color: 'text-warning'}
-
   if (status === '1') statusToShow = {status, translated: 'Confirmar (Pix)', color: 'text-warning'}
   if (status === '2') statusToShow = {status, translated: 'Confirmado (Pix)', color: 'text-success'}
   if (status === '3') statusToShow = {status, translated: 'Confirmar (Infinite)', color: 'text-warning'}
   if (status === '4') statusToShow = {status, translated: 'Confirmado (Infinite)', color: 'text-success'}
   if (status === '5') statusToShow = {status, translated: 'Confirmar (Formulario)', color: 'text-warning'}
   if (status === '6') statusToShow = {status, translated: 'Confirmado (Formulario)', color: 'text-success'}
-  
   if (status === '7') statusToShow = {status, translated: 'No Embarque', color: 'text-success'}
-
+  if (status === 'dependent') statusToShow = {status, translated: 'Dependente', color: 'text-success'}
   return statusToShow
 }
 

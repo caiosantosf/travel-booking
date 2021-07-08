@@ -173,11 +173,10 @@ function Reservation(props) {
 
         if (user.type !== 'admin') {
           peopleSeatsAux.push({ index: 0, person: user, seats: seats.slice(0), departurePosition: '', returnPosition: '' })
+          count++
         }
 
-        count++
-
-        for (const [index, person] of dependents.entries()) {
+        for (let [index, person] of dependents.entries()) {
           if (!person.name) {
             dependentsAux[index].error = { name: 'O Nome é obrigatório' }
             hasError = true
@@ -191,7 +190,10 @@ function Reservation(props) {
             hasError = true
           }
           if (!hasError) {
-            peopleSeatsAux.push({ index: index + 1, person, seats: seats.slice(0), departurePosition: '', returnPosition: '' })  
+            if (user.type !== 'admin') {
+              index++
+            }
+            peopleSeatsAux.push({ index, person, seats: seats.slice(0), departurePosition: '', returnPosition: '' })  
           }
           count++
         }
@@ -232,7 +234,7 @@ function Reservation(props) {
 
       if (nextStep) {
         if (user.type === 'admin') {
-          save()
+          save('admin')
           history.push('/')
          } else {
           if (adminData.mercadoPago) {
@@ -305,7 +307,7 @@ function Reservation(props) {
     const config = { headers :{
       'x-access-token' : localStorage.getItem('token')
     }}
-console.log(reservation)
+
     if (reservation) {
       await api.delete(`/reservations/${reservation.id}`, config)
     }
@@ -371,11 +373,17 @@ console.log(reservation)
 
         const res = await api.post('/dependents', { name, documentType, document, birth }, config)    
         
-        let indexDependent = i + 1
+        let indexDependent = i 
+        
+        if (user.type !== 'admin') {
+          indexDependent++
+        }
+        
         returnSeat = lapChild ? 0 : peopleSeats[indexDependent].returnSeat
         departureSeat = lapChild ? 0 : peopleSeats[indexDependent].departureSeat
 
         if (res.status === 201) {
+
           try {
             await api.post('/reservations', {
               travel_id: Number(travel_id), 
@@ -605,6 +613,7 @@ console.log(reservation)
 
   const handleSelectSeat = (personSeats, type, seat, position) => {
     const { index } = personSeats
+
     let peopleSeatsAux = peopleSeats.slice(0)
 
     if (type === 'departure') {

@@ -10,6 +10,7 @@ import { errorApi } from '../../config/handleErrors'
 function UserHome() {
   const [travels, setTravels] = useState([])
   const [message, setMessage] = useState('')
+  const [noTravels, setNoTravels] = useState(null)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -21,6 +22,11 @@ function UserHome() {
           }})
         if (res.status === 200) {
           setTravels(res.data)
+          if (!res.data.length) {
+            setNoTravels(<h1>No momento não temos viagens em aberto!</h1>)
+          }
+        } else {
+          setNoTravels(<h1>No momento não temos viagens em aberto!</h1>) 
         }
       } catch (error) {  
         const errorHandled = errorApi(error)
@@ -31,8 +37,6 @@ function UserHome() {
     }
     fetchData()
   }, [])
-
-  const noTravels = ''//<h1>No momento não temos viagens em aberto!</h1>
 
   return (
     <React.Fragment>
@@ -46,7 +50,7 @@ function UserHome() {
             {message}
           </div>
           
-          {!travels.length ? noTravels : ''}
+          {noTravels}
 
           <div className="row row-cols-1 row-cols-md-2 row-cols-xl-3 row-cols-xxl-4 g-3">
 

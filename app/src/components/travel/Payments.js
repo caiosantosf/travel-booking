@@ -110,7 +110,7 @@ function Payments(props) {
               </thead>
               <tbody>
                 {passengers.map(passenger => {
-                  const { id, person, datetime, status, value } = passenger
+                  const { id, person, datetime, status, total } = passenger
                   const { name, phone, type } = person
 
                   const statusToShow = translatePaymentStatus(status)
@@ -130,7 +130,7 @@ function Payments(props) {
                             {phone ? `(${passenger.person.phone.substr(0, 2)}) ${phone.substr(2, phoneLen === 10 ? 4: 5)}-${phone.substr(phoneLen === 10 ? 6: 7, 4)}` : ''}
                             {phone ? wpp : ''}
                           </td>
-                          <td>{`R$ ${value.replace('.', ',')}`}</td>
+                          <td>{`R$ ${total.replace('.', ',')}`}</td>
                           <td><strong className={statusToShow.color}>{statusToShow.translated}</strong></td>
                           <td>
                             <button className="btn btn-link p-0" onClick={() => {handleEditStatus(id, name)}}><PencilSquare /> </button>

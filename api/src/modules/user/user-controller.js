@@ -133,7 +133,8 @@ module.exports = {
   async put (req, res) {
     const { id } = req.params
     let data = req.body
-    const { password : reqPassword, newPassword } = data
+
+    const { password : reqPassword, newPassword, reset } = data
 
     try {
 
@@ -142,7 +143,7 @@ module.exports = {
       if (user.length) {
         const { password: dbPassword } = user[0]
 
-        if (await compareCrypt(reqPassword, dbPassword)) {
+        if (await compareCrypt(reqPassword, dbPassword) || reset) {
 
           if (newPassword) {
             data.password = await encrypt(data.newPassword)
@@ -151,6 +152,7 @@ module.exports = {
           }
 
           delete data.newPassword
+          delete data.reset
 
           const result = await db('users').where({ id }).update({ id, ...data })
 
@@ -174,9 +176,10 @@ module.exports = {
     const user = await db('users').where({ email })
     
     if (user.length) {
-      const { id } = user[0]
+      const { id, type } = user[0]
       const domain = process.env.APP_LOCATION
-      const link = `${domain}redefine-senha/${id}?token=${token(id)}`
+
+      const link = `${domain}redefine-senha/${id}?token=${token(id, type)}`
       const emailContent = `Acesse o link a seguir para cadastrar uma nova senha: <a href="${link}">Clique Aqui</a>`
 
       if (await sendMail(email, 'Recuperação de Senha', emailContent, '')) {

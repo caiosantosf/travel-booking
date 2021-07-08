@@ -37,12 +37,13 @@ function Payment(props) {
                        data.status === '3' ? '1' :
                        data.status === '4' ? '2' :
                        data.status === '5' ? '1' :
-                       data.status === '6' ? '2' : '1'
+                       data.status === '6' ? '2' : data.status
 
         data.status = status
 
         setPayment(data)
         setOriginalStatus(res.data.status)
+        console.log(res.data)
       } catch (error) {
         const errorHandled = errorApi(error)
         if (errorHandled.forbidden) {

@@ -137,7 +137,7 @@ const emailConfirmation = async (user_id) => {
 
 module.exports = {
   async getMany (req, res) {
-    const completeReservation = async (reservations) => {
+    const completeReservation = async (reservations, sumDependentValues) => {
       let res = reservations
       if (res.length) {
         for (const [i, reservation] of res.entries()) {
@@ -149,6 +149,15 @@ module.exports = {
 
           if (res[i].person.responsibleReturnSeat) {
             res[i].returnSeat = res[i].person.responsibleReturnSeat
+          }
+
+          if (sumDependentValues) {
+            const { user_id, datetime } = reservation
+            const total = await db('reservations')
+                          .where({ user_id, datetime })
+                          .groupBy('user_id', 'datetime', 'travel_id')
+                          .sum('value')
+            res[i].total = total[0].sum
           }
 
           if (res[i].status !== '1' && res[i].status !== '2' && !res[i].dependent_id) {
@@ -179,7 +188,7 @@ module.exports = {
       return res
     }
     
-    const { currentpage: currentPage, user_id, travel_id, datetime, email, active } = req.headers
+    const { currentpage: currentPage, user_id, travel_id, datetime, email, active, } = req.headers
     let reservations = {}
     let reservationsGrouped = {}
 
@@ -195,7 +204,7 @@ module.exports = {
                             .paginate({ perPage: 100, currentPage, isLengthAware: true })
   
       if (reservations.hasOwnProperty('data')) {
-        reservations.data = await completeReservation(reservations.data)
+        reservations.data = await completeReservation(reservations.data, true)
         reservations.data.sort((a, b) => (a.departureSeat > b.departureSeat) ? 1 : (a.departureSeat === b.departureSeat) ? ((a.dependent_id > b.dependent_id) ? 1 : -1) : -1 )
 
         return res.status(200).json(reservations)
@@ -220,7 +229,7 @@ module.exports = {
                                   .where({ user_id })
                                   .where({ datetime: reservation.datetime })
           
-            reservationsGrouped.data[i].reservations = await completeReservation(reservations)
+            reservationsGrouped.data[i].reservations = await completeReservation(reservations, false)
             reservationsGrouped.data[i].travel = await getTravel(reservation.travel_id, reservationsGrouped.data[i].reservations[0].departurePlace_id)
           }
 
