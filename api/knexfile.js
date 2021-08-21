@@ -10,7 +10,7 @@ module.exports = {
       database: process.env.DB_NAME_DEV,
       user: process.env.DB_USER_DEV,
       password: process.env.DB_PASSWORD_DEV,
-      ssl: { rejectUnauthorized: false }
+      //ssl: { rejectUnauthorized: false }
     },
     pool: {
       min: 2,
@@ -47,7 +47,7 @@ module.exports = {
       database: process.env.DB_NAME_STAGING,
       user: process.env.DB_USER_STAGING,
       password: process.env.DB_PASSWORD_STAGING,
-      ssl: { rejectUnauthorized: false }
+      //ssl: { rejectUnauthorized: false }
     },
     pool: {
       min: 2,
@@ -67,7 +67,7 @@ module.exports = {
       database: process.env.DB_NAME,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
-      ssl: { rejectUnauthorized: false }
+      //ssl: { rejectUnauthorized: false }
     },
     pool: {
       min: 2,
