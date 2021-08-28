@@ -1,4 +1,4 @@
-import React, { Suspense, Redirect } from 'react'
+import React, { Suspense } from 'react'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import { getUserType } from './config/security'
 
@@ -40,7 +40,7 @@ export default function Routes() {
           <Route path="/registro/"                         exact component={User} />
           <Route path="/usuarios/"                         exact render={props => (getUserType() === 'admin' ? <Users { ...props } /> : <Forbidden />)}/>
           <Route path="/usuarios/:id"                      exact component={User} />
-          <Route path="/inicio"                            exact render={props => (getUserType() === 'admin' ? <Admin   { ...props }/> : <UserHome { ...props } /> )} />
+          <Route path="/"                                  exact render={props => (getUserType() === 'admin' ? <Admin   { ...props }/> : <UserHome { ...props } /> )} />
           <Route path="/admin-inicial/"                    exact render={props => (getUserType() === 'admin' ? <Admin   { ...props }/> : <Forbidden />)}/>
           <Route path="/viagens/"                          exact render={props => (getUserType() === 'admin' ? <Travels { ...props }/> : <Forbidden />)}/>
           <Route path="/viagens/:id"                       exact render={props => (getUserType() === 'admin' ? <Travel  { ...props }/> : <Forbidden />)}/>
