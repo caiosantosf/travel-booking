@@ -9,7 +9,7 @@ function Sidebar() {
 
   if (!type) {
     links = [
-              { key: 3, name: 'Início', to: '/inicio' },
+              { key: 3, name: 'Início', to: '/' },
               { key: 1, name: 'Login', to: '/login' },
               { key: 2, name: 'Cadastrar', to: '/registro' }
             ]
