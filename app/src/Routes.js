@@ -2,29 +2,29 @@ import React from 'react'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import { getUserType } from './config/security'
 
-import Login              from './components/user/Login'
-import EmailResetPassword from './components/user/EmailResetPassword'
-import ResetPassword      from './components/user/ResetPassword'
-import UserHome           from './components/user/UserHome'
-import User               from './components/user/User'
-import Users              from './components/user/Users'
-import Admin              from './components/admin/AdminHome'
-import Buses              from './components/bus/Buses'
-import Bus                from './components/bus/Bus'
-import Travels            from './components/travel/Travels'
-import Travel             from './components/travel/Travel'
-import Value              from './components/travel/Value'
-import DeparturePlace     from './components/travel/DeparturePlace'
-import Passengers         from './components/travel/Passengers'
-import Passenger          from './components/travel/Passenger'
-import Payments           from './components/travel/Payments'
-import Payment            from './components/travel/Payment'
-import InactiveReservations from './components/travel/InactiveReservations'
-import Reservation        from './components/reservation/Reservation'
-import ReturnPayment      from './components/reservation/ReturnPayment'
-import UserReservations   from './components/reservation/UserReservations'
-import Forbidden          from './components/environment/Forbidden'
-import ToRegister         from './components/environment/ToRegister'
+const Login             = React.lazy(() => import('./components/user/Login'))
+const EmailResetPassword= React.lazy(() => import('./components/user/EmailResetPassword'))
+const ResetPassword     = React.lazy(() => import('./components/user/ResetPassword'))
+const UserHome          = React.lazy(() => import('./components/user/UserHome'))
+const User              = React.lazy(() => import('./components/user/User'))
+const Users             = React.lazy(() => import('./components/user/Users'))
+const Admin             = React.lazy(() => import('./components/admin/AdminHome'))
+const Buses             = React.lazy(() => import('./components/bus/Buses'))
+const Bus               = React.lazy(() => import('./components/bus/Bus'))
+const Travels           = React.lazy(() => import('./components/travel/Travels'))
+const Travel            = React.lazy(() => import('./components/travel/Travel'))
+const Value             = React.lazy(() => import('./components/travel/Value'))
+const DeparturePlace    = React.lazy(() => import('./components/travel/DeparturePlace'))
+const Passengers        = React.lazy(() => import('./components/travel/Passengers'))
+const Passenger         = React.lazy(() => import('./components/travel/Passenger'))
+const Payments          = React.lazy(() => import('./components/travel/Payments'))
+const Payment           = React.lazy(() => import('./components/travel/Payment'))
+const InactiveReservations= React.lazy(() => import('./components/travel/InactiveReservations'))
+const Reservation       = React.lazy(() => import('./components/reservation/Reservation'))
+const ReturnPayment     = React.lazy(() => import('./components/reservation/ReturnPayment'))
+const UserReservations  = React.lazy(() => import('./components/reservation/UserReservations'))
+const Forbidden         = React.lazy(() => import('./components/environment/Forbidden'))
+const ToRegister        = React.lazy(() => import('./components/environment/ToRegister'))
 
 export default function Routes() {
   return (
