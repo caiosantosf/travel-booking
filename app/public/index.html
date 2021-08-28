@@ -11,8 +11,22 @@
     />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <script src="%PUBLIC_URL%/pwa.dev.min.js"></script>
-    <script> if (navigator.serviceWorker) { navigator.serviceWorker.register ('%PUBLIC_URL%/sw.js') } </script>
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('serviceWorker.js').then(function(registration) {
+            // Registration was successful
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          }, function(err) {
+            // registration failed
+            console.log('ServiceWorker registration failed: ', err);
+          });
+        });
+      }
+    
+      </script>
+
     <title>Reserva de Viagem</title>
   </head>
   <body>
