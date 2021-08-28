@@ -1,4 +1,4 @@
-import { React, Suspense } from 'react'
+import React, { Suspense } from 'react'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import { getUserType } from './config/security'
 import Loader from "react-loader-spinner";
