@@ -5,7 +5,7 @@ import path from "path";
 import React from "react";
 import ReactDOMServer from "react-dom/server";
 
-import Routes from './Routes'
+import Routes from "../src/Routes"
 
 const PORT = 3301;
 
