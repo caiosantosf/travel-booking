@@ -15,10 +15,10 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-app.use(express.static(`${process.cwd()}\\public`))
+app.use(express.static(`${process.cwd()}/public`))
 
 app.get('/', function(req, res) {
-  res.status(200).json({ message: 'Travel Booking is flying!' });
+  res.status(200).json({ message: 'Travel Booking is flying!' })
 })
 
 app.use(userRoutes)
