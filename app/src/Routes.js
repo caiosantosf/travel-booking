@@ -2,13 +2,14 @@ import React from 'react'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import { getUserType } from './config/security'
 
-const Login             = React.lazy(() => import('./components/user/Login'))
+import Login              from './components/user/Login'
+import UserHome           from './components/user/UserHome'
+import Admin              from './components/admin/AdminHome'
+
 const EmailResetPassword= React.lazy(() => import('./components/user/EmailResetPassword'))
 const ResetPassword     = React.lazy(() => import('./components/user/ResetPassword'))
-const UserHome          = React.lazy(() => import('./components/user/UserHome'))
 const User              = React.lazy(() => import('./components/user/User'))
 const Users             = React.lazy(() => import('./components/user/Users'))
-const Admin             = React.lazy(() => import('./components/admin/AdminHome'))
 const Buses             = React.lazy(() => import('./components/bus/Buses'))
 const Bus               = React.lazy(() => import('./components/bus/Bus'))
 const Travels           = React.lazy(() => import('./components/travel/Travels'))
