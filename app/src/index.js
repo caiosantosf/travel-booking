@@ -6,6 +6,12 @@ import '@popperjs/core'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.esm.min.js'
 
+caches.keys().then((names) => {
+  names.forEach((name) => {
+    caches.delete(name);
+  });
+});
+
 ReactDOM.render(
   <React.StrictMode>
     <Routes />
