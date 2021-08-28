@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react'
-import { BrowserRouter, Route, Switch } from 'react-router-dom'
+import { BrowserRouter, Route, Switch, HashRouter  } from 'react-router-dom'
 import { getUserType } from './config/security'
 
 const Login              = React.lazy(() => import('./components/user/Login'))
@@ -28,7 +28,7 @@ const ToRegister        = React.lazy(() => import('./components/environment/ToRe
 
 export default function Routes() {
   return (
-    <BrowserRouter>
+    <HashRouter >
       <Suspense fallback={null}>
         <Switch>
           <Route path="/acesso-negado"                     exact component={Forbidden} />
@@ -59,6 +59,6 @@ export default function Routes() {
           <Route path="/reserva/:travel_id/:random"        exact render={props => (getUserType() ? <Reservation { ...props }/> : <ToRegister { ...props }/>)}/>
         </Switch>
       </Suspense>
-    </BrowserRouter>
+    </HashRouter >
   )
 }

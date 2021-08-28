@@ -12,6 +12,8 @@ caches.keys().then((names) => {
   });
 });
 
+console.log('oi')
+
 ReactDOM.render(
   <React.StrictMode>
     <Routes />
