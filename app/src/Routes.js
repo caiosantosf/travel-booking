@@ -30,15 +30,7 @@ const ToRegister        = React.lazy(() => import('./components/environment/ToRe
 export default function Routes() {
   return (
     <BrowserRouter>
-      <Suspense fallback={
-        <Loader
-          type="Oval"
-          color="#000000"
-          height={100}
-          width={100}
-          timeout={3000}
-        />
-      }>
+      <Suspense fallback={null}>
         <Switch>
           <Route path="/acesso-negado"                     exact component={Forbidden} />
           <Route path="/login"                             exact component={Login} />
