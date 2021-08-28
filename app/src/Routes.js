@@ -1,11 +1,11 @@
 import React, { Suspense } from 'react'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import { getUserType } from './config/security'
-import Loader from "react-loader-spinner";
+
+import Admin              from './components/admin/AdminHome'
+import UserHome           from './components/user/UserHome'
 
 const Login              = React.lazy(() => import('./components/user/Login'))
-const UserHome           = React.lazy(() => import('./components/user/UserHome'))
-const Admin              = React.lazy(() => import('./components/admin/AdminHome'))
 const EmailResetPassword= React.lazy(() => import('./components/user/EmailResetPassword'))
 const ResetPassword     = React.lazy(() => import('./components/user/ResetPassword'))
 const User              = React.lazy(() => import('./components/user/User'))
