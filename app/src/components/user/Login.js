@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useHistory } from "react-router-dom"
 import { api } from '../../config/api'
-import logo from '../../assets/logo.png'
+import logo from '../../assets/logo.webp'
 import { getUserType } from '../../config/security'
 import { errorApi } from '../../config/handleErrors'
 

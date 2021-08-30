@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react'
-import { BrowserRouter, Route, Switch, HashRouter  } from 'react-router-dom'
+import { Route, Switch, HashRouter  } from 'react-router-dom'
 import { getUserType } from './config/security'
 
 const Login              = React.lazy(() => import('./components/user/Login'))
