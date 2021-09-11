@@ -5,7 +5,7 @@
     "static/css/1.274a2bd7.chunk.css": "https://reservas.ldviagens.com/static/css/1.274a2bd7.chunk.css",
     "static/js/1.fbe1c6cc.chunk.js": "https://reservas.ldviagens.com/static/js/1.fbe1c6cc.chunk.js",
     "static/js/1.fbe1c6cc.chunk.js.map": "https://reservas.ldviagens.com/static/js/1.fbe1c6cc.chunk.js.map",
-    "main.css": "https://reservas.ldviagens.com/static/css/main.3b0f0670.chunk.css",
+    "main.css": "https://reservas.ldviagens.com/static/css/main.ccd760b8.chunk.css",
     "main.js": "https://reservas.ldviagens.com/static/js/main.70dae2d7.chunk.js",
     "main.js.map": "https://reservas.ldviagens.com/static/js/main.70dae2d7.chunk.js.map",
     "runtime-main.js": "https://reservas.ldviagens.com/static/js/runtime-main.7275a0ea.js",
@@ -64,7 +64,7 @@
     "index.html": "https://reservas.ldviagens.com/index.html",
     "static/css/1.274a2bd7.chunk.css.map": "https://reservas.ldviagens.com/static/css/1.274a2bd7.chunk.css.map",
     "static/css/5.818011ed.chunk.css.map": "https://reservas.ldviagens.com/static/css/5.818011ed.chunk.css.map",
-    "static/css/main.3b0f0670.chunk.css.map": "https://reservas.ldviagens.com/static/css/main.3b0f0670.chunk.css.map",
+    "static/css/main.ccd760b8.chunk.css.map": "https://reservas.ldviagens.com/static/css/main.ccd760b8.chunk.css.map",
     "static/js/4.ae4c2bf6.chunk.js.LICENSE.txt": "https://reservas.ldviagens.com/static/js/4.ae4c2bf6.chunk.js.LICENSE.txt",
     "static/js/5.d4cb9ad4.chunk.js.LICENSE.txt": "https://reservas.ldviagens.com/static/js/5.d4cb9ad4.chunk.js.LICENSE.txt",
     "static/media/logo.webp": "https://reservas.ldviagens.com/static/media/logo.dfc06e0c.webp"
@@ -73,7 +73,7 @@
     "static/js/runtime-main.7275a0ea.js",
     "static/css/5.818011ed.chunk.css",
     "static/js/5.d4cb9ad4.chunk.js",
-    "static/css/main.3b0f0670.chunk.css",
+    "static/css/main.ccd760b8.chunk.css",
     "static/js/main.70dae2d7.chunk.js"
   ]
 }
