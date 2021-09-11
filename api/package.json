@@ -5,8 +5,8 @@
   "main": "server.js",
   "scripts": {
     "production": "cross-env NODE_ENV=production    knex migrate:latest && cross-env NODE_ENV=production    node src/server.js",
-    "staging":    "cross-env NODE_ENV=staging knex migrate:latest && cross-env NODE_ENV=staging node src/server.js",
-    "dev":        "cross-env NODE_ENV=dev     knex migrate:latest && cross-env NODE_ENV=dev     node src/server.js"
+    "staging": "cross-env NODE_ENV=staging knex migrate:latest && cross-env NODE_ENV=staging node src/server.js",
+    "dev": "cross-env NODE_ENV=dev     knex migrate:latest && cross-env NODE_ENV=dev     node src/server.js"
   },
   "engines": {
     "node": "12.x"
