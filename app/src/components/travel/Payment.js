@@ -16,7 +16,7 @@ function Payment(props) {
   let history = useHistory()
 
   const { id } = props.match.params
-  const { name } = props.location.state
+  const name = sessionStorage.name;
 
   const config = { headers :{
     'x-access-token' : localStorage.getItem('token')
@@ -43,7 +43,6 @@ function Payment(props) {
 
         setPayment(data)
         setOriginalStatus(res.data.status)
-        console.log(res.data)
       } catch (error) {
         const errorHandled = errorApi(error)
         if (errorHandled.forbidden) {

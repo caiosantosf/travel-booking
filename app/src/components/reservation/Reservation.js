@@ -131,6 +131,7 @@ function Reservation(props) {
   useEffect(() => {
     const fetchData = async () => {
       try {
+
         const res = await api.get(`/users/${getUserId()}`, 
           { headers :{
             'x-access-token' : localStorage.getItem('token')

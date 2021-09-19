@@ -113,7 +113,7 @@ function InactiveReservations(props) {
                       <Whatsapp style={{color:'green'}} />
                     </a>
                     
-                    if (person.id !== adminData.user_id && type) {
+                    if (type) {
                       return (
                         <tr key={id}>
                           <td>{name}</td>
