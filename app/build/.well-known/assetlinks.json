@@ -1,23 +1,6 @@
-[
-  {
-    "relation": [
-      "delegate_permission/common.handle_all_urls"
-    ],
-    "target": {
-      "namespace": "web",
-      "site": "https://www.google.com"
-    }
-  },
-  {
-    "relation": [
-      "delegate_permission/common.handle_all_urls"
-    ],
-    "target": {
-      "namespace": "android_app",
-      "package_name": "com.ldviagens.reservas",
-      "sha256_cert_fingerprints": [
-        "10:39:38:EE:45:37:E5:9E:8E:E7:92:F6:54:50:4F:B8:34:6F:C6:B3:46:D0:BB:C4:41:5F:C3:39:FC:FC:8E:C1"
-      ]
-    }
-  }
+[{
+        "relation": ["delegate_permission/common.handle_all_urls"],
+        "target" : { "namespace": "android_app", "package_name": "com.ldviagens.reservas.twa",
+                     "sha256_cert_fingerprints": ["26:B5:02:64:35:FF:64:26:89:B4:86:07:08:18:45:65:9A:69:47:CD:AD:55:39:71:A3:A1:57:F3:F3:07:6A:FB"] }
+      }
 ]

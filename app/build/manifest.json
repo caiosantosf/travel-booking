@@ -23,5 +23,6 @@
   "start_url": "/",
   "display": "standalone",
   "theme_color": "#434596",
-  "background_color": "#ffffff"
+  "background_color": "#ffffff",
+  "scope": "https://reservas.ldviagens.com/"
 }
