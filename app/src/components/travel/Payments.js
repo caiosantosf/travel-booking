@@ -63,8 +63,7 @@ function Payments(props) {
   }, [currentPage, travel_id, history])
 
   const handleEditStatus = async (id, name) => {
-    sessionStorage.setItem('name', name)
-    history.push(`/viagens/${travel_id}/pagamentos/${id}`)
+    history.push(`/viagens/${travel_id}/pagamentos/${id}`, {name})
   }
 
   const handleFirst = async () => {
@@ -122,7 +121,7 @@ function Payments(props) {
                       <Whatsapp style={{color:'green'}} />
                     </a>
                     
-                    if (type) {
+                    if (person.id !== adminData.user_id && type) {
                       return (
                         <tr key={id}>
                           <td>{name}</td>

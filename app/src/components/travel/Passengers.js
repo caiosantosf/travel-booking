@@ -18,16 +18,14 @@ function Passengers(props) {
   const [adminData, setAdminData] = useState({})
 
   const { travel_id } = props.match.params
-  
+  const { travel: trv, departurePlaces: dp } = props.location.state  
+
   let history = useHistory()
 
   useEffect(() => {
-    const trv = JSON.parse(sessionStorage.travel);
-    const dp = JSON.parse(sessionStorage.departurePlaces);
-
     setTravel(trv)
     setDeparturePlaces(dp)
-  }, [])
+  }, [trv, dp])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -133,6 +131,7 @@ function Passengers(props) {
                   <th scope="col">Colo</th>
                   <th scope="col">Responsável</th>
                   <th scope="col">Telefone</th>
+                  <th scope="col"></th>
                 </tr>
               </thead>
               <tbody>
@@ -158,6 +157,7 @@ function Passengers(props) {
                           {phone ? `(${passenger.person.phone.substr(0, 2)}) ${phone.substr(2, phoneLen === 10 ? 4: 5)}-${phone.substr(phoneLen === 10 ? 6: 7, 4)}` : ''}
                           {phone ? wpp : ''}
                         </td>
+                        <td>{user_id === adminData.user_id ? <button className="btn btn-link p-0" onClick={() => {handleDestroy(id)}}><Trash /> </button> : ''}</td>
                       </tr>
                     )
                   } else {

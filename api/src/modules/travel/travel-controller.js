@@ -2,13 +2,9 @@ const db = require('../../database/connection')
 
 const dbErrors = error => {
   let message = { message : 'Ocorreu um erro não identificado', error}
-  
   if (error.hasOwnProperty('constraint')) {
     if (error.constraint === 'travels_bus_id_foreign') {
       message = { bus_id : 'O ônibus não existe!' }
-    }
-    if (error.constraint === 'reservations_departureplace_id_foreign') {
-      message = { message: 'Existem reservas para esta viagem, exclua elas primeiro e depois a viagem!'}
     }
   }
   return message
@@ -213,16 +209,10 @@ module.exports = {
   async destroy (req, res) {
     const { id } = req.params
     
-    const result = null
+    await db('travelValues').where({ travel_id: id }).del()
+    await db('travelDeparturePlaces').where({ travel_id: id }).del()
 
-    try {
-      await db('travelValues').where({ travel_id: id }).del()
-      await db('travelDeparturePlaces').where({ travel_id: id }).del()
-      result = await db('travels').where({ id }).del()
-    } catch (error) {
-      const message = dbErrors(error)
-      return res.status(400).json(message)
-    }
+    const result = await db('travels').where({ id }).del()
 
     if (result) {
       return res.status(200).json({ message: 'Viagem excluída com sucesso'})

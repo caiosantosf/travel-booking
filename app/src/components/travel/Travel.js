@@ -127,12 +127,6 @@ function Travel(props) {
       const errorHandled = errorApi(error)
       if (errorHandled.general) {
         setMessage(errorHandled.error)
-
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth"
-        });
-
       } else {
         setError(errorHandled.error)
       }
@@ -149,18 +143,12 @@ function Travel(props) {
       const errorHandled = errorApi(error)
       if (errorHandled.general) {
         setMessage(errorHandled.error)
-
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth"
-        });
-
       } else {
         setError(errorHandled.error)
       }
     }
 
-    setLoadingDestroy(false)
+    setLoadingSave(false)
   }
 
   const handleAddValues = async () => {
@@ -419,11 +407,7 @@ function Travel(props) {
             <button type="button" 
                     style={travel_id !== 'novo' ? { display: 'inline-block'} : { display : 'none' }}
                     className="btn btn-primary"
-                    onClick={() => {
-                      sessionStorage.setItem('travel', JSON.stringify(travel))
-                      sessionStorage.setItem('departurePlaces', JSON.stringify(departurePlaces))
-                      history.push(`/viagens/${travel_id}/reservas`)
-                    }}>
+                    onClick={() => history.push(`/viagens/${travel_id}/reservas`, {travel, departurePlaces})}>
               Lista de Passageiros
             </button>
 
